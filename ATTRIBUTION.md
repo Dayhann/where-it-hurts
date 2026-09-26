@@ -27,6 +27,12 @@ This prototype is **not clinical guidance**.
 | @supabase/supabase-js             | MIT        | Optional Postgres store client         |
 | nanoid                            | MIT        | IDs                                    |
 
+## Copied UI components
+
+| Component                      | Licence                                      | Source and notes                                                                                                                                                                                                     |
+| ------------------------------ | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Hook Sidebar, Animated Counter | MIT + Commons Clause + Attribution (Rare UI) | [Rare UI](https://rareui.com) by Swami Malode ([swamimalode07/rare-ui](https://github.com/swamimalode07/rare-ui)). Copied into `src/components/ui/`, notice kept in each file. Visible credit link on the home page. |
+
 ## Tooling
 
 | Package                                                   | Licence    | Role                  |

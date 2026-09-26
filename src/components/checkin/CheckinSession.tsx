@@ -8,7 +8,7 @@ import BodyViewer, {
 import { ChatComposer } from '@/components/chat/ChatComposer';
 import { ChatThread } from '@/components/chat/ChatThread';
 import { replyChips } from '@/components/chat/chips';
-import { progressLabel } from '@/components/chat/progress';
+import { QuestionProgress } from '@/components/chat/QuestionProgress';
 import { chatHasStarted, turnFromSession } from '@/components/chat/resume-turn';
 import { patientCopy } from '@/components/i18n/patient';
 import { PatientRecap } from '@/components/recap/PatientRecap';
@@ -188,7 +188,7 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
           </h1>
           {questionTurn && (
             <p className="text-lg text-muted-foreground">
-              {progressLabel(questionTurn.progress, lang)}
+              <QuestionProgress progress={questionTurn.progress} lang={lang} />
             </p>
           )}
           {session?.carerMode && (

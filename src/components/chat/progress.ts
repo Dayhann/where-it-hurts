@@ -1,16 +1,20 @@
 import { patientCopy } from '@/components/i18n/patient';
 import type { Lang } from '@/contracts/types';
 
-export function progressLabel(
-  progress?: {
-    asked: number;
-    estimatedTotal: number;
-  },
-  lang: Lang = 'en',
-): string {
-  const copy = patientCopy(lang).chat;
+type Progress = {
+  asked: number;
+  estimatedTotal: number;
+};
+
+export function progressCount(progress?: Progress) {
   const asked = progress?.asked ?? 0;
   const total = Math.max(progress?.estimatedTotal ?? 7, 1);
-  if (asked <= 0) return copy.progressFallback;
-  return copy.progress(asked, total);
+  return asked > 0 ? { asked, total } : null;
+}
+
+export function progressLabel(progress?: Progress, lang: Lang = 'en'): string {
+  const copy = patientCopy(lang).chat;
+  const count = progressCount(progress);
+  if (!count) return copy.progressFallback;
+  return copy.progress(count.asked, count.total);
 }
