@@ -15,6 +15,5 @@ public/models
 src/components/interior/*.tsx
 src/components/ui/hook-sidebar.tsx
 src/components/ui/fluid-orb.tsx
-src/components/ui/gravity-letters.tsx
 src/components/ui/matrix-orb.tsx
 src/components/ui/grid-reveal.tsx

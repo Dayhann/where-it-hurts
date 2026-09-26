@@ -120,7 +120,6 @@ const COPY = {
       confirm: 'Looks right, send to my doctor',
       sentShort: 'Sent',
       retry: 'Try again',
-      tapHint: 'Tap the box to drop more letters',
       back: 'Back to start',
     },
     redFlag: {
@@ -248,7 +247,6 @@ const COPY = {
       confirm: 'الإجابات صحيحة، أرسلها إلى طبيبي',
       sentShort: 'تم الإرسال',
       retry: 'حاول مرة أخرى',
-      tapHint: 'اضغط على المربع لإسقاط المزيد من الحروف',
       back: 'العودة إلى البداية',
     },
     redFlag: {

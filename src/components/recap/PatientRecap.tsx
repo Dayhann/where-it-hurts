@@ -9,8 +9,6 @@ import type { Lang, PatientRecapLine } from '@/contracts/types';
 import { getApiClient } from '@/lib/api-client';
 import { cn } from '@/lib/utils';
 import { recapEdits } from './recap';
-import { ThanksLetters } from './ThanksLetters';
-
 const SHOW_SENT_MS = 700;
 
 export function PatientRecap({
@@ -79,7 +77,6 @@ export function PatientRecap({
           </h1>
           <p>{copy.sent}</p>
         </div>
-        <ThanksLetters word={copy.thanks} hint={copy.tapHint} />
         <Link
           href="/"
           className={cn(buttonVariants({ size: 'touch' }), 'text-lg')}
