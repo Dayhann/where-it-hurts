@@ -49,7 +49,7 @@ function SummaryQuoteLine({
         )}
       </button>
       {open && (
-        <div className="mt-1 rounded-lg border border-border bg-popover p-3 shadow-lg">
+        <div className="enter-fade mt-1 origin-top rounded-lg border border-border bg-popover p-3 shadow-lg">
           <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
             Patient&apos;s words
           </p>
@@ -149,13 +149,13 @@ export function DoctorPanel({
         type="button"
         aria-label="Close patient summary"
         onClick={onClose}
-        className="fixed inset-0 z-30 cursor-default bg-foreground/20"
+        className="scrim-in fixed inset-0 z-30 cursor-default bg-foreground/20"
       />
       <aside
         role="dialog"
         aria-modal="true"
         aria-labelledby="summary-panel-title"
-        className="fixed inset-y-0 right-0 z-40 flex w-full max-w-[420px] animate-in flex-col border-l border-border bg-background shadow-2xl duration-300 slide-in-from-right"
+        className="drawer-in fixed inset-y-0 right-0 z-40 flex w-full max-w-[420px] flex-col border-l border-border bg-background shadow-2xl"
       >
         <header className="flex items-center justify-between border-b border-border p-4">
           <div>

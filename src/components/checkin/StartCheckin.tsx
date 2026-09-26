@@ -41,7 +41,7 @@ export function StartCheckin() {
         <p className="text-sm font-medium tracking-wide text-primary uppercase">
           {copy.home.badge}
         </p>
-        <h1 className="text-3xl font-semibold tracking-tight">
+        <h1 className="display-title text-3xl font-semibold tracking-tight">
           {copy.home.title}
         </h1>
         <p>{copy.home.description}</p>

@@ -183,7 +183,7 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
           <p className="text-lg text-muted-foreground">
             {copy.checkin.label} {sessionId}
           </p>
-          <h1 className="text-2xl font-semibold tracking-tight">
+          <h1 className="display-title text-2xl font-semibold tracking-tight">
             {copy.checkin.questions}
           </h1>
           {questionTurn && (
@@ -202,7 +202,7 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
           <p className="text-lg text-muted-foreground">
             {copy.checkin.label} {sessionId}
           </p>
-          <h1 className="text-2xl font-semibold tracking-tight">
+          <h1 className="display-title text-2xl font-semibold tracking-tight">
             {session?.carerMode
               ? copy.checkin.bodyTitleCarer
               : copy.checkin.bodyTitle}
