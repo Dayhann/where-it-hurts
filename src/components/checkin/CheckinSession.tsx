@@ -8,6 +8,7 @@ import { ChatThread } from '@/components/chat/ChatThread';
 import { replyChips } from '@/components/chat/chips';
 import { progressLabel } from '@/components/chat/progress';
 import { chatHasStarted, turnFromSession } from '@/components/chat/resume-turn';
+import { PatientRecap } from '@/components/recap/PatientRecap';
 import { RedFlagStop } from '@/components/red-flag/RedFlagStop';
 import { buttonVariants } from '@/components/ui/button';
 import type {
@@ -118,6 +119,15 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
     return <RedFlagStop />;
   }
 
+  if (turn?.type === 'done' && session) {
+    return (
+      <PatientRecap
+        sessionId={sessionId}
+        alreadyConfirmed={session.status === 'confirmed'}
+      />
+    );
+  }
+
   const messages: Message[] = session?.messages ?? [];
   const questionTurn = turn?.type === 'question' ? turn : undefined;
   const showChat = chatStarted;
@@ -190,21 +200,14 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
       {showChat && (
         <>
           <ChatThread messages={messages} typing={sending} />
-          {turn?.type === 'done' ? (
-            <p>
-              You have answered the questions. A recap of what you said comes
-              next.
-            </p>
-          ) : (
-            questionTurn && (
-              <ChatComposer
-                chips={replyChips(questionTurn.question)}
-                question={questionTurn.question}
-                lang={lang}
-                disabled={sending}
-                onSend={send}
-              />
-            )
+          {questionTurn && (
+            <ChatComposer
+              chips={replyChips(questionTurn.question)}
+              question={questionTurn.question}
+              lang={lang}
+              disabled={sending}
+              onSend={send}
+            />
           )}
           {sendError && (
             <p className="text-lg text-destructive" role="alert">
