@@ -1,6 +1,6 @@
 'use client';
 
-import { OrbitControls, useGLTF } from '@react-three/drei';
+import { Line, OrbitControls, useGLTF } from '@react-three/drei';
 import { Canvas, useFrame, type ThreeEvent } from '@react-three/fiber';
 import { X } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
@@ -18,7 +18,14 @@ import { REGION_BY_ID, REGIONS } from '@/contracts/regions';
 import type { BodyMark } from '@/contracts/types';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { removeMark, setIntensity, toggleRegion, type MarkKind } from './marks';
+import {
+  nearestPain,
+  regionIdFromHit,
+  removeMark,
+  setIntensity,
+  toggleRegion,
+  type MarkKind,
+} from './marks';
 
 const MODEL_URL = '/models/body.glb';
 const HEIGHT = 0.88;
@@ -72,7 +79,7 @@ function BodyModel({
   hovered: string | null;
   debug: boolean;
   onHover: (regionId: string | null) => void;
-  onTap: (regionId: string, point: BodyMark['point']) => void;
+  onTap: (regionId: string | null, point: BodyMark['point']) => void;
 }) {
   const { scene } = useGLTF(MODEL_URL);
 
@@ -117,7 +124,7 @@ function BodyModel({
   }, [materials, marks, hovered, debug]);
 
   const regionOf = (e: ThreeEvent<PointerEvent | MouseEvent>) =>
-    REGION_BY_ID[e.object.name] ? e.object.name : null;
+    regionIdFromHit(e.object.name, e.point.toArray() as BodyMark['point']);
 
   return (
     <primitive
@@ -125,8 +132,7 @@ function BodyModel({
       onClick={(e: ThreeEvent<MouseEvent>) => {
         e.stopPropagation();
         if (e.delta > TAP_MAX_DRAG_PX) return;
-        const regionId = regionOf(e);
-        if (regionId) onTap(regionId, e.point.toArray());
+        onTap(regionOf(e), e.point.toArray() as BodyMark['point']);
       }}
       onPointerMove={(e: ThreeEvent<PointerEvent>) => {
         e.stopPropagation();
@@ -159,6 +165,37 @@ function PresetRig({
   return null;
 }
 
+function MarkVisuals({ marks }: { marks: BodyMark[] }) {
+  return (
+    <>
+      {marks.map((mark) => (
+        <mesh key={mark.id} position={mark.point} raycast={() => {}}>
+          <sphereGeometry args={[0.018, 16, 16]} />
+          <meshStandardMaterial color={COLORS[mark.kind]} roughness={0.4} />
+        </mesh>
+      ))}
+      {marks
+        .filter((mark) => mark.kind === 'spread')
+        .map((spread) => {
+          const pain = nearestPain(marks, spread.point);
+          if (!pain) return null;
+          return (
+            <Line
+              key={`spread-${spread.id}`}
+              points={[pain.point, spread.point]}
+              color={COLORS.spread}
+              dashed
+              dashSize={0.03}
+              gapSize={0.02}
+              lineWidth={2}
+              raycast={() => {}}
+            />
+          );
+        })}
+    </>
+  );
+}
+
 type BodyViewerProps = {
   marks: BodyMark[];
   onChange: (marks: BodyMark[]) => void;
@@ -172,16 +209,36 @@ export default function BodyViewer({ marks, onChange }: BodyViewerProps) {
   const [kind, setKind] = useState<MarkKind>('pain');
   const [hovered, setHovered] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const debug = useSearchParams().get('regions') === '1';
+  const [past, setPast] = useState<BodyMark[][]>([]);
+  const params = useSearchParams();
+  const debug = params.get('regions') === '1';
+  const calibrate = params.get('calibrate') === '1';
 
   const selected = marks.find((m) => m.id === selectedId) ?? null;
   const hoveredLabel = hovered ? REGION_BY_ID[hovered]?.label.en : null;
 
-  const handleTap = (regionId: string, point: BodyMark['point']) => {
+  const commit = (next: BodyMark[]) => {
+    setPast((prev) => [...prev, marks]);
+    onChange(next);
+  };
+
+  const undo = () => {
+    const previous = past.at(-1);
+    if (!previous) return;
+    setPast((prev) => prev.slice(0, -1));
+    setSelectedId(null);
+    onChange(previous);
+  };
+
+  const handleTap = (regionId: string | null, point: BodyMark['point']) => {
+    if (calibrate) {
+      console.log({ point });
+    }
+    if (!regionId) return;
     const next = toggleRegion(marks, regionId, point, kind);
     const mark = next.find((m) => m.regionId === regionId);
     setSelectedId(mark?.id ?? null);
-    onChange(next);
+    commit(next);
   };
 
   return (
@@ -239,6 +296,7 @@ export default function BodyViewer({ marks, onChange }: BodyViewerProps) {
                 onHover={setHovered}
                 onTap={handleTap}
               />
+              <MarkVisuals marks={marks} />
             </Suspense>
             <PresetRig
               azimuth={PRESETS[preset].azimuth}
@@ -272,6 +330,11 @@ export default function BodyViewer({ marks, onChange }: BodyViewerProps) {
             {hoveredLabel}
           </p>
         )}
+        {calibrate && (
+          <p className="absolute right-2 bottom-2 rounded-md bg-background/90 px-2 py-1 text-base shadow-sm">
+            Calibration on — taps log the point to the console.
+          </p>
+        )}
       </div>
 
       <div className="grid w-full grid-cols-2 gap-2">
@@ -294,6 +357,28 @@ export default function BodyViewer({ marks, onChange }: BodyViewerProps) {
             {PRESETS[key].label}
           </button>
         ))}
+      </div>
+
+      <div className="grid grid-cols-2 gap-2">
+        <button
+          type="button"
+          onClick={undo}
+          disabled={past.length === 0}
+          className={cn(buttonVariants({ variant: 'outline', size: 'touch' }))}
+        >
+          Undo last change
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setSelectedId(null);
+            commit([]);
+          }}
+          disabled={marks.length === 0}
+          className={cn(buttonVariants({ variant: 'outline', size: 'touch' }))}
+        >
+          Clear all marks
+        </button>
       </div>
 
       <section aria-label="Places you marked" className="flex flex-col gap-3">
@@ -338,7 +423,7 @@ export default function BodyViewer({ marks, onChange }: BodyViewerProps) {
                     type="button"
                     onClick={() => {
                       if (isSelected) setSelectedId(null);
-                      onChange(removeMark(marks, m.id));
+                      commit(removeMark(marks, m.id));
                     }}
                     aria-label={`Remove ${label}`}
                     className="flex size-11 items-center justify-center text-muted-foreground outline-none hover:text-foreground focus-visible:bg-muted"
@@ -370,9 +455,7 @@ export default function BodyViewer({ marks, onChange }: BodyViewerProps) {
               step={1}
               value={selected.intensity ?? 5}
               onChange={(e) =>
-                onChange(
-                  setIntensity(marks, selected.id, Number(e.target.value)),
-                )
+                commit(setIntensity(marks, selected.id, Number(e.target.value)))
               }
               className="h-11 w-full accent-primary"
             />

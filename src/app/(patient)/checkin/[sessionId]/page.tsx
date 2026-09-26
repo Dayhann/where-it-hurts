@@ -1,11 +1,77 @@
 'use client';
 
 import Link from 'next/link';
-import { use, useState } from 'react';
+import { Suspense, use, useEffect, useRef, useState } from 'react';
 import BodyViewer from '@/components/body-map/BodyViewer';
 import { buttonVariants } from '@/components/ui/button';
 import type { BodyMark } from '@/contracts/types';
+import { getApiClient } from '@/lib/api-client';
 import { cn } from '@/lib/utils';
+
+function CheckinBody({ sessionId }: { sessionId: string }) {
+  const [marks, setMarks] = useState<BodyMark[]>([]);
+  const [ready, setReady] = useState(false);
+  const [saveState, setSaveState] = useState<
+    'idle' | 'saving' | 'saved' | 'local'
+  >('idle');
+  const canPersist = useRef(false);
+  const skipNextSave = useRef(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    getApiClient()
+      .getSession(sessionId)
+      .then(({ session }) => {
+        if (cancelled) return;
+        setMarks(session.marks);
+        canPersist.current = true;
+        setSaveState('saved');
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setSaveState('local');
+      })
+      .finally(() => {
+        if (!cancelled) setReady(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [sessionId]);
+
+  useEffect(() => {
+    if (!ready) return;
+    if (skipNextSave.current) {
+      skipNextSave.current = false;
+      return;
+    }
+    if (!canPersist.current) return;
+    setSaveState('saving');
+    const timer = window.setTimeout(() => {
+      getApiClient()
+        .putMarks(sessionId, { marks })
+        .then(() => setSaveState('saved'))
+        .catch(() => setSaveState('local'));
+    }, 400);
+    return () => window.clearTimeout(timer);
+  }, [marks, sessionId, ready]);
+
+  if (!ready) {
+    return <p className="text-muted-foreground">Loading your check-in…</p>;
+  }
+
+  return (
+    <>
+      <BodyViewer marks={marks} onChange={setMarks} />
+      <p className="text-base text-muted-foreground" aria-live="polite">
+        {saveState === 'saving' && 'Saving your marks…'}
+        {saveState === 'saved' && 'Marks saved for this check-in.'}
+        {saveState === 'local' &&
+          'Marks stay on this screen for now. They will save when the check-in link is ready.'}
+      </p>
+    </>
+  );
+}
 
 export default function CheckinPage({
   params,
@@ -13,7 +79,6 @@ export default function CheckinPage({
   params: Promise<{ sessionId: string }>;
 }) {
   const { sessionId } = use(params);
-  const [marks, setMarks] = useState<BodyMark[]>([]);
 
   return (
     <main className="flex flex-1 flex-col gap-5">
@@ -28,7 +93,13 @@ export default function CheckinPage({
           it spreads&quot; and tap those parts too.
         </p>
       </div>
-      <BodyViewer marks={marks} onChange={setMarks} />
+      <Suspense
+        fallback={
+          <p className="text-muted-foreground">Loading the body map…</p>
+        }
+      >
+        <CheckinBody key={sessionId} sessionId={sessionId} />
+      </Suspense>
       <Link
         href="/"
         className={cn(buttonVariants({ variant: 'outline', size: 'touch' }))}

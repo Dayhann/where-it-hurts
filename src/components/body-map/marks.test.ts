@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import type { BodyMark } from '@/contracts/types';
-import { removeMark, setIntensity, toggleRegion } from './marks';
+import {
+  nearestAnchor,
+  nearestPain,
+  regionIdFromHit,
+  removeMark,
+  setIntensity,
+  toggleRegion,
+} from './marks';
 
 const now = new Date('2026-09-26T07:00:00.000Z');
 const point: BodyMark['point'] = [0.1, 1.0, -0.1];
@@ -48,6 +55,44 @@ describe('setIntensity', () => {
   it('clamps to 0-10', () => {
     expect(setIntensity([mark], mark.id, 14)[0].intensity).toBe(10);
     expect(setIntensity([mark], mark.id, -3)[0].intensity).toBe(0);
+  });
+});
+
+describe('region lookup', () => {
+  it('uses the mesh name when it is a contract region', () => {
+    expect(regionIdFromHit('knee_left', point)).toBe('knee_left');
+  });
+
+  it('returns null for unknown meshes while anchors are still empty', () => {
+    expect(regionIdFromHit('head', point)).toBeNull();
+    expect(nearestAnchor(point)).toBeNull();
+  });
+});
+
+describe('nearestPain', () => {
+  it('returns the closest pain mark and ignores spread marks', () => {
+    const painA = toggleRegion(
+      [],
+      'lower_back_left',
+      [0, 1, 0],
+      'pain',
+      now,
+    )[0];
+    const withSpread = toggleRegion(
+      [painA],
+      'thigh_back_left',
+      [0, 0, 0],
+      'spread',
+      now,
+    );
+    const withFarPain = toggleRegion(
+      withSpread,
+      'shoulder_right',
+      [2, 2, 2],
+      'pain',
+      now,
+    );
+    expect(nearestPain(withFarPain, [0.1, 0.9, 0])?.id).toBe(painA.id);
   });
 });
 

@@ -3,7 +3,7 @@ import { PageShell } from '@/components/layout/PageShell';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
-const DEMO_SESSION_ID = 'demo';
+const DEMO_SESSION_ID = 'mock-in-progress';
 
 export default function Home() {
   return (
