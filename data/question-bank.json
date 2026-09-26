@@ -1,0 +1,131 @@
+[
+  {
+    "id": "Q_OPEN",
+    "slot": "site",
+    "kind": "open",
+    "text": {
+      "en": "What's the issue? Tell us in your own words.",
+      "ar": "ما المشكلة؟ أخبرنا بكلماتك."
+    }
+  },
+  {
+    "id": "Q_ONSET",
+    "slot": "onset",
+    "kind": "single",
+    "text": { "en": "When did it start?", "ar": "متى بدأت المشكلة؟" },
+    "options": [
+      { "id": "today", "label": { "en": "Today", "ar": "اليوم" } },
+      {
+        "id": "days",
+        "label": { "en": "A few days ago", "ar": "قبل بضعة أيام" }
+      },
+      {
+        "id": "weeks",
+        "label": { "en": "A few weeks ago", "ar": "قبل بضعة أسابيع" }
+      },
+      {
+        "id": "months",
+        "label": { "en": "Months or longer", "ar": "قبل أشهر أو أكثر" }
+      },
+      { "id": "not_sure", "label": { "en": "Not sure", "ar": "لست متأكداً" } },
+      {
+        "id": "something_else",
+        "label": { "en": "Something else", "ar": "شيء آخر" }
+      }
+    ]
+  },
+  {
+    "id": "Q_CHAR",
+    "slot": "character",
+    "kind": "open",
+    "text": {
+      "en": "How would you describe how it feels?",
+      "ar": "كيف تصف الشعور؟"
+    }
+  },
+  {
+    "id": "RF_SADDLE",
+    "slot": "redflag",
+    "kind": "single",
+    "mandatory": true,
+    "text": {
+      "en": "Any numbness around your bottom, groin or inner thighs?",
+      "ar": "هل يوجد خدر حول المقعدة أو أعلى الفخذين؟"
+    },
+    "options": [
+      { "id": "yes", "label": { "en": "Yes", "ar": "نعم" } },
+      { "id": "no", "label": { "en": "No", "ar": "لا" } },
+      { "id": "not_sure", "label": { "en": "Not sure", "ar": "لست متأكداً" } },
+      {
+        "id": "something_else",
+        "label": { "en": "Something else", "ar": "شيء آخر" }
+      }
+    ]
+  },
+  {
+    "id": "RF_BLADDER",
+    "slot": "redflag",
+    "kind": "single",
+    "mandatory": true,
+    "text": {
+      "en": "Any new trouble controlling your bladder or bowels, or trouble passing urine?",
+      "ar": "هل ظهرت مشكلة جديدة في التحكم بالبول أو البراز أو في التبول؟"
+    },
+    "options": [
+      { "id": "yes", "label": { "en": "Yes", "ar": "نعم" } },
+      { "id": "no", "label": { "en": "No", "ar": "لا" } },
+      { "id": "not_sure", "label": { "en": "Not sure", "ar": "لست متأكداً" } },
+      {
+        "id": "something_else",
+        "label": { "en": "Something else", "ar": "شيء آخر" }
+      }
+    ]
+  },
+  {
+    "id": "RF_BILAT_WEAK",
+    "slot": "redflag",
+    "kind": "single",
+    "mandatory": true,
+    "text": {
+      "en": "Any new weakness in both legs?",
+      "ar": "هل ظهر ضعف جديد في كلتا الساقين؟"
+    },
+    "options": [
+      { "id": "yes", "label": { "en": "Yes", "ar": "نعم" } },
+      { "id": "no", "label": { "en": "No", "ar": "لا" } },
+      { "id": "not_sure", "label": { "en": "Not sure", "ar": "لست متأكداً" } },
+      {
+        "id": "something_else",
+        "label": { "en": "Something else", "ar": "شيء آخر" }
+      }
+    ]
+  },
+  {
+    "id": "RF_FEVER_TRAUMA",
+    "slot": "redflag",
+    "kind": "single",
+    "mandatory": true,
+    "text": {
+      "en": "Any fever, recent fall or injury, history of cancer, or unexplained weight loss?",
+      "ar": "هل لديك حمى أو سقوط أو إصابة حديثة أو تاريخ مرضي بالسرطان أو فقدان وزن غير مفسر؟"
+    },
+    "options": [
+      { "id": "yes", "label": { "en": "Yes", "ar": "نعم" } },
+      { "id": "no", "label": { "en": "No", "ar": "لا" } },
+      { "id": "not_sure", "label": { "en": "Not sure", "ar": "لست متأكداً" } },
+      {
+        "id": "something_else",
+        "label": { "en": "Something else", "ar": "شيء آخر" }
+      }
+    ]
+  },
+  {
+    "id": "Q_SEV",
+    "slot": "severity",
+    "kind": "scale",
+    "text": {
+      "en": "On a scale of 0 to 10, how bad is it at its worst?",
+      "ar": "على مقياس من ٠ إلى ١٠، ما شدة الألم في أسوأ حالاته؟"
+    }
+  }
+]
