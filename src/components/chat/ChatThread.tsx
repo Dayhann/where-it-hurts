@@ -1,17 +1,21 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import type { Message } from '@/contracts/types';
+import { patientCopy } from '@/components/i18n/patient';
+import type { Lang, Message } from '@/contracts/types';
 import { cn } from '@/lib/utils';
 
 export function ChatThread({
   messages,
   typing,
+  lang,
 }: {
   messages: Message[];
   typing: boolean;
+  lang: Lang;
 }) {
   const endRef = useRef<HTMLDivElement>(null);
+  const copy = patientCopy(lang).chat;
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: 'end' });
@@ -43,7 +47,7 @@ export function ChatThread({
       {typing && (
         <p
           className="me-auto rounded-2xl bg-secondary px-4 py-3 text-lg text-muted-foreground"
-          aria-label="Waiting for the next question"
+          aria-label={copy.waiting}
         >
           …
         </p>

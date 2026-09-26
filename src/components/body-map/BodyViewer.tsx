@@ -21,8 +21,9 @@ import {
 } from 'react';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import * as THREE from 'three';
+import { patientCopy } from '@/components/i18n/patient';
 import { REGION_BY_ID, REGIONS } from '@/contracts/regions';
-import type { BodyMark } from '@/contracts/types';
+import type { BodyMark, Lang } from '@/contracts/types';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import {
@@ -42,10 +43,10 @@ const TAP_MAX_DRAG_PX = 6;
 // The model faces +Z with the patient's left at +X, so a camera at +X
 // (azimuth +90°) looks at the patient's left side.
 const PRESETS = {
-  front: { azimuth: 0, label: 'Front' },
-  back: { azimuth: Math.PI, label: 'Back' },
-  left: { azimuth: Math.PI / 2, label: 'Your left side' },
-  right: { azimuth: -Math.PI / 2, label: 'Your right side' },
+  front: { azimuth: 0 },
+  back: { azimuth: Math.PI },
+  left: { azimuth: Math.PI / 2 },
+  right: { azimuth: -Math.PI / 2 },
 } as const;
 
 type Preset = keyof typeof PRESETS;
@@ -59,10 +60,7 @@ const COLORS = {
   spread: '#f29a3a',
 } as const;
 
-const KIND_LABEL: Record<MarkKind, string> = {
-  pain: 'Where it hurts',
-  spread: 'Where it spreads',
-};
+const MARK_KINDS: MarkKind[] = ['pain', 'spread'];
 
 const DEBUG_COLORS = new Map(
   REGIONS.map((r, i) => [
@@ -267,6 +265,8 @@ type BodyViewerProps = {
   variant?: 'full' | 'thumbnail';
   onExpand?: () => void;
   onDone?: (snapshots: BodySnapshots) => Promise<void>;
+  lang?: Lang;
+  carerMode?: boolean;
 };
 
 export default function BodyViewer({
@@ -275,6 +275,8 @@ export default function BodyViewer({
   variant = 'full',
   onExpand,
   onDone,
+  lang = 'en',
+  carerMode = false,
 }: BodyViewerProps) {
   const controls = useRef<OrbitControlsImpl>(null);
   const snapshotCapture = useRef<SnapshotCaptureHandle>(null);
@@ -292,12 +294,23 @@ export default function BodyViewer({
   const [capturing, setCapturing] = useState(false);
   const [captureError, setCaptureError] = useState(false);
   const params = useSearchParams();
+  const copy = patientCopy(lang).body;
+  const kindLabel: Record<MarkKind, string> = {
+    pain: copy.pain,
+    spread: copy.spread,
+  };
+  const presetLabel: Record<Preset, string> = {
+    front: copy.front,
+    back: copy.back,
+    left: carerMode ? copy.leftCarer : copy.left,
+    right: carerMode ? copy.rightCarer : copy.right,
+  };
   const debug = params.get('regions') === '1';
   const calibrate = params.get('calibrate') === '1';
 
   const compact = variant === 'thumbnail';
   const selected = marks.find((m) => m.id === selectedId) ?? null;
-  const hoveredLabel = hovered ? REGION_BY_ID[hovered]?.label.en : null;
+  const hoveredLabel = hovered ? REGION_BY_ID[hovered]?.label[lang] : null;
   const listRegion = REGION_BY_ID[listRegionId] ?? REGIONS[0];
   const listMark = marks.find((mark) => mark.regionId === listRegionId);
 
@@ -331,9 +344,9 @@ export default function BodyViewer({
         <div
           className="grid grid-cols-2 gap-2"
           role="group"
-          aria-label="What are you marking?"
+          aria-label={copy.marking}
         >
-          {(Object.keys(KIND_LABEL) as MarkKind[]).map((k) => (
+          {MARK_KINDS.map((k) => (
             <button
               key={k}
               type="button"
@@ -352,7 +365,7 @@ export default function BodyViewer({
                 className="size-3 shrink-0 rounded-full"
                 style={{ backgroundColor: COLORS[k] }}
               />
-              {KIND_LABEL[k]}
+              {kindLabel[k]}
             </button>
           ))}
         </div>
@@ -361,11 +374,7 @@ export default function BodyViewer({
       <div className="relative overflow-hidden rounded-xl border border-border bg-muted">
         <div
           role="img"
-          aria-label={
-            compact
-              ? 'Body map showing the places you marked'
-              : 'Interactive 3D body map. You can also choose a body region from the accessible list below.'
-          }
+          aria-label={compact ? copy.thumbnail : copy.interactive}
           className={cn(
             compact ? 'h-36 w-full' : 'h-[min(56vh,28rem)] w-full',
             hovered && !compact && 'cursor-pointer',
@@ -433,7 +442,7 @@ export default function BodyViewer({
         )}
         {calibrate && !compact && (
           <p className="absolute right-2 bottom-2 rounded-md bg-background/90 px-2 py-1 text-lg shadow-sm">
-            Calibration on — taps log the point to the console.
+            {copy.calibration}
           </p>
         )}
       </div>
@@ -447,7 +456,7 @@ export default function BodyViewer({
             'text-lg',
           )}
         >
-          Show the full body map
+          {copy.showFull}
         </button>
       )}
 
@@ -471,7 +480,7 @@ export default function BodyViewer({
                   'text-lg',
                 )}
               >
-                {PRESETS[key].label}
+                {presetLabel[key]}
               </button>
             ))}
           </div>
@@ -486,7 +495,7 @@ export default function BodyViewer({
                 'text-lg',
               )}
             >
-              Undo last change
+              {copy.undo}
             </button>
             <button
               type="button"
@@ -500,23 +509,18 @@ export default function BodyViewer({
                 'text-lg',
               )}
             >
-              Clear all marks
+              {copy.clear}
             </button>
           </div>
 
-          <section
-            aria-label="Places you marked"
-            className="flex flex-col gap-3"
-          >
+          <section aria-label={copy.places} className="flex flex-col gap-3">
             {marks.length === 0 ? (
-              <p className="text-muted-foreground">
-                Nothing marked yet. Tap the body where it hurts.
-              </p>
+              <p className="text-muted-foreground">{copy.nothing}</p>
             ) : (
               <ul className="flex flex-wrap gap-2">
                 {marks.map((m) => {
                   const label =
-                    REGION_BY_ID[m.regionId]?.label.en ?? m.regionId;
+                    REGION_BY_ID[m.regionId]?.label[lang] ?? m.regionId;
                   const isSelected = m.id === selectedId;
                   return (
                     <li
@@ -552,7 +556,7 @@ export default function BodyViewer({
                           if (isSelected) setSelectedId(null);
                           commit(removeMark(marks, m.id));
                         }}
-                        aria-label={`Remove ${label}`}
+                        aria-label={`${copy.remove} ${label}`}
                         className="flex size-11 items-center justify-center text-muted-foreground outline-none hover:text-foreground focus-visible:bg-muted"
                       >
                         <X className="size-4" aria-hidden />
@@ -566,13 +570,16 @@ export default function BodyViewer({
             {selected && (
               <label className="flex flex-col gap-2 rounded-xl border border-border bg-background p-3">
                 <span>
-                  {REGION_BY_ID[selected.regionId]?.label.en}: how bad is it?{' '}
+                  {REGION_BY_ID[selected.regionId]?.label[lang]}:{' '}
+                  {copy.severity}{' '}
                   {selected.intensity === undefined ? (
                     <span className="text-muted-foreground">
-                      Move the slider to choose.
+                      {copy.sliderHint}
                     </span>
                   ) : (
-                    <strong>{selected.intensity} out of 10</strong>
+                    <strong>
+                      {selected.intensity} {copy.outOfTen}
+                    </strong>
                   )}
                 </span>
                 <input
@@ -589,8 +596,8 @@ export default function BodyViewer({
                   className="h-11 w-full accent-primary"
                 />
                 <span className="flex justify-between text-lg text-muted-foreground">
-                  <span>0 no pain</span>
-                  <span>10 worst</span>
+                  <span>{copy.noPain}</span>
+                  <span>{copy.worst}</span>
                 </span>
               </label>
             )}
@@ -598,11 +605,11 @@ export default function BodyViewer({
 
           <details className="rounded-xl border border-border bg-background p-3">
             <summary className="min-h-11 cursor-pointer text-lg font-medium">
-              Choose a body part from a list
+              {copy.chooseList}
             </summary>
             <div className="mt-3 flex flex-col gap-3">
               <label className="flex flex-col gap-2 text-lg">
-                Body part
+                {copy.bodyPart}
                 <select
                   value={listRegionId}
                   onChange={(event) => setListRegionId(event.target.value)}
@@ -610,7 +617,7 @@ export default function BodyViewer({
                 >
                   {REGIONS.map((region) => (
                     <option key={region.id} value={region.id}>
-                      {region.label.en}
+                      {region.label[lang]}
                     </option>
                   ))}
                 </select>
@@ -631,22 +638,19 @@ export default function BodyViewer({
                 )}
               >
                 {listMark?.kind === kind
-                  ? `Remove ${listRegion.label.en}`
-                  : `Mark ${listRegion.label.en} as ${KIND_LABEL[kind].toLowerCase()}`}
+                  ? `${copy.remove} ${listRegion.label[lang]}`
+                  : `${copy.mark} ${listRegion.label[lang]} ${copy.as} ${kindLabel[kind]}`}
               </button>
             </div>
           </details>
 
-          <p className="text-muted-foreground">
-            Tap a body part to mark it. Tap it again to remove it. Drag sideways
-            to turn the body, or use the buttons.
-          </p>
+          <p className="text-muted-foreground">{copy.instructions}</p>
 
           {onDone && (
             <>
               {captureError && (
                 <p className="text-lg text-destructive" role="alert">
-                  We could not save the body map. Try again.
+                  {copy.saveError}
                 </p>
               )}
               <button
@@ -667,7 +671,7 @@ export default function BodyViewer({
                 }}
                 className={cn(buttonVariants({ size: 'touch' }), 'text-lg')}
               >
-                {capturing ? 'Saving body map…' : 'Done marking'}
+                {capturing ? copy.saving : copy.done}
               </button>
             </>
           )}

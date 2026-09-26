@@ -2,6 +2,7 @@
 
 import { Mic, Square } from 'lucide-react';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { patientCopy } from '@/components/i18n/patient';
 import type { Lang, Question, QuestionOption } from '@/contracts/types';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -41,6 +42,7 @@ export function ChatComposer({
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const recognitionRef = useRef<BrowserSpeechRecognition | null>(null);
   const voiceBase = useRef('');
+  const copy = patientCopy(lang).chat;
   const voiceSupported = useSyncExternalStore(
     subscribeToVoiceSupport,
     voiceSupportSnapshot,
@@ -98,7 +100,7 @@ export function ChatComposer({
       <div
         className="flex flex-wrap gap-2"
         role="group"
-        aria-label="Quick answers"
+        aria-label={copy.quickAnswers}
       >
         {chips.map((option) => (
           <button
@@ -130,9 +132,7 @@ export function ChatComposer({
       </div>
       <label className="flex flex-col gap-2">
         <span className="text-lg">
-          {wantOther
-            ? 'Type your answer in your own words.'
-            : 'Or type your own answer'}
+          {wantOther ? copy.otherPrompt : copy.ownPrompt}
         </span>
         <textarea
           ref={inputRef}
@@ -160,7 +160,7 @@ export function ChatComposer({
             type="button"
             disabled={disabled}
             aria-pressed={listening}
-            aria-label={listening ? 'Stop voice input' : 'Start voice input'}
+            aria-label={listening ? copy.stopVoice : copy.startVoice}
             onClick={toggleVoice}
             className={cn(
               buttonVariants({ variant: 'outline', size: 'touch' }),
@@ -168,7 +168,7 @@ export function ChatComposer({
             )}
           >
             {listening ? <Square aria-hidden /> : <Mic aria-hidden />}
-            {listening ? 'Stop' : 'Speak'}
+            {listening ? copy.stop : copy.speak}
           </button>
         )}
         <button
@@ -177,7 +177,7 @@ export function ChatComposer({
           onClick={() => void sendText()}
           className={cn(buttonVariants({ size: 'touch' }), 'text-lg')}
         >
-          Send
+          {copy.send}
         </button>
       </div>
     </div>

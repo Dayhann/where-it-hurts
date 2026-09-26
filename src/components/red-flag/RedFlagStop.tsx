@@ -2,11 +2,14 @@
 
 import Link from 'next/link';
 import { useEffect, useRef } from 'react';
+import { patientCopy } from '@/components/i18n/patient';
 import { buttonVariants } from '@/components/ui/button';
+import type { Lang } from '@/contracts/types';
 import { cn } from '@/lib/utils';
 
-export function RedFlagStop() {
+export function RedFlagStop({ lang }: { lang: Lang }) {
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const copy = patientCopy(lang).redFlag;
 
   useEffect(() => {
     headingRef.current?.focus();
@@ -26,14 +29,14 @@ export function RedFlagStop() {
           tabIndex={-1}
           className="text-2xl font-semibold tracking-tight"
         >
-          Please call 000 or go to your nearest emergency department now.
+          {copy.title}
         </h1>
-        <p className="text-lg leading-7">Your clinic has been notified.</p>
+        <p className="text-lg leading-7">{copy.notified}</p>
         <a
           href="tel:000"
           className={cn(buttonVariants({ size: 'touch' }), 'text-lg')}
         >
-          Call 000
+          {copy.call}
         </a>
         <Link
           href="/"
@@ -42,7 +45,7 @@ export function RedFlagStop() {
             'text-lg text-muted-foreground',
           )}
         >
-          Return to start
+          {copy.return}
         </Link>
       </main>
     </div>
