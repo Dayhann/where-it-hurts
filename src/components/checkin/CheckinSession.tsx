@@ -97,7 +97,7 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
   const send = async (payload: {
     text: string;
     choiceId?: string;
-    inputMode: 'text' | 'choice';
+    inputMode: 'text' | 'voice' | 'choice';
   }): Promise<boolean> => {
     setSending(true);
     setSendError(false);
