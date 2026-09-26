@@ -1,12 +1,19 @@
 'use client';
 
 import { Line, OrbitControls, useGLTF } from '@react-three/drei';
-import { Canvas, useFrame, type ThreeEvent } from '@react-three/fiber';
+import {
+  Canvas,
+  useFrame,
+  useThree,
+  type ThreeEvent,
+} from '@react-three/fiber';
 import { X } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import {
+  forwardRef,
   Suspense,
   useEffect,
+  useImperativeHandle,
   useMemo,
   useRef,
   useState,
@@ -211,11 +218,55 @@ function MarkVisuals({ marks }: { marks: BodyMark[] }) {
   );
 }
 
+export type BodySnapshots = { front: string; back: string };
+
+type SnapshotCaptureHandle = {
+  capture: () => BodySnapshots;
+};
+
+const SnapshotCapture = forwardRef<SnapshotCaptureHandle>(
+  function SnapshotCapture(_, ref) {
+    const { camera, gl, scene } = useThree();
+
+    useImperativeHandle(
+      ref,
+      () => ({
+        capture() {
+          const position = camera.position.clone();
+          const quaternion = camera.quaternion.clone();
+
+          const renderAt = (z: number) => {
+            camera.position.set(0, HEIGHT, z);
+            camera.lookAt(...TARGET);
+            camera.updateMatrixWorld();
+            gl.render(scene, camera);
+            return gl.domElement.toDataURL('image/png');
+          };
+
+          const front = renderAt(2.9);
+          const back = renderAt(-2.9);
+
+          camera.position.copy(position);
+          camera.quaternion.copy(quaternion);
+          camera.updateMatrixWorld();
+          gl.render(scene, camera);
+
+          return { front, back };
+        },
+      }),
+      [camera, gl, scene],
+    );
+
+    return null;
+  },
+);
+
 type BodyViewerProps = {
   marks: BodyMark[];
   onChange: (marks: BodyMark[]) => void;
   variant?: 'full' | 'thumbnail';
   onExpand?: () => void;
+  onDone?: (snapshots: BodySnapshots) => Promise<void>;
 };
 
 export default function BodyViewer({
@@ -223,8 +274,10 @@ export default function BodyViewer({
   onChange,
   variant = 'full',
   onExpand,
+  onDone,
 }: BodyViewerProps) {
   const controls = useRef<OrbitControlsImpl>(null);
+  const snapshotCapture = useRef<SnapshotCaptureHandle>(null);
   const dragStartAzimuth = useRef(0);
   const [preset, setPreset] = useState<Preset>('front');
   const [lock, setLock] = useState(true);
@@ -236,6 +289,8 @@ export default function BodyViewer({
     ReadonlyMap<string, BodyMark['point']>
   >(new Map());
   const [past, setPast] = useState<BodyMark[][]>([]);
+  const [capturing, setCapturing] = useState(false);
+  const [captureError, setCaptureError] = useState(false);
   const params = useSearchParams();
   const debug = params.get('regions') === '1';
   const calibrate = params.get('calibrate') === '1';
@@ -346,6 +401,7 @@ export default function BodyViewer({
               lock={lock}
               controls={controls}
             />
+            <SnapshotCapture ref={snapshotCapture} />
             <OrbitControls
               ref={controls}
               target={TARGET}
@@ -585,6 +641,36 @@ export default function BodyViewer({
             Tap a body part to mark it. Tap it again to remove it. Drag sideways
             to turn the body, or use the buttons.
           </p>
+
+          {onDone && (
+            <>
+              {captureError && (
+                <p className="text-lg text-destructive" role="alert">
+                  We could not save the body map. Try again.
+                </p>
+              )}
+              <button
+                type="button"
+                disabled={capturing}
+                onClick={async () => {
+                  const capture = snapshotCapture.current;
+                  if (!capture) return;
+                  setCapturing(true);
+                  setCaptureError(false);
+                  try {
+                    await onDone(capture.capture());
+                  } catch {
+                    setCaptureError(true);
+                  } finally {
+                    setCapturing(false);
+                  }
+                }}
+                className={cn(buttonVariants({ size: 'touch' }), 'text-lg')}
+              >
+                {capturing ? 'Saving body map…' : 'Done marking'}
+              </button>
+            </>
+          )}
         </>
       )}
     </div>

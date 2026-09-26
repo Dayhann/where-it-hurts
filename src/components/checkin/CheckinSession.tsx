@@ -2,7 +2,9 @@
 
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
-import BodyViewer from '@/components/body-map/BodyViewer';
+import BodyViewer, {
+  type BodySnapshots,
+} from '@/components/body-map/BodyViewer';
 import { ChatComposer } from '@/components/chat/ChatComposer';
 import { ChatThread } from '@/components/chat/ChatThread';
 import { replyChips } from '@/components/chat/chips';
@@ -111,6 +113,21 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
     }
   };
 
+  const finishMarking = async (snapshots: BodySnapshots) => {
+    setSaveState('saving');
+    try {
+      saveQueue.current?.enqueue(marks);
+      await saveQueue.current?.waitForIdle();
+      await getApiClient().putMarks(sessionId, { marks, snapshots });
+      setSaveState('saved');
+      setBodyExpanded(false);
+      setChatStarted(true);
+    } catch {
+      setSaveState('local');
+      throw new Error('Body map save failed');
+    }
+  };
+
   if (!ready) {
     return <p className="text-muted-foreground">Loading your check-in…</p>;
   }
@@ -167,6 +184,7 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
         onChange={setMarks}
         variant={compactBody ? 'thumbnail' : 'full'}
         onExpand={compactBody ? () => setBodyExpanded(true) : undefined}
+        onDone={!showChat && !loadError ? finishMarking : undefined}
       />
       {showChat && bodyExpanded && (
         <button
@@ -186,16 +204,6 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
         {saveState === 'local' &&
           'Marks stay on this screen for now. They will save when the check-in link is ready.'}
       </p>
-
-      {!showChat && (
-        <button
-          type="button"
-          onClick={() => setChatStarted(true)}
-          className={cn(buttonVariants({ size: 'touch' }), 'text-lg')}
-        >
-          Continue to questions
-        </button>
-      )}
 
       {showChat && (
         <>

@@ -35,4 +35,8 @@ export class MarkSaveQueue {
       },
     );
   }
+
+  waitForIdle(): Promise<void> {
+    return this.tail;
+  }
 }

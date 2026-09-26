@@ -4,10 +4,77 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import { buttonVariants } from '@/components/ui/button';
-import type { ClinicianSummary, Session } from '@/contracts/types';
+import type { ClinicianSummary, Session, SummaryLine } from '@/contracts/types';
 import { getApiClient } from '@/lib/api-client';
 import { cn } from '@/lib/utils';
 import { summaryText } from './summary-text';
+
+function messageTime(session: Session, line: SummaryLine, quoteIndex: number) {
+  const messageId =
+    line.sourceMessageIds[quoteIndex] ?? line.sourceMessageIds[0];
+  const message = session.messages.find(({ id }) => id === messageId);
+  if (!message) return 'unknown time';
+  return new Intl.DateTimeFormat('en-AU', {
+    hour: 'numeric',
+    minute: '2-digit',
+  }).format(new Date(message.createdAt));
+}
+
+function SummaryQuoteLine({
+  line,
+  lineIndex,
+  session,
+  open,
+  onToggle,
+}: {
+  line: SummaryLine;
+  lineIndex: number;
+  session: Session;
+  open: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={open}
+        className="w-full rounded-lg border border-border p-3 text-left font-semibold hover:bg-muted"
+      >
+        <span>{line.text}</span>
+        {!line.verified && (
+          <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-900">
+            Unverified
+          </span>
+        )}
+      </button>
+      {open && (
+        <div className="mt-1 rounded-lg border border-border bg-popover p-3 shadow-lg">
+          <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+            Patient&apos;s words
+          </p>
+          {line.quotes.map((quote, quoteIndex) => (
+            <blockquote
+              key={`${lineIndex}-${quoteIndex}`}
+              className="mt-2 border-l-2 border-primary pl-3"
+            >
+              <p>&ldquo;{quote}&rdquo;</p>
+              <footer className="mt-1 text-xs text-muted-foreground">
+                From the patient&apos;s message at{' '}
+                {messageTime(session, line, quoteIndex)}
+              </footer>
+            </blockquote>
+          ))}
+          {line.quotes.length === 0 && (
+            <p className="mt-2 text-sm text-muted-foreground">
+              No exact quote was supplied.
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function DoctorPanel({
   sessionId,
@@ -25,6 +92,7 @@ export function DoctorPanel({
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedback, setFeedback] = useState('');
   const [feedbackSent, setFeedbackSent] = useState(false);
+  const [openLine, setOpenLine] = useState<number | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -144,11 +212,31 @@ export function DoctorPanel({
                 </h3>
                 {summary.headline.length > 0 ? (
                   <ul className="mt-2 flex flex-col gap-2">
-                    {summary.headline.slice(0, 3).map((line) => (
-                      <li key={line} className="font-semibold">
-                        {line}
-                      </li>
-                    ))}
+                    {summary.headline.slice(0, 3).map((text) => {
+                      const lineIndex = summary.lines.findIndex(
+                        (line) => line.text === text,
+                      );
+                      const line = summary.lines[lineIndex];
+                      return (
+                        <li key={text}>
+                          {line ? (
+                            <SummaryQuoteLine
+                              line={line}
+                              lineIndex={lineIndex}
+                              session={session}
+                              open={openLine === lineIndex}
+                              onToggle={() =>
+                                setOpenLine((current) =>
+                                  current === lineIndex ? null : lineIndex,
+                                )
+                              }
+                            />
+                          ) : (
+                            <p className="font-semibold">{text}</p>
+                          )}
+                        </li>
+                      );
+                    })}
                   </ul>
                 ) : (
                   <p className="mt-2 text-muted-foreground">
@@ -156,6 +244,32 @@ export function DoctorPanel({
                   </p>
                 )}
               </section>
+
+              {summary.lines.some(
+                (line) => !summary.headline.includes(line.text),
+              ) && (
+                <section>
+                  <h3 className="font-semibold">Other details</h3>
+                  <div className="mt-2 flex flex-col gap-2">
+                    {summary.lines.map((line, lineIndex) =>
+                      summary.headline.includes(line.text) ? null : (
+                        <SummaryQuoteLine
+                          key={`${line.slot}-${lineIndex}`}
+                          line={line}
+                          lineIndex={lineIndex}
+                          session={session}
+                          open={openLine === lineIndex}
+                          onToggle={() =>
+                            setOpenLine((current) =>
+                              current === lineIndex ? null : lineIndex,
+                            )
+                          }
+                        />
+                      ),
+                    )}
+                  </div>
+                </section>
+              )}
 
               <section className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
