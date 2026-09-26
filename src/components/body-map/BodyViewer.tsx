@@ -9,14 +9,16 @@ import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 const MODEL_URL = '/models/body.glb';
-const HEIGHT = 1;
+const HEIGHT = 0.88;
 const TARGET: [number, number, number] = [0, HEIGHT, 0];
 
+// The model faces +Z with the patient's left at +X, so a camera at +X
+// (azimuth +90°) looks at the patient's left side.
 const PRESETS = {
-  front: 0,
-  right: Math.PI / 2,
-  back: Math.PI,
-  left: -Math.PI / 2,
+  front: { azimuth: 0, label: 'Front' },
+  back: { azimuth: Math.PI, label: 'Back' },
+  left: { azimuth: Math.PI / 2, label: 'Your left side' },
+  right: { azimuth: -Math.PI / 2, label: 'Your right side' },
 } as const;
 
 type Preset = keyof typeof PRESETS;
@@ -30,9 +32,9 @@ function BodyMesh() {
   const cloned = useMemo(() => {
     const next = scene.clone(true);
     const material = new THREE.MeshStandardMaterial({
-      color: '#9aa3ad',
-      roughness: 0.75,
-      metalness: 0.04,
+      color: '#b9bec4',
+      roughness: 0.7,
+      metalness: 0.02,
     });
     next.traverse((obj) => {
       if (obj instanceof THREE.Mesh) {
@@ -95,7 +97,7 @@ function Scene({
         enableDamping
         minPolarAngle={Math.PI / 2}
         maxPolarAngle={Math.PI / 2}
-        minDistance={2.2}
+        minDistance={2.4}
         maxDistance={4.5}
         onStart={onDragStart}
       />
@@ -113,13 +115,13 @@ export default function BodyViewer() {
       <div className="relative overflow-hidden rounded-xl border border-border bg-muted">
         <div className="h-[min(56vh,28rem)] w-full">
           <Canvas
-            camera={{ position: [0, HEIGHT, 3], fov: 35 }}
+            camera={{ position: [0, HEIGHT, 2.9], fov: 35 }}
             gl={{ preserveDrawingBuffer: true, antialias: true }}
             dpr={[1, 1.5]}
           >
             <Suspense fallback={null}>
               <Scene
-                azimuth={PRESETS[preset]}
+                azimuth={PRESETS[preset].azimuth}
                 lock={lock}
                 controls={controls}
                 onDragStart={() => setLock(false)}
@@ -143,10 +145,9 @@ export default function BodyViewer() {
                 variant: lock && preset === key ? 'default' : 'outline',
                 size: 'touch',
               }),
-              'capitalize',
             )}
           >
-            {key}
+            {PRESETS[key].label}
           </button>
         ))}
       </div>
