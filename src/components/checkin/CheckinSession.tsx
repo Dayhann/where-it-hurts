@@ -2,12 +2,16 @@
 
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
-import BodyViewer from '@/components/body-map/BodyViewer';
+import BodyViewer, {
+  type BodySnapshots,
+} from '@/components/body-map/BodyViewer';
 import { ChatComposer } from '@/components/chat/ChatComposer';
 import { ChatThread } from '@/components/chat/ChatThread';
 import { replyChips } from '@/components/chat/chips';
 import { progressLabel } from '@/components/chat/progress';
 import { chatHasStarted, turnFromSession } from '@/components/chat/resume-turn';
+import { patientCopy } from '@/components/i18n/patient';
+import { PatientRecap } from '@/components/recap/PatientRecap';
 import { RedFlagStop } from '@/components/red-flag/RedFlagStop';
 import { buttonVariants } from '@/components/ui/button';
 import type {
@@ -94,7 +98,7 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
   const send = async (payload: {
     text: string;
     choiceId?: string;
-    inputMode: 'text' | 'choice';
+    inputMode: 'text' | 'voice' | 'choice';
   }): Promise<boolean> => {
     setSending(true);
     setSendError(false);
@@ -110,44 +114,103 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
     }
   };
 
+  const finishMarking = async (snapshots: BodySnapshots) => {
+    setSaveState('saving');
+    try {
+      saveQueue.current?.enqueue(marks);
+      await saveQueue.current?.waitForIdle();
+      await getApiClient().putMarks(sessionId, { marks, snapshots });
+      setSaveState('saved');
+      setBodyExpanded(false);
+      setChatStarted(true);
+    } catch {
+      setSaveState('local');
+      throw new Error('Body map save failed');
+    }
+  };
+
+  const lang = session?.lang ?? 'en';
+  const copy = patientCopy(lang);
+  const direction = lang === 'ar' ? 'rtl' : 'ltr';
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.lang = lang;
+    root.dir = direction;
+    return () => {
+      root.lang = 'en';
+      root.dir = 'ltr';
+    };
+  }, [direction, lang]);
+
   if (!ready) {
-    return <p className="text-muted-foreground">Loading your check-in…</p>;
+    return (
+      <p className="text-muted-foreground" dir={direction}>
+        {copy.checkin.loading}
+      </p>
+    );
   }
 
   if (turn?.type === 'redflag_stop') {
-    return <RedFlagStop />;
+    return (
+      <div dir={direction}>
+        <RedFlagStop lang={lang} />
+      </div>
+    );
+  }
+
+  if (turn?.type === 'done' && session) {
+    return (
+      <div dir={direction}>
+        <PatientRecap
+          sessionId={sessionId}
+          alreadyConfirmed={session.status === 'confirmed'}
+          lang={lang}
+        />
+      </div>
+    );
   }
 
   const messages: Message[] = session?.messages ?? [];
   const questionTurn = turn?.type === 'question' ? turn : undefined;
   const showChat = chatStarted;
   const compactBody = showChat && !bodyExpanded;
-  const lang = session?.lang ?? 'en';
 
   return (
-    <>
+    <div dir={direction} className="flex flex-col gap-5">
       {showChat ? (
         <div className="flex flex-col gap-1">
-          <p className="text-lg text-muted-foreground">Check-in {sessionId}</p>
+          <p className="text-lg text-muted-foreground">
+            {copy.checkin.label} {sessionId}
+          </p>
           <h1 className="text-2xl font-semibold tracking-tight">
-            A few questions
+            {copy.checkin.questions}
           </h1>
           {questionTurn && (
             <p className="text-lg text-muted-foreground">
-              {progressLabel(questionTurn.progress)}
+              {progressLabel(questionTurn.progress, lang)}
+            </p>
+          )}
+          {session?.carerMode && (
+            <p className="rounded-lg bg-muted px-3 py-2">
+              {copy.checkin.carerBanner}
             </p>
           )}
         </div>
       ) : (
         <div className="flex flex-col gap-1">
-          <p className="text-lg text-muted-foreground">Check-in {sessionId}</p>
+          <p className="text-lg text-muted-foreground">
+            {copy.checkin.label} {sessionId}
+          </p>
           <h1 className="text-2xl font-semibold tracking-tight">
-            Tap where it hurts
+            {session?.carerMode
+              ? copy.checkin.bodyTitleCarer
+              : copy.checkin.bodyTitle}
           </h1>
           <p>
-            Choose &quot;Where it hurts&quot;, then tap each part of the body
-            that hurts. If the pain moves or spreads somewhere else, choose
-            &quot;Where it spreads&quot; and tap those parts too.
+            {session?.carerMode
+              ? copy.checkin.bodyInstructionsCarer
+              : copy.checkin.bodyInstructions}
           </p>
         </div>
       )}
@@ -157,6 +220,9 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
         onChange={setMarks}
         variant={compactBody ? 'thumbnail' : 'full'}
         onExpand={compactBody ? () => setBodyExpanded(true) : undefined}
+        onDone={!showChat && !loadError ? finishMarking : undefined}
+        lang={lang}
+        carerMode={session?.carerMode === true}
       />
       {showChat && bodyExpanded && (
         <button
@@ -167,48 +233,30 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
             'text-lg',
           )}
         >
-          Back to questions
+          {copy.checkin.backToQuestions}
         </button>
       )}
       <p className="text-lg text-muted-foreground" aria-live="polite">
-        {saveState === 'saving' && 'Saving your marks…'}
-        {saveState === 'saved' && 'Marks saved for this check-in.'}
-        {saveState === 'local' &&
-          'Marks stay on this screen for now. They will save when the check-in link is ready.'}
+        {saveState === 'saving' && copy.checkin.saving}
+        {saveState === 'saved' && copy.checkin.saved}
+        {saveState === 'local' && copy.checkin.local}
       </p>
-
-      {!showChat && (
-        <button
-          type="button"
-          onClick={() => setChatStarted(true)}
-          className={cn(buttonVariants({ size: 'touch' }), 'text-lg')}
-        >
-          Continue to questions
-        </button>
-      )}
 
       {showChat && (
         <>
-          <ChatThread messages={messages} typing={sending} />
-          {turn?.type === 'done' ? (
-            <p>
-              You have answered the questions. A recap of what you said comes
-              next.
-            </p>
-          ) : (
-            questionTurn && (
-              <ChatComposer
-                chips={replyChips(questionTurn.question)}
-                question={questionTurn.question}
-                lang={lang}
-                disabled={sending}
-                onSend={send}
-              />
-            )
+          <ChatThread messages={messages} typing={sending} lang={lang} />
+          {questionTurn && (
+            <ChatComposer
+              chips={replyChips(questionTurn.question)}
+              question={questionTurn.question}
+              lang={lang}
+              disabled={sending}
+              onSend={send}
+            />
           )}
           {sendError && (
             <p className="text-lg text-destructive" role="alert">
-              We could not send that. Try again.
+              {copy.checkin.sendError}
             </p>
           )}
         </>
@@ -216,8 +264,7 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
 
       {loadError && (
         <p className="text-lg text-muted-foreground">
-          This check-in link is not ready yet. You can still mark the body on
-          this screen.
+          {copy.checkin.linkError}
         </p>
       )}
 
@@ -228,8 +275,8 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
           'text-lg',
         )}
       >
-        Back to start
+        {copy.checkin.back}
       </Link>
-    </>
+    </div>
   );
 }

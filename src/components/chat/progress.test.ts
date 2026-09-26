@@ -13,4 +13,10 @@ describe('progressLabel', () => {
       'A few questions',
     );
   });
+
+  it('renders Arabic progress copy', () => {
+    expect(progressLabel({ asked: 3, estimatedTotal: 8 }, 'ar')).toBe(
+      'السؤال 3 من نحو 8',
+    );
+  });
 });

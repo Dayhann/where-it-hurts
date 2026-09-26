@@ -71,4 +71,24 @@ describe('MarkSaveQueue', () => {
     await vi.waitFor(() => expect(save).toHaveBeenCalledTimes(2));
     await vi.waitFor(() => expect(states.at(-1)).toBe('saved'));
   });
+
+  it('exposes when all queued writes have finished', async () => {
+    const pending = deferred();
+    const save = vi
+      .fn<(marks: BodyMark[]) => Promise<void>>()
+      .mockReturnValue(pending.promise);
+    const queue = new MarkSaveQueue(save, () => undefined);
+    let idle = false;
+
+    queue.enqueue(first);
+    void queue.waitForIdle().then(() => {
+      idle = true;
+    });
+    await Promise.resolve();
+    expect(idle).toBe(false);
+
+    pending.resolve();
+    await queue.waitForIdle();
+    expect(idle).toBe(true);
+  });
 });
