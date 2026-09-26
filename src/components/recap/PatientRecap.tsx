@@ -59,10 +59,10 @@ export function PatientRecap({
 
   if (confirmed) {
     return (
-      <section className="flex flex-1 flex-col justify-center gap-6 py-8">
+      <section className="enter-fade flex flex-1 flex-col justify-center gap-6 py-8">
         <div className="flex flex-col gap-2">
           <p className="text-lg text-muted-foreground">{copy.complete}</p>
-          <h1 className="text-3xl font-semibold tracking-tight">
+          <h1 className="display-title text-3xl font-semibold tracking-tight">
             {copy.thanks}
           </h1>
           <p>{copy.sent}</p>
