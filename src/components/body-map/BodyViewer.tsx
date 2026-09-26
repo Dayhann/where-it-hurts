@@ -214,9 +214,16 @@ function MarkVisuals({ marks }: { marks: BodyMark[] }) {
 type BodyViewerProps = {
   marks: BodyMark[];
   onChange: (marks: BodyMark[]) => void;
+  variant?: 'full' | 'thumbnail';
+  onExpand?: () => void;
 };
 
-export default function BodyViewer({ marks, onChange }: BodyViewerProps) {
+export default function BodyViewer({
+  marks,
+  onChange,
+  variant = 'full',
+  onExpand,
+}: BodyViewerProps) {
   const controls = useRef<OrbitControlsImpl>(null);
   const dragStartAzimuth = useRef(0);
   const [preset, setPreset] = useState<Preset>('front');
@@ -233,6 +240,7 @@ export default function BodyViewer({ marks, onChange }: BodyViewerProps) {
   const debug = params.get('regions') === '1';
   const calibrate = params.get('calibrate') === '1';
 
+  const compact = variant === 'thumbnail';
   const selected = marks.find((m) => m.id === selectedId) ?? null;
   const hoveredLabel = hovered ? REGION_BY_ID[hovered]?.label.en : null;
   const listRegion = REGION_BY_ID[listRegionId] ?? REGIONS[0];
@@ -264,46 +272,57 @@ export default function BodyViewer({ marks, onChange }: BodyViewerProps) {
 
   return (
     <div className="flex flex-col gap-3">
-      <div
-        className="grid grid-cols-2 gap-2"
-        role="group"
-        aria-label="What are you marking?"
-      >
-        {(Object.keys(KIND_LABEL) as MarkKind[]).map((k) => (
-          <button
-            key={k}
-            type="button"
-            onClick={() => setKind(k)}
-            aria-pressed={kind === k}
-            className={cn(
-              buttonVariants({
-                variant: kind === k ? 'default' : 'outline',
-                size: 'touch',
-              }),
-              'justify-start text-lg',
-            )}
-          >
-            <span
-              aria-hidden
-              className="size-3 shrink-0 rounded-full"
-              style={{ backgroundColor: COLORS[k] }}
-            />
-            {KIND_LABEL[k]}
-          </button>
-        ))}
-      </div>
+      {!compact && (
+        <div
+          className="grid grid-cols-2 gap-2"
+          role="group"
+          aria-label="What are you marking?"
+        >
+          {(Object.keys(KIND_LABEL) as MarkKind[]).map((k) => (
+            <button
+              key={k}
+              type="button"
+              onClick={() => setKind(k)}
+              aria-pressed={kind === k}
+              className={cn(
+                buttonVariants({
+                  variant: kind === k ? 'default' : 'outline',
+                  size: 'touch',
+                }),
+                'justify-start text-lg',
+              )}
+            >
+              <span
+                aria-hidden
+                className="size-3 shrink-0 rounded-full"
+                style={{ backgroundColor: COLORS[k] }}
+              />
+              {KIND_LABEL[k]}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="relative overflow-hidden rounded-xl border border-border bg-muted">
         <div
           role="img"
-          aria-label="Interactive 3D body map. You can also choose a body region from the accessible list below."
+          aria-label={
+            compact
+              ? 'Body map showing the places you marked'
+              : 'Interactive 3D body map. You can also choose a body region from the accessible list below.'
+          }
           className={cn(
-            'h-[min(56vh,28rem)] w-full',
-            hovered && 'cursor-pointer',
+            compact ? 'h-36 w-full' : 'h-[min(56vh,28rem)] w-full',
+            hovered && !compact && 'cursor-pointer',
+            compact && 'pointer-events-none',
           )}
         >
           <Canvas
-            camera={{ position: [0, HEIGHT, 2.9], fov: 35 }}
+            key={compact ? 'thumbnail' : 'full'}
+            camera={{
+              position: compact ? [0, HEIGHT, 3.8] : [0, HEIGHT, 2.9],
+              fov: compact ? 42 : 35,
+            }}
             gl={{ preserveDrawingBuffer: true, antialias: true }}
             dpr={[1, 1.5]}
           >
@@ -331,6 +350,8 @@ export default function BodyViewer({ marks, onChange }: BodyViewerProps) {
               ref={controls}
               target={TARGET}
               enablePan={false}
+              enableRotate={!compact}
+              enableZoom={!compact}
               enableDamping
               minPolarAngle={Math.PI / 2}
               maxPolarAngle={Math.PI / 2}
@@ -349,200 +370,223 @@ export default function BodyViewer({ marks, onChange }: BodyViewerProps) {
             />
           </Canvas>
         </div>
-        {hoveredLabel && (
+        {hoveredLabel && !compact && (
           <p className="pointer-events-none absolute top-2 left-2 rounded-md bg-background/90 px-2 py-1 text-lg shadow-sm">
             {hoveredLabel}
           </p>
         )}
-        {calibrate && (
+        {calibrate && !compact && (
           <p className="absolute right-2 bottom-2 rounded-md bg-background/90 px-2 py-1 text-lg shadow-sm">
             Calibration on — taps log the point to the console.
           </p>
         )}
       </div>
 
-      <div className="grid w-full grid-cols-2 gap-2">
-        {(Object.keys(PRESETS) as Preset[]).map((key) => (
-          <button
-            key={key}
-            type="button"
-            onClick={() => {
-              setPreset(key);
-              setLock(true);
-            }}
-            aria-pressed={lock && preset === key}
-            className={cn(
-              buttonVariants({
-                variant: lock && preset === key ? 'default' : 'outline',
-                size: 'touch',
-              }),
-              'text-lg',
-            )}
-          >
-            {PRESETS[key].label}
-          </button>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-2 gap-2">
+      {compact && onExpand && (
         <button
           type="button"
-          onClick={undo}
-          disabled={past.length === 0}
+          onClick={onExpand}
           className={cn(
             buttonVariants({ variant: 'outline', size: 'touch' }),
             'text-lg',
           )}
         >
-          Undo last change
+          Show the full body map
         </button>
-        <button
-          type="button"
-          onClick={() => {
-            setSelectedId(null);
-            commit([]);
-          }}
-          disabled={marks.length === 0}
-          className={cn(
-            buttonVariants({ variant: 'outline', size: 'touch' }),
-            'text-lg',
-          )}
-        >
-          Clear all marks
-        </button>
-      </div>
+      )}
 
-      <section aria-label="Places you marked" className="flex flex-col gap-3">
-        {marks.length === 0 ? (
-          <p className="text-muted-foreground">
-            Nothing marked yet. Tap the body where it hurts.
-          </p>
-        ) : (
-          <ul className="flex flex-wrap gap-2">
-            {marks.map((m) => {
-              const label = REGION_BY_ID[m.regionId]?.label.en ?? m.regionId;
-              const isSelected = m.id === selectedId;
-              return (
-                <li
-                  key={m.id}
-                  className={cn(
-                    'flex min-h-11 items-center overflow-hidden rounded-full border bg-background text-lg',
-                    isSelected
-                      ? 'border-ring ring-2 ring-ring/40'
-                      : 'border-border',
-                  )}
-                >
-                  <button
-                    type="button"
-                    onClick={() => setSelectedId(isSelected ? null : m.id)}
-                    aria-pressed={isSelected}
-                    className="flex min-h-11 items-center gap-2 pr-1 pl-3 outline-none focus-visible:bg-muted"
-                  >
-                    <span
-                      aria-hidden
-                      className="size-3 rounded-full"
-                      style={{ backgroundColor: COLORS[m.kind] }}
-                    />
-                    {label}
-                    {m.intensity !== undefined && (
-                      <span className="text-muted-foreground">
-                        {m.intensity}/10
-                      </span>
-                    )}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (isSelected) setSelectedId(null);
-                      commit(removeMark(marks, m.id));
-                    }}
-                    aria-label={`Remove ${label}`}
-                    className="flex size-11 items-center justify-center text-muted-foreground outline-none hover:text-foreground focus-visible:bg-muted"
-                  >
-                    <X className="size-4" aria-hidden />
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        )}
+      {!compact && (
+        <>
+          <div className="grid w-full grid-cols-2 gap-2">
+            {(Object.keys(PRESETS) as Preset[]).map((key) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => {
+                  setPreset(key);
+                  setLock(true);
+                }}
+                aria-pressed={lock && preset === key}
+                className={cn(
+                  buttonVariants({
+                    variant: lock && preset === key ? 'default' : 'outline',
+                    size: 'touch',
+                  }),
+                  'text-lg',
+                )}
+              >
+                {PRESETS[key].label}
+              </button>
+            ))}
+          </div>
 
-        {selected && (
-          <label className="flex flex-col gap-2 rounded-xl border border-border bg-background p-3">
-            <span>
-              {REGION_BY_ID[selected.regionId]?.label.en}: how bad is it?{' '}
-              {selected.intensity === undefined ? (
-                <span className="text-muted-foreground">
-                  Move the slider to choose.
-                </span>
-              ) : (
-                <strong>{selected.intensity} out of 10</strong>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={undo}
+              disabled={past.length === 0}
+              className={cn(
+                buttonVariants({ variant: 'outline', size: 'touch' }),
+                'text-lg',
               )}
-            </span>
-            <input
-              type="range"
-              min={0}
-              max={10}
-              step={1}
-              value={selected.intensity ?? 5}
-              onChange={(e) =>
-                commit(setIntensity(marks, selected.id, Number(e.target.value)))
-              }
-              className="h-11 w-full accent-primary"
-            />
-            <span className="flex justify-between text-lg text-muted-foreground">
-              <span>0 no pain</span>
-              <span>10 worst</span>
-            </span>
-          </label>
-        )}
-      </section>
-
-      <details className="rounded-xl border border-border bg-background p-3">
-        <summary className="min-h-11 cursor-pointer text-lg font-medium">
-          Choose a body part from a list
-        </summary>
-        <div className="mt-3 flex flex-col gap-3">
-          <label className="flex flex-col gap-2 text-lg">
-            Body part
-            <select
-              value={listRegionId}
-              onChange={(event) => setListRegionId(event.target.value)}
-              className="min-h-11 rounded-md border border-input bg-background px-3 text-lg"
             >
-              {REGIONS.map((region) => (
-                <option key={region.id} value={region.id}>
-                  {region.label.en}
-                </option>
-              ))}
-            </select>
-          </label>
-          <button
-            type="button"
-            disabled={!regionPoints.has(listRegionId)}
-            onClick={() => {
-              const point = regionPoints.get(listRegionId);
-              if (point) handleTap(listRegionId, point);
-            }}
-            className={cn(
-              buttonVariants({
-                variant: listMark?.kind === kind ? 'outline' : 'default',
-                size: 'touch',
-              }),
-              'text-lg',
-            )}
-          >
-            {listMark?.kind === kind
-              ? `Remove ${listRegion.label.en}`
-              : `Mark ${listRegion.label.en} as ${KIND_LABEL[kind].toLowerCase()}`}
-          </button>
-        </div>
-      </details>
+              Undo last change
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedId(null);
+                commit([]);
+              }}
+              disabled={marks.length === 0}
+              className={cn(
+                buttonVariants({ variant: 'outline', size: 'touch' }),
+                'text-lg',
+              )}
+            >
+              Clear all marks
+            </button>
+          </div>
 
-      <p className="text-muted-foreground">
-        Tap a body part to mark it. Tap it again to remove it. Drag sideways to
-        turn the body, or use the buttons.
-      </p>
+          <section
+            aria-label="Places you marked"
+            className="flex flex-col gap-3"
+          >
+            {marks.length === 0 ? (
+              <p className="text-muted-foreground">
+                Nothing marked yet. Tap the body where it hurts.
+              </p>
+            ) : (
+              <ul className="flex flex-wrap gap-2">
+                {marks.map((m) => {
+                  const label =
+                    REGION_BY_ID[m.regionId]?.label.en ?? m.regionId;
+                  const isSelected = m.id === selectedId;
+                  return (
+                    <li
+                      key={m.id}
+                      className={cn(
+                        'flex min-h-11 items-center overflow-hidden rounded-full border bg-background text-lg',
+                        isSelected
+                          ? 'border-ring ring-2 ring-ring/40'
+                          : 'border-border',
+                      )}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setSelectedId(isSelected ? null : m.id)}
+                        aria-pressed={isSelected}
+                        className="flex min-h-11 items-center gap-2 pr-1 pl-3 outline-none focus-visible:bg-muted"
+                      >
+                        <span
+                          aria-hidden
+                          className="size-3 rounded-full"
+                          style={{ backgroundColor: COLORS[m.kind] }}
+                        />
+                        {label}
+                        {m.intensity !== undefined && (
+                          <span className="text-muted-foreground">
+                            {m.intensity}/10
+                          </span>
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (isSelected) setSelectedId(null);
+                          commit(removeMark(marks, m.id));
+                        }}
+                        aria-label={`Remove ${label}`}
+                        className="flex size-11 items-center justify-center text-muted-foreground outline-none hover:text-foreground focus-visible:bg-muted"
+                      >
+                        <X className="size-4" aria-hidden />
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+
+            {selected && (
+              <label className="flex flex-col gap-2 rounded-xl border border-border bg-background p-3">
+                <span>
+                  {REGION_BY_ID[selected.regionId]?.label.en}: how bad is it?{' '}
+                  {selected.intensity === undefined ? (
+                    <span className="text-muted-foreground">
+                      Move the slider to choose.
+                    </span>
+                  ) : (
+                    <strong>{selected.intensity} out of 10</strong>
+                  )}
+                </span>
+                <input
+                  type="range"
+                  min={0}
+                  max={10}
+                  step={1}
+                  value={selected.intensity ?? 5}
+                  onChange={(e) =>
+                    commit(
+                      setIntensity(marks, selected.id, Number(e.target.value)),
+                    )
+                  }
+                  className="h-11 w-full accent-primary"
+                />
+                <span className="flex justify-between text-lg text-muted-foreground">
+                  <span>0 no pain</span>
+                  <span>10 worst</span>
+                </span>
+              </label>
+            )}
+          </section>
+
+          <details className="rounded-xl border border-border bg-background p-3">
+            <summary className="min-h-11 cursor-pointer text-lg font-medium">
+              Choose a body part from a list
+            </summary>
+            <div className="mt-3 flex flex-col gap-3">
+              <label className="flex flex-col gap-2 text-lg">
+                Body part
+                <select
+                  value={listRegionId}
+                  onChange={(event) => setListRegionId(event.target.value)}
+                  className="min-h-11 rounded-md border border-input bg-background px-3 text-lg"
+                >
+                  {REGIONS.map((region) => (
+                    <option key={region.id} value={region.id}>
+                      {region.label.en}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <button
+                type="button"
+                disabled={!regionPoints.has(listRegionId)}
+                onClick={() => {
+                  const point = regionPoints.get(listRegionId);
+                  if (point) handleTap(listRegionId, point);
+                }}
+                className={cn(
+                  buttonVariants({
+                    variant: listMark?.kind === kind ? 'outline' : 'default',
+                    size: 'touch',
+                  }),
+                  'text-lg',
+                )}
+              >
+                {listMark?.kind === kind
+                  ? `Remove ${listRegion.label.en}`
+                  : `Mark ${listRegion.label.en} as ${KIND_LABEL[kind].toLowerCase()}`}
+              </button>
+            </div>
+          </details>
+
+          <p className="text-muted-foreground">
+            Tap a body part to mark it. Tap it again to remove it. Drag sideways
+            to turn the body, or use the buttons.
+          </p>
+        </>
+      )}
     </div>
   );
 }
