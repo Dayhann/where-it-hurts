@@ -22,6 +22,7 @@ import {
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import * as THREE from 'three';
 import { patientCopy } from '@/components/i18n/patient';
+import { Dropdown } from '@/components/interior/dropdown';
 import { HoldToConfirm } from '@/components/interior/hold-to-confirm';
 import { SegmentedControl } from '@/components/interior/segmented-control';
 import { SliderDetents } from '@/components/interior/slider-detents';
@@ -594,20 +595,20 @@ export default function BodyViewer({
               {copy.chooseList}
             </summary>
             <div className="mt-3 flex flex-col gap-3">
-              <label className="flex flex-col gap-2 text-lg">
-                {copy.bodyPart}
-                <select
-                  value={listRegionId}
-                  onChange={(event) => setListRegionId(event.target.value)}
-                  className="min-h-11 rounded-md border border-input bg-background px-3 text-lg"
-                >
-                  {REGIONS.map((region) => (
-                    <option key={region.id} value={region.id}>
-                      {region.label[lang]}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <Dropdown
+                label={`${copy.bodyPart}: ${listRegion.label[lang]}`}
+                value={listRegionId}
+                onChange={setListRegionId}
+                items={REGIONS.map((region) => {
+                  const marked = marks.find((m) => m.regionId === region.id);
+                  return {
+                    value: region.id,
+                    label: region.label[lang],
+                    hint: marked ? kindLabel[marked.kind] : undefined,
+                  };
+                })}
+                className="block w-full [&_li]:text-lg! [&_li_.font-mono]:font-sans! [&_li_.font-mono]:text-sm! [&_ul]:max-h-72! [&>button]:h-11! [&>button]:w-full [&>button]:justify-between [&>button]:border-input! [&>button]:bg-background! [&>button]:text-lg! [&>button]:font-normal! [&>button]:text-foreground! [&>div]:right-0"
+              />
               <button
                 type="button"
                 disabled={!regionPoints.has(listRegionId)}
