@@ -28,7 +28,7 @@ Other scripts: `npm run typecheck`, `npm run lint`, `npm test`, `npm run eval` (
 
 ## Team
 
-- Engineer A (Face) — UI, 3D body map, clinic panel. Agent: `face-builder`.
+- Engineer A (Face) — UI, 3D body map, clinic panel. Agent: `face-builder`. GitHub: [Dayhann](https://github.com/Dayhann).
 - Engineer B (Brain) — engine, red flags, LLM, storage. Agent: `brain-builder`. GitHub: [KostaToulantas](https://github.com/KostaToulantas).
 
 See `BUILD_PLAN.md` for tickets, contracts and the safety design. See `ATTRIBUTION.md` for licences and AI tools used.
