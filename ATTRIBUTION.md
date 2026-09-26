@@ -18,6 +18,7 @@ This prototype is **not clinical guidance**.
 | cn                                | MIT        | className helper (shadcn)              |
 | lucide-react                      | ISC        | Icons                                  |
 | tw-animate-css                    | MIT        | CSS animations                         |
+| motion                            | MIT        | Springs for Rare UI components         |
 | three                             | MIT        | 3D renderer                            |
 | @react-three/fiber                | MIT        | React bindings for three.js            |
 | @react-three/drei                 | MIT        | 3D helpers (OrbitControls, Html)       |
