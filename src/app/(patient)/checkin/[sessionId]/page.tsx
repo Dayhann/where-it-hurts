@@ -6,15 +6,17 @@ import BodyViewer from '@/components/body-map/BodyViewer';
 import { buttonVariants } from '@/components/ui/button';
 import type { BodyMark } from '@/contracts/types';
 import { getApiClient } from '@/lib/api-client';
+import {
+  MarkSaveQueue,
+  type MarkSaveState,
+} from '@/lib/api-client/mark-save-queue';
 import { cn } from '@/lib/utils';
 
 function CheckinBody({ sessionId }: { sessionId: string }) {
   const [marks, setMarks] = useState<BodyMark[]>([]);
   const [ready, setReady] = useState(false);
-  const [saveState, setSaveState] = useState<
-    'idle' | 'saving' | 'saved' | 'local'
-  >('idle');
-  const canPersist = useRef(false);
+  const [saveState, setSaveState] = useState<MarkSaveState | 'idle'>('idle');
+  const saveQueue = useRef<MarkSaveQueue | null>(null);
   const skipNextSave = useRef(true);
 
   useEffect(() => {
@@ -24,7 +26,15 @@ function CheckinBody({ sessionId }: { sessionId: string }) {
       .then(({ session }) => {
         if (cancelled) return;
         setMarks(session.marks);
-        canPersist.current = true;
+        saveQueue.current = new MarkSaveQueue(
+          (next) =>
+            getApiClient()
+              .putMarks(sessionId, { marks: next })
+              .then(() => undefined),
+          (state) => {
+            if (!cancelled) setSaveState(state);
+          },
+        );
         setSaveState('saved');
       })
       .catch(() => {
@@ -45,13 +55,9 @@ function CheckinBody({ sessionId }: { sessionId: string }) {
       skipNextSave.current = false;
       return;
     }
-    if (!canPersist.current) return;
-    setSaveState('saving');
+    if (!saveQueue.current) return;
     const timer = window.setTimeout(() => {
-      getApiClient()
-        .putMarks(sessionId, { marks })
-        .then(() => setSaveState('saved'))
-        .catch(() => setSaveState('local'));
+      saveQueue.current?.enqueue(marks);
     }, 400);
     return () => window.clearTimeout(timer);
   }, [marks, sessionId, ready]);
@@ -63,7 +69,7 @@ function CheckinBody({ sessionId }: { sessionId: string }) {
   return (
     <>
       <BodyViewer marks={marks} onChange={setMarks} />
-      <p className="text-base text-muted-foreground" aria-live="polite">
+      <p className="text-lg text-muted-foreground" aria-live="polite">
         {saveState === 'saving' && 'Saving your marks…'}
         {saveState === 'saved' && 'Marks saved for this check-in.'}
         {saveState === 'local' &&
@@ -83,7 +89,7 @@ export default function CheckinPage({
   return (
     <main className="flex flex-1 flex-col gap-5">
       <div className="flex flex-col gap-1">
-        <p className="text-base text-muted-foreground">Check-in {sessionId}</p>
+        <p className="text-lg text-muted-foreground">Check-in {sessionId}</p>
         <h1 className="text-2xl font-semibold tracking-tight">
           Tap where it hurts
         </h1>
@@ -102,7 +108,10 @@ export default function CheckinPage({
       </Suspense>
       <Link
         href="/"
-        className={cn(buttonVariants({ variant: 'outline', size: 'touch' }))}
+        className={cn(
+          buttonVariants({ variant: 'outline', size: 'touch' }),
+          'text-lg',
+        )}
       >
         Back to start
       </Link>

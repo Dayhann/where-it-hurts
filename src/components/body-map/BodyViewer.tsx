@@ -74,18 +74,21 @@ function BodyModel({
   debug,
   onHover,
   onTap,
+  onRegionPoints,
 }: {
   marks: BodyMark[];
   hovered: string | null;
   debug: boolean;
   onHover: (regionId: string | null) => void;
   onTap: (regionId: string | null, point: BodyMark['point']) => void;
+  onRegionPoints: (points: ReadonlyMap<string, BodyMark['point']>) => void;
 }) {
   const { scene } = useGLTF(MODEL_URL);
 
-  const { root, materials } = useMemo(() => {
+  const { root, materials, regionPoints } = useMemo(() => {
     const next = scene.clone(true);
     const byName = new Map<string, THREE.MeshStandardMaterial>();
+    const points = new Map<string, BodyMark['point']>();
     next.traverse((obj) => {
       if (obj instanceof THREE.LineSegments) {
         obj.material = new THREE.LineBasicMaterial({
@@ -102,10 +105,22 @@ function BodyModel({
         });
         obj.material = material;
         byName.set(obj.name, material);
+        if (REGION_BY_ID[obj.name]) {
+          obj.geometry.computeBoundingBox();
+          const center = obj.geometry.boundingBox?.getCenter(
+            new THREE.Vector3(),
+          );
+          if (center) {
+            obj.localToWorld(center);
+            points.set(obj.name, center.toArray() as BodyMark['point']);
+          }
+        }
       }
     });
-    return { root: next, materials: byName };
+    return { root: next, materials: byName, regionPoints: points };
   }, [scene]);
+
+  useEffect(() => onRegionPoints(regionPoints), [onRegionPoints, regionPoints]);
 
   useEffect(() => {
     const kindByRegion = new Map(marks.map((m) => [m.regionId, m.kind]));
@@ -209,6 +224,10 @@ export default function BodyViewer({ marks, onChange }: BodyViewerProps) {
   const [kind, setKind] = useState<MarkKind>('pain');
   const [hovered, setHovered] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [listRegionId, setListRegionId] = useState(REGIONS[0].id);
+  const [regionPoints, setRegionPoints] = useState<
+    ReadonlyMap<string, BodyMark['point']>
+  >(new Map());
   const [past, setPast] = useState<BodyMark[][]>([]);
   const params = useSearchParams();
   const debug = params.get('regions') === '1';
@@ -216,6 +235,8 @@ export default function BodyViewer({ marks, onChange }: BodyViewerProps) {
 
   const selected = marks.find((m) => m.id === selectedId) ?? null;
   const hoveredLabel = hovered ? REGION_BY_ID[hovered]?.label.en : null;
+  const listRegion = REGION_BY_ID[listRegionId] ?? REGIONS[0];
+  const listMark = marks.find((mark) => mark.regionId === listRegionId);
 
   const commit = (next: BodyMark[]) => {
     setPast((prev) => [...prev, marks]);
@@ -259,7 +280,7 @@ export default function BodyViewer({ marks, onChange }: BodyViewerProps) {
                 variant: kind === k ? 'default' : 'outline',
                 size: 'touch',
               }),
-              'justify-start',
+              'justify-start text-lg',
             )}
           >
             <span
@@ -274,6 +295,8 @@ export default function BodyViewer({ marks, onChange }: BodyViewerProps) {
 
       <div className="relative overflow-hidden rounded-xl border border-border bg-muted">
         <div
+          role="img"
+          aria-label="Interactive 3D body map. You can also choose a body region from the accessible list below."
           className={cn(
             'h-[min(56vh,28rem)] w-full',
             hovered && 'cursor-pointer',
@@ -295,6 +318,7 @@ export default function BodyViewer({ marks, onChange }: BodyViewerProps) {
                 debug={debug}
                 onHover={setHovered}
                 onTap={handleTap}
+                onRegionPoints={setRegionPoints}
               />
               <MarkVisuals marks={marks} />
             </Suspense>
@@ -326,12 +350,12 @@ export default function BodyViewer({ marks, onChange }: BodyViewerProps) {
           </Canvas>
         </div>
         {hoveredLabel && (
-          <p className="pointer-events-none absolute top-2 left-2 rounded-md bg-background/90 px-2 py-1 text-base shadow-sm">
+          <p className="pointer-events-none absolute top-2 left-2 rounded-md bg-background/90 px-2 py-1 text-lg shadow-sm">
             {hoveredLabel}
           </p>
         )}
         {calibrate && (
-          <p className="absolute right-2 bottom-2 rounded-md bg-background/90 px-2 py-1 text-base shadow-sm">
+          <p className="absolute right-2 bottom-2 rounded-md bg-background/90 px-2 py-1 text-lg shadow-sm">
             Calibration on — taps log the point to the console.
           </p>
         )}
@@ -352,6 +376,7 @@ export default function BodyViewer({ marks, onChange }: BodyViewerProps) {
                 variant: lock && preset === key ? 'default' : 'outline',
                 size: 'touch',
               }),
+              'text-lg',
             )}
           >
             {PRESETS[key].label}
@@ -364,7 +389,10 @@ export default function BodyViewer({ marks, onChange }: BodyViewerProps) {
           type="button"
           onClick={undo}
           disabled={past.length === 0}
-          className={cn(buttonVariants({ variant: 'outline', size: 'touch' }))}
+          className={cn(
+            buttonVariants({ variant: 'outline', size: 'touch' }),
+            'text-lg',
+          )}
         >
           Undo last change
         </button>
@@ -375,7 +403,10 @@ export default function BodyViewer({ marks, onChange }: BodyViewerProps) {
             commit([]);
           }}
           disabled={marks.length === 0}
-          className={cn(buttonVariants({ variant: 'outline', size: 'touch' }))}
+          className={cn(
+            buttonVariants({ variant: 'outline', size: 'touch' }),
+            'text-lg',
+          )}
         >
           Clear all marks
         </button>
@@ -395,7 +426,7 @@ export default function BodyViewer({ marks, onChange }: BodyViewerProps) {
                 <li
                   key={m.id}
                   className={cn(
-                    'flex h-11 items-center overflow-hidden rounded-full border bg-background text-base',
+                    'flex min-h-11 items-center overflow-hidden rounded-full border bg-background text-lg',
                     isSelected
                       ? 'border-ring ring-2 ring-ring/40'
                       : 'border-border',
@@ -405,7 +436,7 @@ export default function BodyViewer({ marks, onChange }: BodyViewerProps) {
                     type="button"
                     onClick={() => setSelectedId(isSelected ? null : m.id)}
                     aria-pressed={isSelected}
-                    className="flex h-full items-center gap-2 pr-1 pl-3 outline-none focus-visible:bg-muted"
+                    className="flex min-h-11 items-center gap-2 pr-1 pl-3 outline-none focus-visible:bg-muted"
                   >
                     <span
                       aria-hidden
@@ -459,13 +490,54 @@ export default function BodyViewer({ marks, onChange }: BodyViewerProps) {
               }
               className="h-11 w-full accent-primary"
             />
-            <span className="flex justify-between text-base text-muted-foreground">
+            <span className="flex justify-between text-lg text-muted-foreground">
               <span>0 no pain</span>
               <span>10 worst</span>
             </span>
           </label>
         )}
       </section>
+
+      <details className="rounded-xl border border-border bg-background p-3">
+        <summary className="min-h-11 cursor-pointer text-lg font-medium">
+          Choose a body part from a list
+        </summary>
+        <div className="mt-3 flex flex-col gap-3">
+          <label className="flex flex-col gap-2 text-lg">
+            Body part
+            <select
+              value={listRegionId}
+              onChange={(event) => setListRegionId(event.target.value)}
+              className="min-h-11 rounded-md border border-input bg-background px-3 text-lg"
+            >
+              {REGIONS.map((region) => (
+                <option key={region.id} value={region.id}>
+                  {region.label.en}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button
+            type="button"
+            disabled={!regionPoints.has(listRegionId)}
+            onClick={() => {
+              const point = regionPoints.get(listRegionId);
+              if (point) handleTap(listRegionId, point);
+            }}
+            className={cn(
+              buttonVariants({
+                variant: listMark?.kind === kind ? 'outline' : 'default',
+                size: 'touch',
+              }),
+              'text-lg',
+            )}
+          >
+            {listMark?.kind === kind
+              ? `Remove ${listRegion.label.en}`
+              : `Mark ${listRegion.label.en} as ${KIND_LABEL[kind].toLowerCase()}`}
+          </button>
+        </div>
+      </details>
 
       <p className="text-muted-foreground">
         Tap a body part to mark it. Tap it again to remove it. Drag sideways to
