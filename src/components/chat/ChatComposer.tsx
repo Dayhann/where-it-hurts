@@ -21,18 +21,20 @@ export function ChatComposer({
     text: string;
     choiceId?: string;
     inputMode: 'text' | 'choice';
-  }) => void;
+  }) => Promise<boolean>;
 }) {
   const [text, setText] = useState('');
   const [wantOther, setWantOther] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  const sendText = () => {
+  const sendText = async () => {
     const next = text.trim();
     if (!next) return;
-    onSend({ text: next, inputMode: 'text' });
-    setText('');
-    setWantOther(false);
+    const sent = await onSend({ text: next, inputMode: 'text' });
+    if (sent) {
+      setText('');
+      setWantOther(false);
+    }
   };
 
   return (
@@ -47,15 +49,17 @@ export function ChatComposer({
             key={option.id}
             type="button"
             disabled={disabled}
-            onClick={() => {
+            onClick={async () => {
               if (option.id === SOMETHING_ELSE.id) {
                 setWantOther(true);
                 inputRef.current?.focus();
                 return;
               }
-              onSend(payloadForChip(option, lang, question));
-              setText('');
-              setWantOther(false);
+              const sent = await onSend(payloadForChip(option, lang, question));
+              if (sent) {
+                setText('');
+                setWantOther(false);
+              }
             }}
             className={cn(
               buttonVariants({ variant: 'outline', size: 'touch' }),
@@ -82,7 +86,7 @@ export function ChatComposer({
           onKeyDown={(event) => {
             if (event.key === 'Enter' && !event.shiftKey) {
               event.preventDefault();
-              sendText();
+              void sendText();
             }
           }}
           className="min-h-11 w-full resize-y rounded-lg border border-input bg-background px-3 py-2 text-lg leading-7 outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
@@ -91,7 +95,7 @@ export function ChatComposer({
       <button
         type="button"
         disabled={disabled || text.trim().length === 0}
-        onClick={sendText}
+        onClick={() => void sendText()}
         className={cn(buttonVariants({ size: 'touch' }), 'text-lg')}
       >
         Send

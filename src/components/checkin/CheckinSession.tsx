@@ -87,21 +87,24 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
   const applyTurn = (nextTurn: AssistantTurn, nextSession: Session) => {
     setTurn(nextTurn);
     setSession(nextSession);
-    setMarks(nextSession.marks);
+    // A chat response can predate the debounced mark save. Keep the local
+    // marks as the source of truth instead of restoring that stale snapshot.
   };
 
   const send = async (payload: {
     text: string;
     choiceId?: string;
     inputMode: 'text' | 'choice';
-  }) => {
+  }): Promise<boolean> => {
     setSending(true);
     setSendError(false);
     try {
       const result = await getApiClient().postMessage(sessionId, payload);
       applyTurn(result.turn, result.session);
+      return true;
     } catch {
       setSendError(true);
+      return false;
     } finally {
       setSending(false);
     }
