@@ -2,30 +2,18 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { patientCopy } from '@/components/i18n/patient';
 import { buttonVariants } from '@/components/ui/button';
-import type { Lang } from '@/contracts/types';
 import { getApiClient } from '@/lib/api-client';
 import { cn } from '@/lib/utils';
 
 export function StartCheckin() {
   const router = useRouter();
-  const [lang, setLang] = useState<Lang>('en');
   const [carerMode, setCarerMode] = useState(false);
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState(false);
-  const copy = patientCopy(lang);
-
-  useEffect(() => {
-    const root = document.documentElement;
-    root.lang = lang;
-    root.dir = lang === 'ar' ? 'rtl' : 'ltr';
-    return () => {
-      root.lang = 'en';
-      root.dir = 'ltr';
-    };
-  }, [lang]);
+  const copy = patientCopy('en');
 
   const start = async () => {
     setStarting(true);
@@ -37,7 +25,7 @@ export function StartCheckin() {
           clinician: 'Dr Morgan Demo',
           startsAt: new Date().toISOString(),
         },
-        lang,
+        lang: 'en',
         carerMode,
       });
       router.push(`/checkin/${session.id}`);
@@ -48,10 +36,7 @@ export function StartCheckin() {
   };
 
   return (
-    <main
-      dir={lang === 'ar' ? 'rtl' : 'ltr'}
-      className="flex flex-1 flex-col justify-center gap-7 py-4"
-    >
+    <main className="flex flex-1 flex-col justify-center gap-7 py-4">
       <header className="flex flex-col gap-3">
         <p className="text-sm font-medium tracking-wide text-primary uppercase">
           {copy.home.badge}
@@ -61,34 +46,6 @@ export function StartCheckin() {
         </h1>
         <p>{copy.home.description}</p>
       </header>
-
-      <fieldset className="flex flex-col gap-2">
-        <legend className="mb-2 font-semibold">{copy.home.language}</legend>
-        <div className="grid grid-cols-2 gap-2">
-          {(
-            [
-              ['en', copy.home.english],
-              ['ar', copy.home.arabic],
-            ] as const
-          ).map(([value, label]) => (
-            <button
-              key={value}
-              type="button"
-              onClick={() => setLang(value)}
-              aria-pressed={lang === value}
-              className={cn(
-                buttonVariants({
-                  variant: lang === value ? 'default' : 'outline',
-                  size: 'touch',
-                }),
-                'text-lg',
-              )}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      </fieldset>
 
       <label className="flex min-h-11 items-center gap-3 rounded-lg border border-border bg-card px-4 py-3">
         <input
