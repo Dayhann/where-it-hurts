@@ -1,0 +1,17 @@
+# Replace with GitHub usernames after gh auth (Engineer B: KostaToulantas)
+/src/app/api/        @KostaToulantas
+/src/server/         @KostaToulantas
+/src/mocks/          @KostaToulantas
+/data/               @KostaToulantas
+/tests/unit/         @KostaToulantas
+/tests/vignettes/    @KostaToulantas
+/src/components/     @engineerA
+/src/app/(patient)/  @engineerA
+/src/app/(clinic)/   @engineerA
+/src/lib/api-client/ @engineerA
+/public/             @engineerA
+/tests/e2e/          @engineerA
+/src/contracts/      @engineerA @KostaToulantas
+/CLAUDE.md           @engineerA @KostaToulantas
+/.claude/            @engineerA @KostaToulantas
+/package.json        @engineerA @KostaToulantas

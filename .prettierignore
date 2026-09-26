@@ -1,0 +1,12 @@
+node_modules
+.next
+out
+build
+coverage
+package-lock.json
+playwright-report
+test-results
+public/models
+*.glb
+*.ico
+.next-env.d.ts
