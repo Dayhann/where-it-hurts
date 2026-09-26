@@ -1,83 +1,49 @@
-// Adapted from interior.dev (https://www.interior.dev). MIT, Copyright (c) 2026 ozzy. See ./LICENSE.
-'use client';
+// Copied unchanged from interior.dev (https://www.interior.dev). MIT, Copyright (c) 2026 ozzy. See ./LICENSE.
+/* eslint-disable react-hooks/refs -- upstream file kept unchanged */
+"use client";
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   animate,
   motion,
   useMotionValue,
   useReducedMotion,
   useTransform,
-} from 'motion/react';
+} from "motion/react";
 
-const CELL = {
-  type: 'spring',
-  stiffness: 520,
-  damping: 34,
-  mass: 0.45,
-} as const;
+const CELL = { type: "spring", stiffness: 520, damping: 34, mass: 0.45 } as const;
 
-const SEG = {
-  sm: 'px-3 py-1.5 text-sm font-medium leading-5',
-  touch: 'min-h-11 px-3 py-2 text-lg font-medium leading-7',
-} as const;
+const SEG =
+  "px-3 py-[7px] text-center text-[13px] font-medium leading-[18px] tracking-[-0.01em] whitespace-nowrap";
 
-export type SegmentedOption<T extends string = string> = {
-  value: T;
+export type SegmentedOption = {
+  value: string;
   label: string;
-  swatch?: string;
   disabled?: boolean;
 };
 
-export type SegmentedControlProps<T extends string = string> = {
-  options: SegmentedOption<T>[];
+export type SegmentedControlProps = {
+  options: SegmentedOption[];
   label: string;
-  value?: T;
-  defaultValue?: T;
-  onValueChange?: (value: T) => void;
-  size?: keyof typeof SEG;
+  value?: string;
+  defaultValue?: string;
+  onValueChange?: (value: string) => void;
   className?: string;
 };
 
-function Face({
-  option,
-  seg,
-  className,
-}: {
-  option: SegmentedOption;
-  seg: string;
-  className: string;
-}) {
-  return (
-    <span
-      className={`${seg} flex items-center justify-center gap-2 text-center whitespace-nowrap ${className}`}
-    >
-      {option.swatch && (
-        <span
-          className="size-3 shrink-0 rounded-full ring-1 ring-background"
-          style={{ backgroundColor: option.swatch }}
-        />
-      )}
-      {option.label}
-    </span>
-  );
-}
-
-export function SegmentedControl<T extends string = string>({
+export function SegmentedControl({
   options,
   label,
   value,
   defaultValue,
   onValueChange,
-  size = 'sm',
-  className = '',
-}: SegmentedControlProps<T>) {
+  className = "",
+}: SegmentedControlProps) {
   const count = Math.max(1, options.length);
   const template = `repeat(${count}, minmax(0, 1fr))`;
-  const seg = SEG[size];
 
-  const [internal, setInternal] = useState<T | undefined>(
-    () => defaultValue ?? options[0]?.value,
+  const [internal, setInternal] = useState(
+    () => defaultValue ?? options[0]?.value ?? "",
   );
   const [hovered, setHovered] = useState(-1);
 
@@ -88,9 +54,7 @@ export function SegmentedControl<T extends string = string>({
 
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
   const emit = useRef(onValueChange);
-  useEffect(() => {
-    emit.current = onValueChange;
-  });
+  emit.current = onValueChange;
 
   const reduced = useReducedMotion();
   const pos = useMotionValue(index);
@@ -107,7 +71,7 @@ export function SegmentedControl<T extends string = string>({
   }, [index, reduced, pos]);
 
   const select = useCallback(
-    (next: T) => {
+    (next: string) => {
       if (!controlled) setInternal(next);
       if (next !== current) emit.current?.(next);
     },
@@ -137,16 +101,16 @@ export function SegmentedControl<T extends string = string>({
   );
 
   const onKeyDown = (e: React.KeyboardEvent, i: number) => {
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") {
       e.preventDefault();
       go(seek(i, 1));
-    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+    } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
       e.preventDefault();
       go(seek(i, -1));
-    } else if (e.key === 'Home') {
+    } else if (e.key === "Home") {
       e.preventDefault();
       go(seek(count - 1, 1));
-    } else if (e.key === 'End') {
+    } else if (e.key === "End") {
       e.preventDefault();
       go(seek(0, -1));
     }
@@ -156,31 +120,31 @@ export function SegmentedControl<T extends string = string>({
     <div
       role="radiogroup"
       aria-label={label}
-      dir="ltr"
-      className={`relative rounded-lg border border-border bg-muted p-[3px] select-none ${className}`}
+      className={`relative inline-block select-none rounded-[9px] border border-stone-200 bg-stone-100/70 p-[3px] shadow-[inset_0_1px_2px_rgba(28,25,23,0.07)] dark:border-white/[0.16] dark:bg-[#1D1D1A] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.45)] ${className}`}
     >
       <div
         className="relative grid"
-        style={{ gridTemplateColumns: template, touchAction: 'manipulation' }}
+        style={{ gridTemplateColumns: template, touchAction: "manipulation" }}
       >
         {options.map((option, i) => (
-          <Face
+          <span
             key={option.value}
-            option={option}
-            seg={seg}
-            className={`pointer-events-none ${
+            aria-hidden
+            className={`${SEG} pointer-events-none ${
               option.disabled
-                ? 'text-muted-foreground/50'
+                ? "text-stone-300 dark:text-stone-600"
                 : hovered === i && i !== index
-                  ? 'text-foreground'
-                  : 'text-muted-foreground'
+                  ? "text-stone-700 dark:text-stone-200"
+                  : "text-stone-500 dark:text-stone-400"
             }`}
-          />
+          >
+            {option.label}
+          </span>
         ))}
 
         <motion.div
           aria-hidden
-          className="pointer-events-none absolute inset-y-0 left-0 overflow-hidden rounded-md bg-primary shadow-sm"
+          className="pointer-events-none absolute inset-y-0 left-0 overflow-hidden rounded-[6px] bg-stone-800 shadow-[0_1px_2px_rgba(28,25,23,0.28)] dark:bg-stone-100 dark:shadow-[0_1px_2px_rgba(0,0,0,0.5)]"
           style={{ width: `${100 / count}%`, x: thumbX }}
           initial={false}
         >
@@ -191,23 +155,19 @@ export function SegmentedControl<T extends string = string>({
           >
             <div
               className="absolute inset-y-0 left-0 grid"
-              style={{
-                width: `${count * 100}%`,
-                gridTemplateColumns: template,
-              }}
+              style={{ width: `${count * 100}%`, gridTemplateColumns: template }}
             >
               {options.map((option) => (
-                <Face
+                <span
                   key={option.value}
-                  option={option}
-                  seg={seg}
-                  className="text-primary-foreground"
-                />
+                  className={`${SEG} text-stone-50 dark:text-stone-900`}
+                >
+                  {option.label}
+                </span>
               ))}
             </div>
           </motion.div>
         </motion.div>
-
         <div
           className="absolute inset-0 grid"
           style={{ gridTemplateColumns: template }}
@@ -227,7 +187,7 @@ export function SegmentedControl<T extends string = string>({
               onClick={() => !option.disabled && select(option.value)}
               onKeyDown={(e) => onKeyDown(e, i)}
               onPointerEnter={() => !option.disabled && setHovered(i)}
-              className="rounded-md outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+              className="cursor-default rounded-[6px] outline-none focus-visible:bg-[#4568FF]/[0.06] focus-visible:shadow-[inset_0_0_0_1px_#4568FF] dark:focus-visible:bg-[#93B0FF]/[0.08] dark:focus-visible:shadow-[inset_0_0_0_1px_#93B0FF]"
             >
               <span className="sr-only">{option.label}</span>
             </button>

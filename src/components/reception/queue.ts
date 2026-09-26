@@ -9,6 +9,20 @@ export function sortReceptionQueue(items: QueueItem[]): QueueItem[] {
   });
 }
 
+export function queueChanges(
+  previous: QueueItem[] | null,
+  next: QueueItem[],
+): { arrived: QueueItem[]; flagged: QueueItem[] } {
+  if (!previous) return { arrived: [], flagged: [] };
+  const before = new Map(previous.map((item) => [item.sessionId, item]));
+  return {
+    arrived: next.filter((item) => !before.has(item.sessionId)),
+    flagged: next.filter(
+      (item) => item.redFlag && !before.get(item.sessionId)?.redFlag,
+    ),
+  };
+}
+
 export function queueStatus(status: QueueItem['status']): string {
   switch (status) {
     case 'in_progress':

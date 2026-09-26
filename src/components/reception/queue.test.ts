@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { QueueItem } from './queue';
-import { queueStatus, sortReceptionQueue } from './queue';
+import { queueChanges, queueStatus, sortReceptionQueue } from './queue';
 
 const item = (
   sessionId: string,
@@ -27,6 +27,26 @@ describe('sortReceptionQueue', () => {
       'earlier',
       'later',
     ]);
+  });
+});
+
+describe('queueChanges', () => {
+  const nine = '2026-09-26T09:00:00.000Z';
+
+  it('reports nothing on the first load', () => {
+    expect(queueChanges(null, [item('a', nine, true)])).toEqual({
+      arrived: [],
+      flagged: [],
+    });
+  });
+
+  it('reports new check-ins and newly raised red flags', () => {
+    const changes = queueChanges(
+      [item('a', nine), item('b', nine, true)],
+      [item('a', nine, true), item('b', nine, true), item('c', nine)],
+    );
+    expect(changes.arrived.map(({ sessionId }) => sessionId)).toEqual(['c']);
+    expect(changes.flagged.map(({ sessionId }) => sessionId)).toEqual(['a']);
   });
 });
 

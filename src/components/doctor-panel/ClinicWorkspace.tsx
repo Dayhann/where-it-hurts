@@ -88,30 +88,19 @@ export function ClinicWorkspace() {
           ) : (
             <HookSidebar
               aria-label="Today's patients"
-              className="p-3"
-              itemClassName="flex min-h-16 items-center justify-between gap-3"
+              className="p-4"
+              color="var(--primary)"
               value={items.findIndex((item) => item.sessionId === selectedId)}
               onChange={(index) => setSelectedId(items[index].sessionId)}
-              items={items.map((item) => ({
-                key: item.sessionId,
-                label: (
-                  <>
-                    <span>
-                      <strong className="block">
-                        {item.patientDisplayName}
-                      </strong>
-                      <span className="text-sm text-muted-foreground">
-                        {appointmentTime(item.startsAt)}
-                      </span>
-                    </span>
-                    {item.redFlag && (
-                      <span className="rounded-full bg-destructive/10 px-2 py-1 text-xs font-semibold text-destructive">
-                        Alert
-                      </span>
-                    )}
-                  </>
-                ),
-              }))}
+              items={items.map((item) =>
+                [
+                  item.patientDisplayName,
+                  appointmentTime(item.startsAt),
+                  item.redFlag ? 'Red flag' : null,
+                ]
+                  .filter(Boolean)
+                  .join(' · '),
+              )}
             />
           )}
         </aside>
@@ -124,8 +113,13 @@ export function ClinicWorkspace() {
                   <p className="text-sm text-muted-foreground">
                     {appointmentTime(selected.startsAt)} phone consultation
                   </p>
-                  <h2 className="text-xl font-semibold">
+                  <h2 className="flex items-center gap-2 text-xl font-semibold">
                     {selected.patientDisplayName}
+                    {selected.redFlag && (
+                      <span className="rounded-full bg-destructive/10 px-2 py-1 text-xs font-semibold text-destructive">
+                        Red flag
+                      </span>
+                    )}
                   </h2>
                   <p className="mt-1 text-sm text-muted-foreground">
                     Check-in status: {selected.status.replaceAll('_', ' ')}

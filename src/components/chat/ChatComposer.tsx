@@ -3,8 +3,11 @@
 import { Mic, Square } from 'lucide-react';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { patientCopy } from '@/components/i18n/patient';
+import { PressDepth } from '@/components/interior/press-depth';
+import { Ripple } from '@/components/interior/ripple';
 import type { Lang, Question, QuestionOption } from '@/contracts/types';
 import { buttonVariants } from '@/components/ui/button';
+import MatrixOrb from '@/components/ui/matrix-orb';
 import { cn } from '@/lib/utils';
 import { SOMETHING_ELSE, optionLabel, payloadForChip } from './chips';
 import {
@@ -103,9 +106,8 @@ export function ChatComposer({
         aria-label={copy.quickAnswers}
       >
         {chips.map((option) => (
-          <button
+          <PressDepth
             key={option.id}
-            type="button"
             disabled={disabled}
             onClick={async () => {
               if (option.id === SOMETHING_ELSE.id) {
@@ -121,13 +123,12 @@ export function ChatComposer({
               }
             }}
             className={cn(
-              buttonVariants({ variant: 'outline', size: 'touch' }),
-              'text-lg',
-              option.id.startsWith('scale_') && 'min-w-11 px-3',
+              'h-11! px-4! text-lg! leading-7!',
+              option.id.startsWith('scale_') && 'min-w-11 px-3!',
             )}
           >
             {optionLabel(option, lang)}
-          </button>
+          </PressDepth>
         ))}
       </div>
       <label className="flex flex-col gap-2">
@@ -152,6 +153,19 @@ export function ChatComposer({
           className="min-h-11 w-full resize-y rounded-lg border border-input bg-background px-3 py-2 text-lg leading-7 outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
         />
       </label>
+      {voiceSupported && (
+        <MatrixOrb
+          size={44}
+          color="#23636B"
+          state={listening ? 'listening' : disabled ? 'thinking' : 'idle'}
+          labels={{
+            idle: copy.voiceIdle,
+            listening: copy.voiceListening,
+            thinking: copy.waiting,
+          }}
+          className="flex-row! gap-3! [&_[role=status]]:text-lg! [&_[role=status]]:text-muted-foreground!"
+        />
+      )}
       <div
         className={cn('grid gap-2', voiceSupported && 'grid-cols-[auto_1fr]')}
       >
@@ -171,14 +185,14 @@ export function ChatComposer({
             {listening ? copy.stop : copy.speak}
           </button>
         )}
-        <button
-          type="button"
+        <Ripple
           disabled={disabled || text.trim().length === 0}
-          onClick={() => void sendText()}
-          className={cn(buttonVariants({ size: 'touch' }), 'text-lg')}
+          onPress={() => void sendText()}
+          tintClassName="bg-white/30"
+          className="min-h-11 rounded-lg! border-primary! bg-primary! text-lg! text-primary-foreground!"
         >
           {copy.send}
-        </button>
+        </Ripple>
       </div>
     </div>
   );

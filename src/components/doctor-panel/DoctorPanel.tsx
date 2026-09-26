@@ -1,15 +1,13 @@
 'use client';
 
-import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
+import { Accordion } from '@/components/interior/accordion';
 import { CopyButton } from '@/components/interior/copy-button';
 import { SegmentedControl } from '@/components/interior/segmented-control';
-import {
-  SkeletonLines,
-  useSkeletonSwap,
-} from '@/components/interior/skeleton-swap';
+import { SkeletonSwap } from '@/components/interior/skeleton-swap';
 import { buttonVariants } from '@/components/ui/button';
+import GridReveal from '@/components/ui/grid-reveal';
 import type { ClinicianSummary, Session, SummaryLine } from '@/contracts/types';
 import { getApiClient } from '@/lib/api-client';
 import { cn } from '@/lib/utils';
@@ -24,6 +22,26 @@ function messageTime(session: Session, line: SummaryLine, quoteIndex: number) {
     hour: 'numeric',
     minute: '2-digit',
   }).format(new Date(message.createdAt));
+}
+
+function useImageAspect(src: string | undefined) {
+  const [measured, setMeasured] = useState<{ src: string; aspect: number }>();
+
+  useEffect(() => {
+    if (!src) return;
+    let cancelled = false;
+    const image = new window.Image();
+    image.onload = () => {
+      if (cancelled || !image.naturalWidth || !image.naturalHeight) return;
+      setMeasured({ src, aspect: image.naturalWidth / image.naturalHeight });
+    };
+    image.src = src;
+    return () => {
+      cancelled = true;
+    };
+  }, [src]);
+
+  return measured && measured.src === src ? measured.aspect : undefined;
 }
 
 function SummaryQuoteLine({
@@ -121,8 +139,6 @@ export function DoctorPanel({
     };
   }, [sessionId]);
 
-  const { showSkeleton } = useSkeletonSwap({ ready: !loading });
-
   const sendFeedback = async () => {
     if (!summary?.lines.length || !feedback.trim()) return;
     setError(false);
@@ -139,6 +155,7 @@ export function DoctorPanel({
   };
 
   const snapshot = session?.bodySnapshots?.[view];
+  const snapshotAspect = useImageAspect(snapshot);
 
   return (
     <>
@@ -177,41 +194,46 @@ export function DoctorPanel({
         </header>
 
         <div className="flex flex-1 flex-col gap-5 overflow-y-auto p-4">
-          <p role="status" className="sr-only">
-            {loading ? 'Loading summary' : ''}
-          </p>
-          {showSkeleton && <SkeletonLines lines={6} />}
           {error && (
             <p className="text-destructive" role="alert">
               This summary could not be loaded or updated.
             </p>
           )}
 
-          {!showSkeleton && summary && session && (
-            <>
-              {summary.redFlags.length > 0 ? (
-                <section className="rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-destructive">
-                  <h3 className="font-semibold">Red flag reported</h3>
-                  <ul className="mt-1 list-disc pl-5">
-                    {summary.redFlags.map((hit) => (
-                      <li key={`${hit.ruleId}-${hit.sourceMessageId}`}>
-                        {hit.label}
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              ) : (
-                <p className="rounded-lg bg-muted p-3 font-medium">
-                  No red flags reported
-                </p>
-              )}
+          {summary &&
+            session &&
+            (summary.redFlags.length > 0 ? (
+              <section className="rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-destructive">
+                <h3 className="font-semibold">Red flag reported</h3>
+                <ul className="mt-1 list-disc pl-5">
+                  {summary.redFlags.map((hit) => (
+                    <li key={`${hit.ruleId}-${hit.sourceMessageId}`}>
+                      {hit.label}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ) : (
+              <p className="rounded-lg bg-muted p-3 font-medium">
+                No red flags reported
+              </p>
+            ))}
 
-              <section>
-                <h3 className="text-sm font-semibold tracking-wide text-muted-foreground uppercase">
-                  Headline
-                </h3>
-                {summary.headline.length > 0 ? (
-                  <ul className="mt-2 flex flex-col gap-2">
+          <section>
+            <h3 className="text-sm font-semibold tracking-wide text-muted-foreground uppercase">
+              Headline
+            </h3>
+            <SkeletonSwap
+              ready={!loading}
+              lines={3}
+              lineHeight={68}
+              barHeight={52}
+              label="Summary headline"
+              className="mt-2 h-auto! overflow-visible! text-foreground!"
+            >
+              {summary && session ? (
+                summary.headline.length > 0 ? (
+                  <ul className="flex flex-col gap-2">
                     {summary.headline.slice(0, 3).map((text) => {
                       const lineIndex = summary.lines.findIndex(
                         (line) => line.text === text,
@@ -239,12 +261,16 @@ export function DoctorPanel({
                     })}
                   </ul>
                 ) : (
-                  <p className="mt-2 text-muted-foreground">
+                  <p className="text-muted-foreground">
                     No summary available yet.
                   </p>
-                )}
-              </section>
+                )
+              ) : null}
+            </SkeletonSwap>
+          </section>
 
+          {summary && session && (
+            <>
               {summary.lines.some(
                 (line) => !summary.headline.includes(line.text),
               ) && (
@@ -277,7 +303,7 @@ export function DoctorPanel({
                   <SegmentedControl
                     label="Body view"
                     value={view}
-                    onValueChange={setView}
+                    onValueChange={(next) => setView(next as 'front' | 'back')}
                     options={[
                       { value: 'front', label: 'Front' },
                       { value: 'back', label: 'Back' },
@@ -286,14 +312,16 @@ export function DoctorPanel({
                 </div>
                 <div className="flex h-44 items-center justify-center overflow-hidden rounded-lg border border-border bg-muted">
                   {snapshot ? (
-                    <Image
-                      src={snapshot}
-                      alt={`${view} body map marked by the patient`}
-                      width={360}
-                      height={176}
-                      unoptimized
-                      className="h-full w-full object-contain"
-                    />
+                    snapshotAspect ? (
+                      <GridReveal
+                        key={snapshot}
+                        src={snapshot}
+                        alt={`${view} body map marked by the patient`}
+                        aspect={snapshotAspect}
+                        estimatedDuration={900}
+                        className="h-full! w-auto! max-w-full rounded-none!"
+                      />
+                    ) : null
                   ) : (
                     <p className="px-4 text-center text-muted-foreground">
                       Body snapshot not available.
@@ -358,21 +386,32 @@ export function DoctorPanel({
                 )}
               </section>
 
-              <details className="rounded-lg border border-border p-3">
-                <summary className="cursor-pointer font-semibold">
-                  Transcript
-                </summary>
-                <div className="mt-3 flex flex-col gap-2">
-                  {session.messages.map((message) => (
-                    <p key={message.id}>
-                      <strong>
-                        {message.role === 'patient' ? 'Patient' : 'Check-in'}:
-                      </strong>{' '}
-                      {message.text}
-                    </p>
-                  ))}
-                </div>
-              </details>
+              <Accordion
+                maxPanelHeight={260}
+                className="shrink-0 rounded-lg! border-border! bg-card! shadow-none! [&_button]:min-h-11 [&_button>span]:text-sm! [&_button>span:first-child]:text-base! [&_button>span:first-child]:font-semibold! [&_button>span:first-child]:text-foreground!"
+                items={[
+                  {
+                    id: 'transcript',
+                    title: 'Transcript',
+                    meta: `${session.messages.length} messages`,
+                    content: (
+                      <div className="flex flex-col gap-2 text-base text-foreground">
+                        {session.messages.map((message) => (
+                          <p key={message.id}>
+                            <strong>
+                              {message.role === 'patient'
+                                ? 'Patient'
+                                : 'Check-in'}
+                              :
+                            </strong>{' '}
+                            {message.text}
+                          </p>
+                        ))}
+                      </div>
+                    ),
+                  },
+                ]}
+              />
             </>
           )}
         </div>

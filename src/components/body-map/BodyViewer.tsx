@@ -22,7 +22,9 @@ import {
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import * as THREE from 'three';
 import { patientCopy } from '@/components/i18n/patient';
+import { HoldToConfirm } from '@/components/interior/hold-to-confirm';
 import { SegmentedControl } from '@/components/interior/segmented-control';
+import { SliderDetents } from '@/components/interior/slider-detents';
 import { REGION_BY_ID, REGIONS } from '@/contracts/regions';
 import type { BodyMark, Lang } from '@/contracts/types';
 import { buttonVariants } from '@/components/ui/button';
@@ -344,13 +346,12 @@ export default function BodyViewer({
       {!compact && (
         <SegmentedControl
           label={copy.marking}
-          size="touch"
+          className="block w-full [&_span]:py-2.5 [&_span]:text-lg [&_span]:leading-7"
           value={kind}
-          onValueChange={setKind}
+          onValueChange={(next) => setKind(next as MarkKind)}
           options={MARK_KINDS.map((k) => ({
             value: k,
             label: kindLabel[k],
-            swatch: COLORS[k],
           }))}
         />
       )}
@@ -469,7 +470,7 @@ export default function BodyViewer({
             ))}
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-[auto_1fr] gap-2">
             <button
               type="button"
               onClick={undo}
@@ -481,20 +482,17 @@ export default function BodyViewer({
             >
               {copy.undo}
             </button>
-            <button
-              type="button"
-              onClick={() => {
+            <HoldToConfirm
+              disabled={marks.length === 0}
+              confirmLabel={copy.cleared}
+              onConfirm={() => {
                 setSelectedId(null);
                 commit([]);
               }}
-              disabled={marks.length === 0}
-              className={cn(
-                buttonVariants({ variant: 'outline', size: 'touch' }),
-                'text-lg',
-              )}
+              className="h-11! w-full rounded-lg! border-border! bg-background! text-lg! text-foreground! [&>span.absolute]:bg-primary! [&>span.absolute]:text-primary-foreground!"
             >
-              {copy.clear}
-            </button>
+              {copy.holdClear}
+            </HoldToConfirm>
           </div>
 
           <section aria-label={copy.places} className="flex flex-col gap-3">
@@ -552,8 +550,8 @@ export default function BodyViewer({
             )}
 
             {selected && (
-              <label className="flex flex-col gap-2 rounded-xl border border-border bg-background p-3">
-                <span>
+              <div className="flex flex-col gap-2 rounded-xl border border-border bg-background p-3">
+                <p>
                   {REGION_BY_ID[selected.regionId]?.label[lang]}:{' '}
                   {copy.severity}{' '}
                   {selected.intensity === undefined ? (
@@ -565,25 +563,29 @@ export default function BodyViewer({
                       {selected.intensity} {copy.outOfTen}
                     </strong>
                   )}
-                </span>
-                <input
-                  type="range"
+                </p>
+                <SliderDetents
+                  key={selected.id}
+                  label={copy.sliderLabel}
                   min={0}
                   max={10}
                   step={1}
                   value={selected.intensity ?? 5}
-                  onChange={(e) =>
-                    commit(
-                      setIntensity(marks, selected.id, Number(e.target.value)),
-                    )
+                  detents={[
+                    { value: 0, label: copy.noPainShort },
+                    { value: 10, label: copy.worstShort },
+                  ]}
+                  format={(value) =>
+                    selected.intensity === undefined
+                      ? '–'
+                      : `${value} ${copy.outOfTen}`
                   }
-                  className="h-11 w-full accent-primary"
+                  onValueChange={(value) =>
+                    commit(setIntensity(marks, selected.id, value))
+                  }
+                  className="overflow-x-clip [&_.bg-stone-800]:bg-primary! [&_span]:text-lg! [&_span]:leading-7!"
                 />
-                <span className="flex justify-between text-lg text-muted-foreground">
-                  <span>{copy.noPain}</span>
-                  <span>{copy.worst}</span>
-                </span>
-              </label>
+              </div>
             )}
           </section>
 
