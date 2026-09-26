@@ -583,7 +583,7 @@ export default function BodyViewer({
                   onValueChange={(value) =>
                     commit(setIntensity(marks, selected.id, value))
                   }
-                  className="overflow-x-clip [&_.bg-stone-800]:bg-primary! [&_span]:text-lg! [&_span]:leading-7!"
+                  className="overflow-x-clip [&_.bg-stone-800]:bg-primary! [&>div:first-child]:sr-only"
                 />
               </div>
             )}
