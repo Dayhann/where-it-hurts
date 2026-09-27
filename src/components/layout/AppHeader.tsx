@@ -24,7 +24,17 @@ function Peaks({ className }: { className?: string }) {
  * today's date. The band is a gradient standing in for the photograph in the
  * design reference — drop a real image in behind it when one exists.
  */
-export function AppHeader({ date }: { date?: Date }) {
+export function AppHeader({
+  date,
+  greeting,
+  title,
+}: {
+  date?: Date;
+  /** Small line above the title, e.g. "Good to see you,". */
+  greeting?: string;
+  /** Serif headline. Sits over the hero, as in the design reference. */
+  title?: string;
+}) {
   const today = date ?? new Date();
   const label = new Intl.DateTimeFormat('en-AU', {
     weekday: 'short',
@@ -52,6 +62,17 @@ export function AppHeader({ date }: { date?: Date }) {
           <time dateTime={today.toISOString().slice(0, 10)}>{label}</time>
         </p>
       </div>
+
+      {(greeting ?? title) && (
+        <header className="relative mt-7 flex flex-col">
+          {greeting && (
+            <p className="text-base text-muted-foreground">{greeting}</p>
+          )}
+          {title && (
+            <h1 className="display-title mt-1 text-[2.125rem]">{title}</h1>
+          )}
+        </header>
+      )}
     </div>
   );
 }

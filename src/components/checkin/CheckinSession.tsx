@@ -8,10 +8,10 @@ import BodyViewer, {
 import { ChatComposer } from '@/components/chat/ChatComposer';
 import { ChatThread } from '@/components/chat/ChatThread';
 import { replyChips } from '@/components/chat/chips';
-import { QuestionProgress } from '@/components/chat/QuestionProgress';
+import { progressLabel } from '@/components/chat/progress';
 import { chatHasStarted, turnFromSession } from '@/components/chat/resume-turn';
 import { patientCopy } from '@/components/i18n/patient';
-import { TaskSteps } from '@/components/interior/task-steps';
+import { StepCard } from '@/components/layout/StepCard';
 import { PatientRecap } from '@/components/recap/PatientRecap';
 import { RedFlagStop } from '@/components/red-flag/RedFlagStop';
 import { buttonVariants } from '@/components/ui/button';
@@ -27,7 +27,6 @@ import {
   type MarkSaveState,
 } from '@/lib/api-client/mark-save-queue';
 import { cn } from '@/lib/utils';
-import { checkinStep } from './steps';
 
 export function CheckinSession({ sessionId }: { sessionId: string }) {
   const [session, setSession] = useState<Session | null>(null);
@@ -162,26 +161,15 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
     );
   }
 
-  const steps = (
-    <TaskSteps
-      label={copy.checkin.stepsLabel}
-      steps={copy.checkin.steps.map((label, index) => ({
-        id: String(index),
-        label,
-      }))}
-      current={checkinStep({
-        chatStarted,
-        turn,
-        confirmed: confirmed || session?.status === 'confirmed',
-      })}
-      className="[&_li]:h-9 [&_li>span.truncate]:text-lg!"
-    />
-  );
-
   if (turn?.type === 'done' && session) {
     return (
       <div dir={direction} className="flex flex-col gap-5">
-        {steps}
+        <StepCard
+          step={3}
+          stepName={copy.checkin.steps[2]}
+          title={confirmed ? copy.recap.thanks : copy.recap.title}
+          body={confirmed ? copy.recap.sent : copy.recap.instructions}
+        />
         <PatientRecap
           sessionId={sessionId}
           alreadyConfirmed={session.status === 'confirmed'}
@@ -199,39 +187,40 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
 
   return (
     <div dir={direction} className="flex flex-col gap-5">
-      <div className="surface">{steps}</div>
       {showChat ? (
-        <div className="flex flex-col">
-          <h1 className="display-title text-[1.75rem]">
-            {copy.checkin.questions}
-          </h1>
-          {questionTurn && (
-            <p className="mt-2 text-base text-muted-foreground">
-              <QuestionProgress progress={questionTurn.progress} lang={lang} />
-            </p>
-          )}
-          {session?.carerMode && (
-            <p className="mt-4 rounded-xl bg-accent px-4 py-3 text-base text-accent-foreground">
-              {copy.checkin.carerBanner}
-            </p>
-          )}
-        </div>
+        <StepCard
+          step={2}
+          stepName={copy.checkin.steps[1]}
+          title={copy.checkin.questions}
+          body={
+            questionTurn
+              ? progressLabel(questionTurn.progress, lang)
+              : copy.checkin.stepsLabel
+          }
+        />
       ) : (
-        <div className="flex flex-col">
-          <h1 className="display-title text-[1.75rem]">
-            {session?.carerMode
+        <StepCard
+          step={1}
+          stepName={copy.checkin.steps[0]}
+          title={
+            session?.carerMode
               ? copy.checkin.bodyTitleCarer
-              : copy.checkin.bodyTitle}
-          </h1>
-          <p className="measure body-copy mt-3 text-muted-foreground">
-            {session?.carerMode
+              : copy.checkin.bodyTitle
+          }
+          body={
+            session?.carerMode
               ? copy.checkin.bodyInstructionsCarer
-              : copy.checkin.bodyInstructions}
-          </p>
-        </div>
+              : copy.checkin.bodyInstructions
+          }
+        />
+      )}
+      {showChat && session?.carerMode && (
+        <p className="rounded-xl bg-accent px-4 py-3 text-base text-accent-foreground">
+          {copy.checkin.carerBanner}
+        </p>
       )}
 
-      <div className="surface">
+      <div className="surface !p-4 sm:!p-6">
         <BodyViewer
           marks={marks}
           onChange={setMarks}

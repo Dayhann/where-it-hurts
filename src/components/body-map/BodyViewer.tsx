@@ -7,7 +7,17 @@ import {
   useThree,
   type ThreeEvent,
 } from '@react-three/fiber';
-import { ArrowRight, Check, ChevronRight, Hand, Plus, X } from 'lucide-react';
+import {
+  ArrowRight,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Hand,
+  Plus,
+  Trash2,
+  Undo2,
+  X,
+} from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import {
   forwardRef,
@@ -69,6 +79,9 @@ const COLORS = {
 } as const;
 
 const MARK_KINDS: MarkKind[] = ['pain', 'spread'];
+
+/** The two face-on views get plain labels; the side views get chevrons. */
+const FACE_PRESETS = ['front', 'back'] as const satisfies readonly Preset[];
 
 const DEBUG_COLORS = new Map(
   REGIONS.map((r, i) => [
@@ -361,82 +374,176 @@ export default function BodyViewer({
         />
       )}
 
-      <div className="body-canvas-scroll-safe relative overflow-hidden rounded-xl border border-border bg-muted">
-        <div
-          role="img"
-          aria-label={compact ? copy.thumbnail : copy.interactive}
-          className={cn(
-            // Capped at 46vh so the marking controls and "Done marking"
-            // stay within reach on a 375x812 phone instead of sitting
-            // ~500px below the fold.
-            compact ? 'h-36 w-full' : 'h-[min(46vh,26rem)] w-full',
-            hovered && !compact && 'cursor-pointer',
-            compact && 'pointer-events-none',
-          )}
-        >
-          <Canvas
-            key={compact ? 'thumbnail' : 'full'}
-            camera={{
-              position: compact ? [0, HEIGHT, 3.8] : [0, HEIGHT, 2.9],
-              fov: compact ? 42 : 35,
-            }}
-            gl={{ preserveDrawingBuffer: true, antialias: true }}
-            dpr={[1, 1.5]}
-          >
-            <color attach="background" args={['#f7f6f1']} />
-            <hemisphereLight args={['#fdfcf7', '#c6c9bf', 1.2]} />
-            <directionalLight position={[2.2, 4, 2.5]} intensity={1.15} />
-            <directionalLight position={[-2, 1.5, -1.5]} intensity={0.35} />
-            <Suspense fallback={null}>
-              <BodyModel
-                marks={marks}
-                hovered={hovered}
-                debug={debug}
-                onHover={setHovered}
-                onTap={handleTap}
-                onRegionPoints={setRegionPoints}
-              />
-              <MarkVisuals marks={marks} />
-            </Suspense>
-            <PresetRig
-              azimuth={PRESETS[preset].azimuth}
-              lock={lock}
-              controls={controls}
-            />
-            <SnapshotCapture ref={snapshotCapture} />
-            <OrbitControls
-              ref={controls}
-              target={TARGET}
-              enablePan={false}
-              enableRotate={!compact}
-              enableZoom={!compact}
-              enableDamping
-              minPolarAngle={Math.PI / 2}
-              maxPolarAngle={Math.PI / 2}
-              minDistance={2.4}
-              maxDistance={4.5}
-              onStart={() => {
-                dragStartAzimuth.current =
-                  controls.current?.getAzimuthalAngle() ?? 0;
-              }}
-              onEnd={() => {
-                const now = controls.current?.getAzimuthalAngle() ?? 0;
-                if (Math.abs(now - dragStartAzimuth.current) > 0.02) {
-                  setLock(false);
-                }
-              }}
-            />
-          </Canvas>
-        </div>
-        {hoveredLabel && !compact && (
-          <p className="pointer-events-none absolute top-2 left-2 rounded-xl bg-background/90 px-2 py-1 text-lg">
-            {hoveredLabel}
-          </p>
+      <div
+        className={cn(
+          !compact && 'grid grid-cols-[1fr_7rem] items-stretch gap-2.5',
         )}
-        {calibrate && !compact && (
-          <p className="absolute right-2 bottom-2 rounded-xl bg-background/90 px-2 py-1 text-lg">
-            {copy.calibration}
-          </p>
+      >
+        <div className="body-canvas-scroll-safe relative overflow-hidden rounded-xl border border-border bg-muted">
+          <div
+            role="img"
+            aria-label={compact ? copy.thumbnail : copy.interactive}
+            className={cn(
+              // Capped at 46vh so the marking controls and "Done marking"
+              // stay within reach on a 375x812 phone instead of sitting
+              // ~500px below the fold.
+              compact ? 'h-36 w-full' : 'h-[min(46vh,26rem)] w-full',
+              hovered && !compact && 'cursor-pointer',
+              compact && 'pointer-events-none',
+            )}
+          >
+            <Canvas
+              key={compact ? 'thumbnail' : 'full'}
+              camera={{
+                position: compact ? [0, HEIGHT, 3.8] : [0, HEIGHT, 2.9],
+                fov: compact ? 42 : 35,
+              }}
+              gl={{ preserveDrawingBuffer: true, antialias: true }}
+              dpr={[1, 1.5]}
+            >
+              <color attach="background" args={['#f7f6f1']} />
+              <hemisphereLight args={['#fdfcf7', '#c6c9bf', 1.2]} />
+              <directionalLight position={[2.2, 4, 2.5]} intensity={1.15} />
+              <directionalLight position={[-2, 1.5, -1.5]} intensity={0.35} />
+              <Suspense fallback={null}>
+                <BodyModel
+                  marks={marks}
+                  hovered={hovered}
+                  debug={debug}
+                  onHover={setHovered}
+                  onTap={handleTap}
+                  onRegionPoints={setRegionPoints}
+                />
+                <MarkVisuals marks={marks} />
+              </Suspense>
+              <PresetRig
+                azimuth={PRESETS[preset].azimuth}
+                lock={lock}
+                controls={controls}
+              />
+              <SnapshotCapture ref={snapshotCapture} />
+              <OrbitControls
+                ref={controls}
+                target={TARGET}
+                enablePan={false}
+                enableRotate={!compact}
+                enableZoom={!compact}
+                enableDamping
+                minPolarAngle={Math.PI / 2}
+                maxPolarAngle={Math.PI / 2}
+                minDistance={2.4}
+                maxDistance={4.5}
+                onStart={() => {
+                  dragStartAzimuth.current =
+                    controls.current?.getAzimuthalAngle() ?? 0;
+                }}
+                onEnd={() => {
+                  const now = controls.current?.getAzimuthalAngle() ?? 0;
+                  if (Math.abs(now - dragStartAzimuth.current) > 0.02) {
+                    setLock(false);
+                  }
+                }}
+              />
+            </Canvas>
+          </div>
+          {hoveredLabel && !compact && (
+            <p className="pointer-events-none absolute top-2 left-2 rounded-xl bg-background/90 px-2 py-1 text-lg">
+              {hoveredLabel}
+            </p>
+          )}
+          {calibrate && !compact && (
+            <p className="absolute right-2 bottom-2 rounded-xl bg-background/90 px-2 py-1 text-lg">
+              {copy.calibration}
+            </p>
+          )}
+        </div>
+
+        {/* Control column beside the model: the two face-on views, the two
+          side views with direction chevrons, then undo and clear. */}
+        {!compact && (
+          <div className="flex flex-col gap-2">
+            {FACE_PRESETS.map((key) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => {
+                  setPreset(key);
+                  setLock(true);
+                }}
+                aria-pressed={lock && preset === key}
+                className={cn(
+                  buttonVariants({
+                    variant: lock && preset === key ? 'default' : 'outline',
+                  }),
+                  'h-10 w-full rounded-full text-[0.75rem]',
+                )}
+              >
+                {presetLabel[key]}
+              </button>
+            ))}
+
+            <button
+              type="button"
+              onClick={() => {
+                setPreset('left');
+                setLock(true);
+              }}
+              aria-pressed={lock && preset === 'left'}
+              className={cn(
+                buttonVariants({
+                  variant: lock && preset === 'left' ? 'default' : 'outline',
+                }),
+                'h-10 w-full justify-start gap-1 rounded-full px-2 text-[0.6875rem] leading-tight',
+              )}
+            >
+              <ChevronLeft aria-hidden className="size-3.5 shrink-0" />
+              <span className="flex-1 text-start">{presetLabel.left}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setPreset('right');
+                setLock(true);
+              }}
+              aria-pressed={lock && preset === 'right'}
+              className={cn(
+                buttonVariants({
+                  variant: lock && preset === 'right' ? 'default' : 'outline',
+                }),
+                'h-10 w-full justify-start gap-1 rounded-full px-2 text-[0.6875rem] leading-tight',
+              )}
+            >
+              <span className="flex-1 text-start">{presetLabel.right}</span>
+              <ChevronRight aria-hidden className="size-3.5 shrink-0" />
+            </button>
+
+            <button
+              type="button"
+              onClick={undo}
+              disabled={past.length === 0}
+              className={cn(
+                buttonVariants({ variant: 'outline' }),
+                'h-auto min-h-11 w-full justify-start gap-1.5 rounded-xl px-2 py-2 text-start text-[0.6875rem] leading-tight whitespace-normal',
+              )}
+            >
+              <Undo2 aria-hidden className="size-3.5 shrink-0" />
+              <span className="flex-1">{copy.undo}</span>
+            </button>
+
+            <HoldToConfirm
+              disabled={marks.length === 0}
+              confirmLabel={copy.cleared}
+              onConfirm={() => {
+                setSelectedId(null);
+                commit([]);
+              }}
+              className="h-11! w-full rounded-xl! border-border! bg-card! px-2! text-[0.6875rem]! text-foreground! [&>span.absolute]:bg-primary! [&>span.absolute]:text-primary-foreground! [&_span]:justify-start! [&_span]:gap-2!"
+            >
+              <Trash2 aria-hidden className="size-3.5 shrink-0" />
+              <span className="flex-1 text-start">{copy.clearShort}</span>
+            </HoldToConfirm>
+          </div>
         )}
       </div>
 
@@ -455,54 +562,6 @@ export default function BodyViewer({
 
       {!compact && (
         <>
-          <div className="grid w-full grid-cols-2 gap-2.5">
-            {(Object.keys(PRESETS) as Preset[]).map((key) => (
-              <button
-                key={key}
-                type="button"
-                onClick={() => {
-                  setPreset(key);
-                  setLock(true);
-                }}
-                aria-pressed={lock && preset === key}
-                className={cn(
-                  buttonVariants({
-                    variant: lock && preset === key ? 'default' : 'outline',
-                    size: 'touch',
-                  }),
-                  'rounded-xl text-base',
-                )}
-              >
-                {presetLabel[key]}
-              </button>
-            ))}
-          </div>
-
-          <div className="grid grid-cols-2 gap-2.5">
-            <button
-              type="button"
-              onClick={undo}
-              disabled={past.length === 0}
-              className={cn(
-                buttonVariants({ variant: 'outline', size: 'touch' }),
-                'rounded-xl text-base',
-              )}
-            >
-              {copy.undo}
-            </button>
-            <HoldToConfirm
-              disabled={marks.length === 0}
-              confirmLabel={copy.cleared}
-              onConfirm={() => {
-                setSelectedId(null);
-                commit([]);
-              }}
-              className="h-12! w-full rounded-xl! border-border! bg-card! text-base! text-foreground! [&>span.absolute]:bg-primary! [&>span.absolute]:text-primary-foreground!"
-            >
-              {copy.holdClear}
-            </HoldToConfirm>
-          </div>
-
           <section aria-label={copy.places} className="flex flex-col gap-3">
             <p className="flex items-center gap-2.5 text-[0.9375rem] text-muted-foreground">
               <Hand aria-hidden className="size-4 shrink-0" />
@@ -533,13 +592,26 @@ export default function BodyViewer({
                         aria-pressed={isSelected}
                         className="flex min-h-13 flex-1 items-center gap-3 px-4 text-start text-[0.9375rem] outline-none focus-visible:bg-muted"
                       >
-                        <span
-                          aria-hidden
-                          className="flex size-5 shrink-0 items-center justify-center rounded-full"
-                          style={{ backgroundColor: COLORS[m.kind] }}
-                        >
-                          <Check className="size-3 text-white" />
-                        </span>
+                        {/* Filled tick once a severity has been given,
+                            hollow circle while one is still outstanding —
+                            so the list doubles as a to-do. The fill uses
+                            the mark's own colour, which is the one piece
+                            of information the reference row does not
+                            carry. */}
+                        {m.intensity === undefined ? (
+                          <span
+                            aria-hidden
+                            className="size-5 shrink-0 rounded-full border-2 border-border"
+                          />
+                        ) : (
+                          <span
+                            aria-hidden
+                            className="flex size-5 shrink-0 items-center justify-center rounded-full"
+                            style={{ backgroundColor: COLORS[m.kind] }}
+                          >
+                            <Check className="size-3 text-white" />
+                          </span>
+                        )}
                         <span className="flex-1 truncate">{label}</span>
                         {m.intensity !== undefined && (
                           <span className="shrink-0 text-muted-foreground tabular-nums">
@@ -605,7 +677,7 @@ export default function BodyViewer({
           </section>
 
           <details className="card-row flex-col items-stretch !px-0 [&[open]]:pb-3">
-            <summary className="flex min-h-13 cursor-pointer list-none items-center gap-3 px-4 text-[0.9375rem] font-medium [&::-webkit-details-marker]:hidden">
+            <summary className="flex min-h-13 cursor-pointer list-none items-center gap-3 px-4 text-[0.875rem] font-medium [&::-webkit-details-marker]:hidden">
               <Plus
                 aria-hidden
                 className="size-4 shrink-0 text-muted-foreground"
@@ -655,8 +727,6 @@ export default function BodyViewer({
             </div>
           </details>
 
-          <p className="text-muted-foreground">{copy.instructions}</p>
-
           {onDone && (
             <>
               {captureError && (
@@ -685,7 +755,7 @@ export default function BodyViewer({
                   'h-14 rounded-2xl text-base',
                 )}
               >
-                {capturing ? copy.saving : copy.done}
+                {capturing ? copy.saving : copy.next}
                 <ArrowRight aria-hidden className="size-4 rtl:-scale-x-100" />
               </button>
             </>
