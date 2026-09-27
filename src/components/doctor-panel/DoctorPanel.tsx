@@ -63,7 +63,7 @@ function SummaryQuoteLine({
         type="button"
         onClick={onToggle}
         aria-expanded={open}
-        className="w-full rounded-lg border border-border p-3 text-left font-semibold hover:bg-muted"
+        className="pressable w-full rounded-xl border border-border bg-card p-4 text-left leading-snug font-semibold shadow-[var(--elevation-1)] hover:bg-muted"
       >
         <span>{line.text}</span>
         {!line.verified && (
@@ -73,7 +73,7 @@ function SummaryQuoteLine({
         )}
       </button>
       {open && (
-        <div className="enter-fade mt-1 origin-top rounded-lg border border-border bg-popover p-3 shadow-lg">
+        <div className="enter-fade mt-2 origin-top rounded-xl border border-border bg-popover p-4 shadow-[var(--elevation-2)]">
           <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
             Patient&apos;s words
           </p>
@@ -169,9 +169,9 @@ export function DoctorPanel({
         role="dialog"
         aria-modal="true"
         aria-labelledby="summary-panel-title"
-        className="drawer-in fixed inset-y-0 right-0 z-40 flex w-full max-w-[420px] flex-col border-l border-border bg-background shadow-2xl"
+        className="drawer-in fixed inset-y-0 right-0 z-40 flex w-full max-w-[460px] flex-col border-l border-border bg-background shadow-[var(--elevation-3)]"
       >
-        <header className="flex items-center justify-between border-b border-border p-4">
+        <header className="flex items-center justify-between border-b border-border px-6 py-5">
           <div>
             <p className="text-sm font-medium text-muted-foreground">
               Pre-consult check-in
@@ -193,7 +193,7 @@ export function DoctorPanel({
           </button>
         </header>
 
-        <div className="flex flex-1 flex-col gap-5 overflow-y-auto p-4">
+        <div className="flex flex-1 flex-col gap-7 overflow-y-auto px-6 py-6">
           {error && (
             <p className="text-destructive" role="alert">
               This summary could not be loaded or updated.
@@ -203,7 +203,7 @@ export function DoctorPanel({
           {summary &&
             session &&
             (summary.redFlags.length > 0 ? (
-              <section className="rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-destructive">
+              <section className="rounded-xl border border-destructive/40 bg-destructive/10 p-4 text-destructive">
                 <h3 className="font-semibold">Red flag reported</h3>
                 <ul className="mt-1 list-disc pl-5">
                   {summary.redFlags.map((hit) => (
@@ -214,7 +214,7 @@ export function DoctorPanel({
                 </ul>
               </section>
             ) : (
-              <p className="rounded-lg bg-muted p-3 font-medium">
+              <p className="rounded-xl bg-muted p-4 font-medium">
                 No red flags reported
               </p>
             ))}
@@ -330,7 +330,7 @@ export function DoctorPanel({
                 </div>
               </section>
 
-              <section className="grid grid-cols-2 gap-3">
+              <section className="grid grid-cols-2 gap-5">
                 <div>
                   <h3 className="font-semibold">Not asked</h3>
                   <div className="mt-2 flex flex-wrap gap-1">
@@ -416,7 +416,7 @@ export function DoctorPanel({
           )}
         </div>
 
-        <footer className="flex flex-col gap-3 border-t border-border p-4">
+        <footer className="flex flex-col gap-3 border-t border-border px-6 py-5">
           {showFeedback && (
             <label className="flex flex-col gap-2">
               <span className="font-medium">What looks inaccurate?</span>

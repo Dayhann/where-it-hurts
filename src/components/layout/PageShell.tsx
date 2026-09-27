@@ -13,8 +13,11 @@ export function PageShell({ children, variant = 'patient' }: PageShellProps) {
   return (
     <div
       className={cn(
-        'flex min-h-full flex-1 justify-center px-4 py-6',
-        patient ? 'text-[18px] leading-7' : 'text-base leading-6',
+        // Generous, responsive gutters on an 8px grid. The old flat px-4 py-6
+        // left content touching the edge of a phone and cramped on desktop.
+        'flex min-h-full flex-1 justify-center',
+        'px-5 py-8 sm:px-8 sm:py-12 lg:py-16',
+        patient ? 'text-[18px] leading-[1.65]' : 'text-base leading-relaxed',
       )}
     >
       <div

@@ -343,7 +343,7 @@ export default function BodyViewer({
   };
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-4">
       {!compact && (
         <SegmentedControl
           label={copy.marking}
@@ -357,12 +357,15 @@ export default function BodyViewer({
         />
       )}
 
-      <div className="relative overflow-hidden rounded-xl border border-border bg-muted">
+      <div className="body-canvas-scroll-safe relative overflow-hidden rounded-2xl border border-border bg-muted shadow-[var(--elevation-1)]">
         <div
           role="img"
           aria-label={compact ? copy.thumbnail : copy.interactive}
           className={cn(
-            compact ? 'h-36 w-full' : 'h-[min(56vh,28rem)] w-full',
+            // Capped at 46vh so the marking controls and "Done marking"
+            // stay within reach on a 375x812 phone instead of sitting
+            // ~500px below the fold.
+            compact ? 'h-36 w-full' : 'h-[min(46vh,26rem)] w-full',
             hovered && !compact && 'cursor-pointer',
             compact && 'pointer-events-none',
           )}

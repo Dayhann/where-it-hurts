@@ -106,7 +106,7 @@ export function ReceptionQueue() {
   }, []);
 
   return (
-    <main className="flex flex-1 flex-col gap-5">
+    <main className="flex flex-1 flex-col gap-8">
       <LiveActivity
         activity={activity}
         onDismiss={dismiss}
@@ -114,14 +114,10 @@ export function ReceptionQueue() {
         dismissLabel="Dismiss alert"
         className="fixed inset-x-0 top-4 z-50"
       />
-      <header className="flex flex-wrap items-center justify-between gap-3">
+      <header className="flex flex-wrap items-end justify-between gap-4 border-b border-border pb-6">
         <div>
-          <p className="text-sm font-medium tracking-wide text-primary uppercase">
-            Riverside Family Clinic
-          </p>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Reception queue
-          </h1>
+          <p className="eyebrow">Riverside Family Clinic</p>
+          <h1 className="display-title mt-2 text-[1.75rem]">Reception queue</h1>
           <p className="text-muted-foreground">
             Today&apos;s pre-consult check-ins
           </p>
@@ -134,8 +130,8 @@ export function ReceptionQueue() {
         </Link>
       </header>
 
-      <dl className="grid grid-cols-2 gap-3">
-        <div className="rounded-xl border border-border bg-card p-4">
+      <dl className="grid grid-cols-2 gap-5">
+        <div className="rounded-2xl border border-border bg-card p-6 shadow-[var(--elevation-1)]">
           <dt className="text-sm text-muted-foreground">Checked in</dt>
           <dd>
             <ValueFlash
@@ -185,7 +181,7 @@ export function ReceptionQueue() {
       )}
 
       <section
-        className="relative overflow-hidden rounded-xl border border-border bg-card"
+        className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--elevation-1)]"
         aria-label="Today's check-ins"
       >
         <NewItemsPill
@@ -209,7 +205,7 @@ export function ReceptionQueue() {
                   id={rowId(item.sessionId)}
                   tabIndex={-1}
                   className={cn(
-                    'grid min-h-20 grid-cols-[6rem_1fr_auto] items-center gap-4 px-5 py-4 outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-inset',
+                    'grid min-h-24 grid-cols-[6rem_1fr_auto] items-center gap-5 px-6 py-5 outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-inset',
                     item.redFlag && 'bg-destructive/10',
                   )}
                 >
@@ -224,7 +220,7 @@ export function ReceptionQueue() {
                   </div>
                   <span
                     className={cn(
-                      'rounded-full px-3 py-1 text-sm font-semibold',
+                      'rounded-full px-3.5 py-1.5 text-sm font-semibold',
                       item.redFlag
                         ? 'bg-destructive text-white'
                         : item.status === 'confirmed'

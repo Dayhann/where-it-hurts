@@ -50,62 +50,87 @@ export function ClinicWorkspace() {
   const selected = items.find((item) => item.sessionId === selectedId);
 
   return (
-    <main className="flex min-h-[calc(100vh-3rem)] flex-col gap-4">
-      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
+    <main className="flex min-h-[calc(100vh-3rem)] flex-col gap-8">
+      <header className="flex flex-wrap items-end justify-between gap-4 border-b border-border pb-6">
         <div>
-          <p className="text-sm font-medium tracking-wide text-primary uppercase">
-            Riverside Family Clinic
-          </p>
-          <h1 className="text-2xl font-semibold tracking-tight">
+          <p className="eyebrow">Riverside Family Clinic</p>
+          <h1 className="display-title mt-2 text-[1.75rem]">
             Consultation workspace
           </h1>
         </div>
         <Link
           href="/"
-          className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}
+          className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }))}
         >
           Exit demo
         </Link>
       </header>
 
       {error && (
-        <p className="rounded-lg bg-destructive/10 p-3 text-destructive">
+        <p className="rounded-lg bg-destructive/10 p-4 text-destructive">
           Today&apos;s appointments could not be loaded.
         </p>
       )}
 
-      <div className="grid flex-1 gap-4 md:grid-cols-[18rem_1fr]">
-        <aside className="rounded-xl border border-border bg-card">
-          <h2 className="border-b border-border p-4 font-semibold">
+      <div className="grid flex-1 gap-6 md:grid-cols-[19rem_1fr]">
+        <aside className="h-fit rounded-2xl border border-border bg-card shadow-[var(--elevation-1)]">
+          <h2 className="border-b border-border px-5 py-4 text-sm font-semibold tracking-wide text-muted-foreground uppercase">
             Today&apos;s patients
           </h2>
           {loading ? (
-            <p className="p-4 text-muted-foreground">Loading appointments…</p>
+            <p className="p-5 text-muted-foreground">Loading appointments…</p>
           ) : items.length === 0 ? (
-            <p className="p-4 text-muted-foreground">
+            <p className="p-5 text-muted-foreground">
               No appointments scheduled.
             </p>
           ) : (
-            <HookSidebar
-              aria-label="Today's patients"
-              className="p-4"
-              color="var(--primary)"
-              value={items.findIndex((item) => item.sessionId === selectedId)}
-              onChange={(index) => setSelectedId(items[index].sessionId)}
-              items={items.map((item) =>
-                [
-                  item.patientDisplayName,
-                  appointmentTime(item.startsAt),
-                  item.redFlag ? 'Red flag' : null,
-                ]
-                  .filter(Boolean)
-                  .join(' · '),
+            <>
+              {/* HookSidebar renders plain strings, so a flagged patient is
+                  indistinguishable from an appointment time in the list.
+                  This strip restores the at-a-glance alarm that the list
+                  itself can no longer carry, and jumps straight to them. */}
+              {items.some((item) => item.redFlag) && (
+                <div className="border-b border-border p-3">
+                  {items
+                    .filter((item) => item.redFlag)
+                    .map((item) => (
+                      <button
+                        key={item.sessionId}
+                        type="button"
+                        onClick={() => setSelectedId(item.sessionId)}
+                        className="pressable flex w-full items-center justify-between gap-3 rounded-lg bg-destructive/10 px-3 py-3 text-left hover:bg-destructive/15"
+                      >
+                        <span className="font-semibold text-destructive">
+                          {item.patientDisplayName}
+                        </span>
+                        <span className="rounded-full bg-destructive px-2.5 py-1 text-xs font-semibold tracking-wide text-background uppercase">
+                          Red flag
+                        </span>
+                      </button>
+                    ))}
+                </div>
               )}
-            />
+              <HookSidebar
+                aria-label="Today's patients"
+                className="p-4"
+                color="var(--primary)"
+                value={items.findIndex((item) => item.sessionId === selectedId)}
+                onChange={(index) => setSelectedId(items[index].sessionId)}
+                items={items.map((item) =>
+                  [
+                    item.patientDisplayName,
+                    appointmentTime(item.startsAt),
+                    item.redFlag ? 'Red flag' : null,
+                  ]
+                    .filter(Boolean)
+                    .join(' · '),
+                )}
+              />
+            </>
           )}
         </aside>
 
-        <section className="flex flex-col gap-4 rounded-xl border border-border bg-card p-5">
+        <section className="flex flex-col gap-6 rounded-2xl border border-border bg-card p-7 shadow-[var(--elevation-1)]">
           {selected ? (
             <>
               <div className="flex flex-wrap items-start justify-between gap-4">

@@ -49,34 +49,57 @@
 }
 
 :root {
-  /* Calm clinical tokens: warm paper, slate ink, muted teal. */
-  --background: oklch(0.985 0.008 85);
-  --foreground: oklch(0.3 0.025 250);
-  --card: oklch(0.995 0.004 85);
-  --card-foreground: oklch(0.3 0.025 250);
-  --popover: oklch(0.995 0.004 85);
-  --popover-foreground: oklch(0.3 0.025 250);
-  --primary: oklch(0.42 0.07 205);
-  --primary-foreground: oklch(0.99 0.005 85);
-  --secondary: oklch(0.955 0.012 85);
-  --secondary-foreground: oklch(0.3 0.025 250);
-  --muted: oklch(0.955 0.012 85);
-  --muted-foreground: oklch(0.48 0.02 250);
-  --accent: oklch(0.94 0.02 200);
-  --accent-foreground: oklch(0.28 0.04 205);
+  /* Calm clinical tokens: warm paper, deep ink, one restrained petrol accent.
+     Red is reserved exclusively for clinical alarm — never decoration. */
+  --background: oklch(0.982 0.006 80);
+  --foreground: oklch(0.26 0.012 250);
+  --card: oklch(0.996 0.003 80);
+  --card-foreground: oklch(0.26 0.012 250);
+  --popover: oklch(0.998 0.002 80);
+  --popover-foreground: oklch(0.26 0.012 250);
+  --primary: oklch(0.38 0.062 200);
+  --primary-foreground: oklch(0.99 0.004 80);
+  --secondary: oklch(0.958 0.008 80);
+  --secondary-foreground: oklch(0.26 0.012 250);
+  --muted: oklch(0.956 0.008 80);
+  --muted-foreground: oklch(0.52 0.014 250);
+  --accent: oklch(0.945 0.016 200);
+  --accent-foreground: oklch(0.32 0.05 200);
   --destructive: oklch(0.55 0.19 25);
-  --border: oklch(0.9 0.015 85);
-  --input: oklch(0.9 0.015 85);
-  --ring: oklch(0.42 0.07 205);
+  --border: oklch(0.918 0.007 80);
+  --input: oklch(0.905 0.008 80);
+  --ring: oklch(0.38 0.062 200);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
+  --radius: 0.75rem;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* Spacing scale — strict 8px grid. Use these instead of ad-hoc gaps so
+     vertical rhythm stays consistent across patient and clinic surfaces. */
+  --space-1: 0.5rem; /*  8px — inside a control            */
+  --space-2: 1rem; /* 16px — between related controls    */
+  --space-3: 1.5rem; /* 24px — inside a card               */
+  --space-4: 2rem; /* 32px — between cards               */
+  --space-5: 2.5rem; /* 40px — between sections            */
+  --space-6: 3rem; /* 48px — between major sections      */
+  --space-8: 4rem; /* 64px — page top/bottom breathing   */
+
+  /* Elevation — layered, low-opacity, tinted with the ink colour so shadows
+     read as depth rather than grey haze. */
+  --elevation-1:
+    0 1px 2px oklch(0.26 0.012 250 / 0.04),
+    0 1px 3px oklch(0.26 0.012 250 / 0.03);
+  --elevation-2:
+    0 2px 4px oklch(0.26 0.012 250 / 0.04),
+    0 6px 16px oklch(0.26 0.012 250 / 0.05);
+  --elevation-3:
+    0 4px 8px oklch(0.26 0.012 250 / 0.05),
+    0 16px 40px oklch(0.26 0.012 250 / 0.08);
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -138,8 +161,82 @@
 
 @layer components {
   .display-title {
-    letter-spacing: -0.02em;
-    line-height: 1.15;
+    letter-spacing: -0.022em;
+    line-height: 1.12;
+    font-weight: 600;
+    /* Optical balance: large type reads heavier, so pull the colour back a
+       touch rather than sitting at full ink. */
+    color: oklch(0.24 0.014 250);
+  }
+
+  /* Vertical rhythm ------------------------------------------------------ */
+
+  /* Between top-level sections of a page. */
+  .section-stack > * + * {
+    margin-block-start: var(--space-5);
+  }
+
+  /* Between cards / grouped blocks inside a section. */
+  .group-stack > * + * {
+    margin-block-start: var(--space-3);
+  }
+
+  /* Between tightly related controls (a label and its input). */
+  .tight-stack > * + * {
+    margin-block-start: var(--space-1);
+  }
+
+  /* Surfaces ------------------------------------------------------------- */
+
+  .surface {
+    background-color: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-3);
+    box-shadow: var(--elevation-1);
+  }
+
+  .surface-raised {
+    box-shadow: var(--elevation-2);
+  }
+
+  /* Readability ---------------------------------------------------------- */
+
+  /* Caps line length at roughly 66 characters — the comfortable range for
+     body copy. Patient pages run at 18px, so this matters more than usual. */
+  .measure {
+    max-width: 34rem;
+  }
+
+  .body-copy {
+    line-height: 1.65;
+    letter-spacing: 0.004em;
+  }
+
+  /* Eyebrow / section label above a heading. */
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--primary);
+  }
+
+  /* Interaction ---------------------------------------------------------- */
+
+  /* The 3D body canvas fills ~91% of a phone's width. Without this, a
+     vertical swipe is captured by OrbitControls and the page cannot be
+     scrolled at all, stranding the patient above the "Done marking" button.
+
+     pan-y hands vertical gestures back to the page; horizontal drags still
+     rotate the model. This viewer locks the polar angle
+     (minPolarAngle === maxPolarAngle), so vertical dragging never rotated
+     anything here — nothing is lost by giving that axis to the page.
+
+     !important is required: three.js writes touch-action inline on the
+     canvas element, and an inline style beats an ordinary rule. */
+  .body-canvas-scroll-safe canvas {
+    touch-action: pan-y !important;
   }
 
   .pressable {
