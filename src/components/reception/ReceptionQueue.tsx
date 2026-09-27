@@ -114,11 +114,11 @@ export function ReceptionQueue() {
         dismissLabel="Dismiss alert"
         className="fixed inset-x-0 top-4 z-50"
       />
-      <header className="flex flex-wrap items-end justify-between gap-4 border-b border-border pb-6">
+      <header className="flex flex-wrap items-end justify-between gap-4 border-b border-track pb-6">
         <div>
-          <p className="eyebrow">Riverside Family Clinic</p>
-          <h1 className="display-title mt-2 text-[1.75rem]">Reception queue</h1>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground">Riverside Family Clinic</p>
+          <h1 className="type-title mt-1">Reception queue</h1>
+          <p className="mt-1 text-muted-foreground">
             Today&apos;s pre-consult check-ins
           </p>
         </div>
@@ -132,7 +132,7 @@ export function ReceptionQueue() {
 
       <dl className="grid grid-cols-2 gap-5">
         <div className="surface">
-          <dt className="label-caps">Checked in</dt>
+          <dt className="text-muted-foreground">Checked in</dt>
           <dd>
             <ValueFlash
               value={items.length}
@@ -142,7 +142,7 @@ export function ReceptionQueue() {
           </dd>
         </div>
         <div className="surface">
-          <dt className="label-caps">Red flags</dt>
+          <dt className="text-muted-foreground">Red flags</dt>
           <dd>
             <ValueFlash
               value={redFlags}
@@ -156,7 +156,7 @@ export function ReceptionQueue() {
         </div>
       </dl>
 
-      <div className="flex items-center justify-between gap-3 text-sm text-muted-foreground">
+      <div className="flex items-center justify-between gap-3 text-muted-foreground">
         <p aria-live="polite">
           {loading
             ? 'Updating queue…'
@@ -173,7 +173,7 @@ export function ReceptionQueue() {
 
       {error && (
         <p
-          className="border-l-2 border-destructive bg-destructive/8 p-3 text-destructive"
+          className="surface-inset bg-destructive/8 p-3 text-destructive"
           role="alert"
         >
           The queue could not be refreshed. The last update remains visible.
@@ -198,7 +198,7 @@ export function ReceptionQueue() {
           {items.length === 0 && !loading ? (
             <p className="p-6 text-muted-foreground">No check-ins yet today.</p>
           ) : (
-            <ul className="divide-y divide-border">
+            <ul className="divide-y divide-track">
               {items.map((item) => (
                 <li
                   key={item.sessionId}
@@ -214,13 +214,11 @@ export function ReceptionQueue() {
                   </time>
                   <div>
                     <p className="font-semibold">{item.patientDisplayName}</p>
-                    <p className="text-sm text-muted-foreground">
-                      Phone consultation
-                    </p>
+                    <p className="text-muted-foreground">Phone consultation</p>
                   </div>
                   <span
                     className={cn(
-                      'label-caps rounded-full px-3 py-1.5',
+                      'rounded-full px-3 py-1.5 font-medium',
                       item.redFlag
                         ? 'bg-destructive text-white'
                         : item.status === 'confirmed'

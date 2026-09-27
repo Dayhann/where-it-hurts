@@ -129,8 +129,8 @@ export function ChatComposer({
             }}
             className={cn(
               buttonVariants({ variant: 'outline' }),
-              'h-12 rounded-full px-5 text-base',
-              option.id.startsWith('scale_') && 'min-w-12 px-3',
+              'h-[46px] px-5 text-base',
+              option.id.startsWith('scale_') && 'min-w-[46px] px-3',
             )}
           >
             {optionLabel(option, lang)}
@@ -156,7 +156,7 @@ export function ChatComposer({
               void sendText();
             }
           }}
-          className="min-h-14 w-full resize-y rounded-xl border border-input bg-card px-4 py-3 text-lg leading-relaxed outline-none transition-shadow focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+          className="min-h-14 w-full resize-y rounded-inset bg-card px-4 py-3 text-lg leading-relaxed shadow-[var(--elevation-1)] outline-none transition-shadow focus-visible:ring-3 focus-visible:ring-ring/50"
         />
       </label>
       {voiceSupported && (
@@ -195,7 +195,7 @@ export function ChatComposer({
           disabled={disabled || text.trim().length === 0}
           onPress={() => void sendText()}
           tintClassName="bg-white/30"
-          className="min-h-14 rounded-2xl! border-primary! bg-primary! text-lg! text-primary-foreground!"
+          className="button-raised! h-[46px] rounded-full! text-lg!"
         >
           {copy.send}
         </Ripple>

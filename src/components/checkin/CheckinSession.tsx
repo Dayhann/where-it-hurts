@@ -213,7 +213,7 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
         />
       )}
       {showChat && session?.carerMode && (
-        <p className="rounded-xl bg-accent px-4 py-3 text-base text-accent-foreground">
+        <p className="surface-inset bg-accent px-4 py-3 text-accent-foreground">
           {copy.checkin.carerBanner}
         </p>
       )}
@@ -245,7 +245,7 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
           </button>
         )}
       </div>
-      <p className="text-sm text-muted-foreground" aria-live="polite">
+      <p className="type-body text-muted-foreground" aria-live="polite">
         {saveState === 'saving' && copy.checkin.saving}
         {saveState === 'saved' && copy.checkin.saved}
         {saveState === 'local' && copy.checkin.local}
@@ -277,7 +277,7 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
         </p>
       )}
 
-      <footer className="mt-4 flex flex-col gap-4 border-t border-border pt-6">
+      <footer className="mt-4 flex flex-col gap-4 border-t border-track pt-6">
         <Link
           href="/"
           className={cn(

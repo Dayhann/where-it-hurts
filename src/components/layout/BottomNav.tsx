@@ -27,7 +27,7 @@ export function BottomNav() {
   return (
     <nav
       aria-label="Sections"
-      className="sticky bottom-0 z-20 -mx-5 mt-10 border-t border-border bg-card/95 px-5 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur-sm sm:-mx-8 sm:px-8"
+      className="sticky bottom-0 z-20 -mx-5 mt-10 border-t border-track bg-card/95 px-5 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur-sm sm:-mx-8 sm:px-8"
     >
       <ul className="mx-auto flex max-w-md items-stretch justify-between">
         {TABS.map(({ href, label, icon: Icon }) => {
@@ -35,14 +35,21 @@ export function BottomNav() {
           const isCheckin = href === '/checkin';
           const content = (
             <>
-              <Icon aria-hidden className="size-5" />
-              <span className="text-[0.6875rem] font-medium">{label}</span>
+              <span
+                className={cn(
+                  'flex size-[38px] items-center justify-center rounded-full transition-shadow',
+                  active ? 'button-raised-soft text-primary' : 'text-strong',
+                )}
+              >
+                <Icon aria-hidden className="size-5" />
+              </span>
+              <span className="type-body">{label}</span>
             </>
           );
           const className = cn(
-            'flex min-h-14 min-w-16 flex-col items-center justify-center gap-1 rounded-xl px-2 transition-colors',
+            'flex min-h-16 min-w-16 flex-col items-center justify-center gap-0.5 rounded-xl px-2 transition-colors',
             active
-              ? 'text-primary'
+              ? 'text-foreground'
               : 'text-muted-foreground hover:text-foreground',
           );
 

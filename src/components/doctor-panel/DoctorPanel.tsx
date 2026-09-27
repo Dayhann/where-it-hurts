@@ -63,32 +63,32 @@ function SummaryQuoteLine({
         type="button"
         onClick={onToggle}
         aria-expanded={open}
-        className="pressable w-full border-b border-border bg-transparent py-4 pe-2 text-left leading-snug font-medium hover:bg-muted/50"
+        className="pressable w-full border-b border-track bg-transparent py-4 pe-2 text-left font-medium hover:bg-muted/50"
       >
         <span>{line.text}</span>
         {!line.verified && (
-          <span className="label-caps ms-2 bg-accent px-2 py-1 text-accent-foreground!">
+          <span className="ms-2 rounded-full bg-accent px-2.5 py-0.5 text-accent-foreground">
             Unverified
           </span>
         )}
       </button>
       {open && (
-        <div className="enter-fade mt-2 origin-top rounded-xl border border-border bg-popover p-4">
-          <p className="label-caps">Patient&apos;s words</p>
+        <div className="enter-fade surface-inset mt-2 origin-top bg-popover p-4">
+          <p className="text-muted-foreground">Patient&apos;s words</p>
           {line.quotes.map((quote, quoteIndex) => (
             <blockquote
               key={`${lineIndex}-${quoteIndex}`}
               className="mt-2 border-l-2 border-primary pl-3"
             >
               <p>&ldquo;{quote}&rdquo;</p>
-              <footer className="mt-1 text-xs text-muted-foreground">
+              <footer className="mt-1 text-muted-foreground">
                 From the patient&apos;s message at{' '}
                 {messageTime(session, line, quoteIndex)}
               </footer>
             </blockquote>
           ))}
           {line.quotes.length === 0 && (
-            <p className="mt-2 text-sm text-muted-foreground">
+            <p className="mt-2 text-muted-foreground">
               No exact quote was supplied.
             </p>
           )}
@@ -167,15 +167,12 @@ export function DoctorPanel({
         role="dialog"
         aria-modal="true"
         aria-labelledby="summary-panel-title"
-        className="drawer-in fixed inset-y-0 right-0 z-40 flex w-full max-w-[460px] flex-col border-l border-border bg-background shadow-[var(--elevation-3)]"
+        className="drawer-in fixed inset-y-0 right-0 z-40 flex w-full max-w-[460px] flex-col bg-background shadow-[var(--elevation-3)]"
       >
-        <header className="flex items-center justify-between border-b border-border px-6 py-5">
+        <header className="flex items-center justify-between border-b border-track px-6 py-5">
           <div>
-            <p className="eyebrow">Pre-consult check-in</p>
-            <h2
-              id="summary-panel-title"
-              className="display-title mt-1 text-[1.5rem]"
-            >
+            <p className="text-muted-foreground">Pre-consult check-in</p>
+            <h2 id="summary-panel-title" className="type-title mt-1">
               Patient summary
             </h2>
           </div>
@@ -184,11 +181,10 @@ export function DoctorPanel({
             onClick={onClose}
             aria-label="Close patient summary"
             className={cn(
-              buttonVariants({ variant: 'ghost', size: 'icon' }),
-              'size-11',
+              buttonVariants({ variant: 'outline', size: 'icon-lg' }),
             )}
           >
-            <X aria-hidden />
+            <X aria-hidden className="text-strong" />
           </button>
         </header>
 
@@ -202,8 +198,8 @@ export function DoctorPanel({
           {summary &&
             session &&
             (summary.redFlags.length > 0 ? (
-              <section className="border-l-2 border-destructive bg-destructive/8 p-4 text-destructive">
-                <h3 className="font-semibold">Red flag reported</h3>
+              <section className="surface-inset bg-destructive/8 p-4 text-destructive">
+                <h3 className="type-section">Red flag reported</h3>
                 <ul className="mt-1 list-disc pl-5">
                   {summary.redFlags.map((hit) => (
                     <li key={`${hit.ruleId}-${hit.sourceMessageId}`}>
@@ -213,13 +209,13 @@ export function DoctorPanel({
                 </ul>
               </section>
             ) : (
-              <p className="rounded-xl bg-muted p-4 font-medium">
+              <p className="surface-inset bg-muted p-4 font-medium">
                 No red flags reported
               </p>
             ))}
 
           <section>
-            <h3 className="label-caps">Headline</h3>
+            <h3 className="type-section">Headline</h3>
             <SkeletonSwap
               ready={!loading}
               lines={3}
@@ -272,7 +268,7 @@ export function DoctorPanel({
                 (line) => !summary.headline.includes(line.text),
               ) && (
                 <section>
-                  <h3 className="font-semibold">Other details</h3>
+                  <h3 className="type-section">Other details</h3>
                   <div className="mt-2 flex flex-col gap-2">
                     {summary.lines.map((line, lineIndex) =>
                       summary.headline.includes(line.text) ? null : (
@@ -296,9 +292,10 @@ export function DoctorPanel({
 
               <section className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-semibold">Body map</h3>
+                  <h3 className="type-section">Body map</h3>
                   <SegmentedControl
                     label="Body view"
+                    className="rounded-full! border-transparent! bg-muted! [&>div>div.pointer-events-none.absolute]:button-raised! [&>div>div.pointer-events-none.absolute]:rounded-full!"
                     value={view}
                     onValueChange={(next) => setView(next as 'front' | 'back')}
                     options={[
@@ -307,7 +304,7 @@ export function DoctorPanel({
                     ]}
                   />
                 </div>
-                <div className="flex h-44 items-center justify-center overflow-hidden rounded-xl border border-border bg-muted">
+                <div className="surface-inset flex h-44 items-center justify-center overflow-hidden bg-muted">
                   {snapshot ? (
                     snapshotAspect ? (
                       <GridReveal
@@ -329,47 +326,43 @@ export function DoctorPanel({
 
               <section className="grid grid-cols-2 gap-5">
                 <div>
-                  <h3 className="font-semibold">Not asked</h3>
+                  <h3 className="type-section">Not asked</h3>
                   <div className="mt-2 flex flex-wrap gap-1">
                     {summary.notAsked.length > 0 ? (
                       summary.notAsked.map((slot) => (
                         <span
                           key={slot}
-                          className="border border-border bg-muted px-2 py-1 text-sm"
+                          className="rounded-full bg-muted px-2.5 py-1"
                         >
                           {slot.replaceAll('_', ' ')}
                         </span>
                       ))
                     ) : (
-                      <span className="text-sm text-muted-foreground">
-                        None
-                      </span>
+                      <span className="text-muted-foreground">None</span>
                     )}
                   </div>
                 </div>
                 <div>
-                  <h3 className="font-semibold">Unsure</h3>
+                  <h3 className="type-section">Unsure</h3>
                   <div className="mt-2 flex flex-wrap gap-1">
                     {summary.unsure.length > 0 ? (
                       summary.unsure.map((slot) => (
                         <span
                           key={slot}
-                          className="border border-border bg-muted px-2 py-1 text-sm"
+                          className="rounded-full bg-muted px-2.5 py-1"
                         >
                           {slot.replaceAll('_', ' ')}
                         </span>
                       ))
                     ) : (
-                      <span className="text-sm text-muted-foreground">
-                        None
-                      </span>
+                      <span className="text-muted-foreground">None</span>
                     )}
                   </div>
                 </div>
               </section>
 
               <section>
-                <h3 className="font-semibold">Clarify on the call</h3>
+                <h3 className="type-section">Clarify on the call</h3>
                 {summary.clarify.length > 0 ? (
                   <ul className="mt-2 list-disc pl-5">
                     {summary.clarify.map((item) => (
@@ -385,14 +378,14 @@ export function DoctorPanel({
 
               <Accordion
                 maxPanelHeight={260}
-                className="shrink-0 rounded-xl! border-border! bg-card! shadow-none! [&_button]:min-h-11 [&_button>span]:text-sm! [&_button>span:first-child]:text-base! [&_button>span:first-child]:font-semibold! [&_button>span:first-child]:text-foreground!"
+                className="shrink-0 rounded-inset! border-transparent! bg-card! shadow-[var(--elevation-1)]! [&_button]:min-h-11 [&_button>span]:type-body! [&_button>span:first-child]:type-section! [&_button>span:first-child]:text-foreground!"
                 items={[
                   {
                     id: 'transcript',
                     title: 'Transcript',
                     meta: `${session.messages.length} messages`,
                     content: (
-                      <div className="flex flex-col gap-2 text-base text-foreground">
+                      <div className="type-body flex flex-col gap-2 text-foreground">
                         {session.messages.map((message) => (
                           <p key={message.id}>
                             <strong>
@@ -413,7 +406,7 @@ export function DoctorPanel({
           )}
         </div>
 
-        <footer className="flex flex-col gap-3 border-t border-border px-6 py-5">
+        <footer className="flex flex-col gap-3 border-t border-track px-6 py-5">
           {showFeedback && (
             <label className="flex flex-col gap-2">
               <span className="font-medium">What looks inaccurate?</span>
@@ -421,7 +414,7 @@ export function DoctorPanel({
                 value={feedback}
                 onChange={(event) => setFeedback(event.target.value)}
                 rows={2}
-                className="rounded-xl border border-input bg-background p-2"
+                className="surface-inset bg-background p-2"
               />
               <button
                 type="button"
@@ -440,6 +433,7 @@ export function DoctorPanel({
               label="Copy to notes"
               copiedLabel="Copied"
               errorLabel="Copy failed"
+              className="button-raised-soft! h-[42px]! justify-center rounded-full! text-sm! [&_svg]:text-strong"
             />
             <button
               type="button"
@@ -451,9 +445,7 @@ export function DoctorPanel({
             </button>
           </div>
           {summary && (
-            <p className="text-xs leading-5 text-muted-foreground">
-              {summary.aiLabel}
-            </p>
+            <p className="text-muted-foreground">{summary.aiLabel}</p>
           )}
         </footer>
       </aside>

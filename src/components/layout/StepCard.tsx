@@ -3,7 +3,7 @@ import { FigureMark } from './FigureMark';
 
 /**
  * The step card from the design reference: a numbered badge and step name on
- * one line, a serif heading, the instructions, and a right-hand column
+ * one line, a heading, the instructions, and a right-hand column
  * holding the figure thumbnail and a forward arrow.
  */
 export function StepCard({
@@ -28,21 +28,21 @@ export function StepCard({
             >
               {step}
             </span>
-            <span className="text-sm font-medium">{stepName}</span>
+            <span className="type-body text-foreground">{stepName}</span>
           </div>
 
-          <h2 className="display-title mt-3 text-[1.5rem]">{title}</h2>
+          <h2 className="type-section mt-3">{title}</h2>
 
-          <p className="mt-2 text-[0.8125rem] leading-relaxed text-muted-foreground">
+          <p className="mt-2 text-[18px] leading-[1.5] text-muted-foreground">
             {body}
           </p>
         </div>
 
-        <FigureMark className="mt-1 h-24 w-12 shrink-0 text-muted-foreground/70" />
+        <FigureMark className="mt-1 h-24 w-12 shrink-0 text-strong/60" />
 
         <ArrowRight
           aria-hidden
-          className="mt-14 size-5 shrink-0 text-foreground rtl:-scale-x-100"
+          className="mt-14 size-5 shrink-0 text-strong rtl:-scale-x-100"
         />
       </div>
     </section>
