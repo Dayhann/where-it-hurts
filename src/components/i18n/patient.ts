@@ -36,6 +36,7 @@ const COPY = {
       bodyInstructionsCarer:
         'Choose “Where it hurts”, then tap each part of their body that hurts. If the pain moves or spreads, choose “Where it spreads” and tap those parts too.',
       questions: 'A few questions',
+      backToBody: 'Back to the body map',
       backToQuestions: 'Back to questions',
       saving: 'Saving your marks…',
       saved: 'Marks saved for this check-in.',
@@ -171,6 +172,7 @@ const COPY = {
       bodyInstructionsCarer:
         'اختر «موضع الألم»، ثم اضغط على كل جزء يؤلمهم. إذا امتد الألم، اختر «موضع امتداد الألم» واضغط على تلك الأجزاء أيضاً.',
       questions: 'بعض الأسئلة',
+      backToBody: 'العودة إلى رسم الجسم',
       backToQuestions: 'العودة إلى الأسئلة',
       saving: 'جارٍ حفظ العلامات…',
       saved: 'تم حفظ العلامات لهذا التسجيل.',

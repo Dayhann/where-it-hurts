@@ -284,7 +284,6 @@ type BodyViewerProps = {
   marks: BodyMark[];
   onChange: (marks: BodyMark[]) => void;
   variant?: 'full' | 'thumbnail';
-  onExpand?: () => void;
   onDone?: (snapshots: BodySnapshots) => Promise<void>;
   lang?: Lang;
   carerMode?: boolean;
@@ -294,7 +293,6 @@ export default function BodyViewer({
   marks,
   onChange,
   variant = 'full',
-  onExpand,
   onDone,
   lang = 'en',
   carerMode = false,
@@ -379,7 +377,12 @@ export default function BodyViewer({
           !compact && 'grid grid-cols-[1fr_7rem] items-stretch gap-2.5',
         )}
       >
-        <div className="body-canvas-scroll-safe relative overflow-hidden rounded-xl border border-border bg-muted">
+        <div
+          className={cn(
+            'relative overflow-hidden rounded-xl border border-border bg-muted',
+            compact ? 'body-canvas-locked' : 'body-canvas-scroll-safe',
+          )}
+        >
           <div
             role="img"
             aria-label={compact ? copy.thumbnail : copy.interactive}
@@ -546,19 +549,6 @@ export default function BodyViewer({
           </div>
         )}
       </div>
-
-      {compact && onExpand && (
-        <button
-          type="button"
-          onClick={onExpand}
-          className={cn(
-            buttonVariants({ variant: 'outline', size: 'touch' }),
-            'text-lg',
-          )}
-        >
-          {copy.showFull}
-        </button>
-      )}
 
       {!compact && (
         <>
