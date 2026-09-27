@@ -212,6 +212,52 @@ describe('mock and real API contracts', () => {
     expect(summary.lines[0]?.quotes).toEqual(['My left knee aches.']);
     expect(summary.lines[0]?.verified).toBe(true);
   });
+
+  it('keeps separate edits for two answers in the same history slot', async () => {
+    const store = new MemoryStore();
+    const api = createServerApi(store);
+    const created = await api.createSession({
+      appointment,
+      lang: 'en',
+      carerMode: false,
+    });
+    await store.update({
+      ...created.session,
+      status: 'awaiting_confirm',
+      messages: [
+        ...created.session.messages,
+        {
+          id: 'p1',
+          role: 'patient',
+          text: 'My knee aches.',
+          createdAt: appointment.startsAt,
+        },
+        {
+          id: 'q2',
+          role: 'assistant',
+          questionId: 'Q_SITE_DETAIL',
+          text: 'Where most?',
+          createdAt: appointment.startsAt,
+        },
+        {
+          id: 'p2',
+          role: 'patient',
+          text: 'The front of my knee.',
+          createdAt: appointment.startsAt,
+        },
+      ],
+    });
+    expect((await api.getRecap(created.session.id)).lines).toHaveLength(2);
+    await api.confirm(created.session.id, {
+      edits: [
+        { slot: 'site', text: 'First edited answer' },
+        { slot: 'site', text: 'Second edited answer' },
+      ],
+    });
+    expect(
+      (await api.getRecap(created.session.id)).lines.map((line) => line.text),
+    ).toEqual(['First edited answer', 'Second edited answer']);
+  });
 });
 
 describe('HTTP route validation', () => {
