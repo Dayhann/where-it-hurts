@@ -49,9 +49,10 @@ This prototype is **not clinical guidance**.
 
 ## Fonts
 
-| Asset             | Licence                   | Source                      |
-| ----------------- | ------------------------- | --------------------------- |
-| Geist, Geist Mono | SIL Open Font Licence 1.1 | `next/font/google` (Vercel) |
+| Asset       | Licence                   | Source                                                      |
+| ----------- | ------------------------- | ----------------------------------------------------------- |
+| Inter Tight | SIL Open Font Licence 1.1 | `next/font/google` (Rasmus Andersson). UI and heading face. |
+| Geist Mono  | SIL Open Font Licence 1.1 | `next/font/google` (Vercel)                                 |
 
 ## Body model
 

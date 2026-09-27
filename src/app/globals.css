@@ -7,9 +7,14 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-inter-tight);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
+  --color-text: var(--text);
+  --color-strong: var(--strong);
+  --color-track: var(--track);
+  --radius-inset: 14px;
+  --radius-card: 18px;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -30,7 +35,7 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
+  --color-muted: var(--muted-surface);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
@@ -49,34 +54,94 @@
 }
 
 :root {
-  /* Calm clinical tokens: warm paper, slate ink, muted teal. */
-  --background: oklch(0.985 0.008 85);
-  --foreground: oklch(0.3 0.025 250);
-  --card: oklch(0.995 0.004 85);
-  --card-foreground: oklch(0.3 0.025 250);
-  --popover: oklch(0.995 0.004 85);
-  --popover-foreground: oklch(0.3 0.025 250);
-  --primary: oklch(0.42 0.07 205);
-  --primary-foreground: oklch(0.99 0.005 85);
-  --secondary: oklch(0.955 0.012 85);
-  --secondary-foreground: oklch(0.3 0.025 250);
-  --muted: oklch(0.955 0.012 85);
-  --muted-foreground: oklch(0.48 0.02 250);
-  --accent: oklch(0.94 0.02 200);
-  --accent-foreground: oklch(0.28 0.04 205);
-  --destructive: oklch(0.55 0.19 25);
-  --border: oklch(0.9 0.015 85);
-  --input: oklch(0.9 0.015 85);
-  --ring: oklch(0.42 0.07 205);
+  /* Warm grey ground, deep forest green ink, soft lifted surfaces.
+
+     Cards are only a shade lighter than the page: shade and a lit top edge
+     separate them, not contrast or outlines. Tracks and inputs are the
+     inverse — pressed into the page. A single deep forest green carries
+     every primary action; it reads as near-black at a glance.
+
+     Red remains reserved exclusively for clinical alarm — never decoration. */
+
+  /* Ink. --text is primary copy, --muted secondary copy, --strong icons,
+     --track the only colour a divider or edge may use. --muted is text, so
+     the shadcn `bg-muted` surface reads from --muted-surface instead. */
+  --text: oklch(0.235 0.013 135);
+  --muted: oklch(0.508 0.013 135);
+  --strong: oklch(0.19 0.016 140);
+  --track: oklch(0.235 0.013 135 / 0.09);
+
+  --background: oklch(0.938 0.006 80);
+  --foreground: var(--text);
+  --card: oklch(0.972 0.004 80);
+  --card-foreground: var(--text);
+  --popover: oklch(0.982 0.003 80);
+  --popover-foreground: var(--text);
+  --primary: oklch(0.345 0.035 148);
+  --primary-foreground: oklch(0.975 0.006 92);
+  --secondary: oklch(0.918 0.006 80);
+  --secondary-foreground: var(--text);
+  --muted-surface: oklch(0.918 0.006 80);
+  --muted-foreground: var(--muted);
+  --accent: oklch(0.925 0.022 148);
+  --accent-foreground: oklch(0.32 0.04 148);
+  --destructive: oklch(0.49 0.196 27);
+  --border: var(--track);
+  --input: var(--track);
+  --ring: oklch(0.345 0.035 148);
+
+  /* Lighter green, for the selected-state check marks and small detail. */
+  --gold: oklch(0.46 0.055 148);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
+  /* Soft cards lifted off the cream page, matching the reference. */
+  --radius: 1rem;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* Spacing scale — strict 8px grid. Use these instead of ad-hoc gaps so
+     vertical rhythm stays consistent across patient and clinic surfaces. */
+  --space-1: 0.5rem; /*  8px — inside a control            */
+  --space-2: 1rem; /* 16px — between related controls    */
+  --space-3: 1.5rem; /* 24px — inside a card               */
+  --space-4: 2rem; /* 32px — between cards               */
+  --space-5: 2.5rem; /* 40px — between sections            */
+  --space-6: 3rem; /* 48px — between major sections      */
+  --space-8: 4rem; /* 64px — page top/bottom breathing   */
+
+  /* Every surface is lit from above: a white inset top edge, then warm shade
+     stacked below, never a border. Depth 1 (14px radius) is a row or panel
+     nested in a card; depth 2 (18px) is a card on the page; depth 3 floats
+     over content (tab bar, drawer, menus). --sunken presses a track or an
+     input into the surface it sits on. */
+  --elevation-1:
+    inset 0 1px 0 oklch(1 0 0 / 0.75), 0 1px 2px oklch(0.3 0.012 70 / 0.06),
+    0 4px 10px -4px oklch(0.3 0.012 70 / 0.12);
+  --elevation-2:
+    inset 0 1px 0 oklch(1 0 0 / 0.85), 0 1px 2px oklch(0.3 0.012 70 / 0.05),
+    0 8px 20px -8px oklch(0.3 0.012 70 / 0.12),
+    0 22px 44px -22px oklch(0.3 0.012 70 / 0.16);
+  --elevation-3:
+    inset 0 1px 0 oklch(1 0 0 / 0.85), 0 2px 4px oklch(0.3 0.012 70 / 0.06),
+    0 12px 28px -8px oklch(0.3 0.012 70 / 0.16),
+    0 30px 60px -24px oklch(0.3 0.012 70 / 0.24);
+  --sunken:
+    inset 0 1px 3px oklch(0.3 0.012 70 / 0.12),
+    inset 0 -1px 0 oklch(1 0 0 / 0.6);
+
+  /* Buttons: a 6px inset highlight on top of a soft drop shadow. */
+  --button-highlight: inset 0 1px 6px oklch(1 0 0 / 0.3);
+  --button-highlight-soft: inset 0 1px 6px oklch(1 0 0 / 0.95);
+  --button-drop:
+    0 1px 2px oklch(0.3 0.012 70 / 0.08),
+    0 6px 14px -6px oklch(0.3 0.012 70 / 0.24);
+
+  --rule: 1px solid var(--track);
+  --rule-strong: 1px solid var(--track);
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -88,23 +153,27 @@
 }
 
 .dark {
+  --text: oklch(0.985 0 0);
+  --muted: oklch(0.708 0 0);
+  --strong: oklch(1 0 0);
+  --track: oklch(1 0 0 / 10%);
   --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
+  --foreground: var(--text);
   --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
+  --card-foreground: var(--text);
   --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
+  --popover-foreground: var(--text);
   --primary: oklch(0.922 0 0);
   --primary-foreground: oklch(0.205 0 0);
   --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
+  --secondary-foreground: var(--text);
+  --muted-surface: oklch(0.269 0 0);
+  --muted-foreground: var(--muted);
   --accent: oklch(0.269 0 0);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
+  --border: var(--track);
+  --input: var(--track);
   --ring: oklch(0.556 0 0);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
@@ -137,9 +206,207 @@
 }
 
 @layer components {
-  .display-title {
-    letter-spacing: -0.02em;
-    line-height: 1.15;
+  /* Vertical rhythm ------------------------------------------------------ */
+
+  /* Between top-level sections of a page. */
+  .section-stack > * + * {
+    margin-block-start: var(--space-5);
+  }
+
+  /* Between cards / grouped blocks inside a section. */
+  .group-stack > * + * {
+    margin-block-start: var(--space-3);
+  }
+
+  /* Between tightly related controls (a label and its input). */
+  .tight-stack > * + * {
+    margin-block-start: var(--space-1);
+  }
+
+  /* Surfaces ------------------------------------------------------------- */
+
+  /* A card on the page: depth 2. */
+  .surface {
+    background-color: var(--card);
+    border-radius: var(--radius-card);
+    padding: var(--space-3);
+    box-shadow: var(--elevation-2);
+  }
+
+  /* A panel nested inside a card: depth 1. */
+  .surface-inset {
+    border-radius: var(--radius-inset);
+    box-shadow: var(--elevation-1);
+  }
+
+  /* A row: check circle, label, trailing control. Depth 1. */
+  .card-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 3.25rem;
+    padding-inline: var(--space-2);
+    background-color: var(--card);
+    border-radius: var(--radius-inset);
+    box-shadow: var(--elevation-1);
+    transition:
+      background-color 160ms ease,
+      box-shadow 160ms ease;
+  }
+
+  /* Pressed into the surface: search fields, text areas, segmented tracks. */
+  .field {
+    background-color: var(--background);
+    border-radius: var(--radius-inset);
+    box-shadow: var(--sunken);
+  }
+
+  /* A pinned card: an ink bar on the leading edge marks it as the thing to
+     read first. Set --pin to recolour the bar. */
+  .pinned {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .pinned::before {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: 3px;
+    background-color: var(--pin, var(--text));
+  }
+
+  .card-row[data-selected='true'] {
+    background-color: color-mix(in oklch, var(--accent), var(--card) 45%);
+    box-shadow:
+      0 0 0 1.5px var(--primary),
+      var(--elevation-1);
+  }
+
+  /* Misted landscape band behind the app header. Stands in for the
+     photograph in the reference — swap in a real image when there is one. */
+  .hero-mist {
+    background:
+      radial-gradient(
+        120% 90% at 18% 118%,
+        oklch(0.345 0.035 148 / 0.5) 0%,
+        transparent 58%
+      ),
+      radial-gradient(
+        95% 80% at 74% 122%,
+        oklch(0.4 0.03 155 / 0.42) 0%,
+        transparent 55%
+      ),
+      radial-gradient(
+        130% 110% at 45% 135%,
+        oklch(0.28 0.03 145 / 0.55) 0%,
+        transparent 62%
+      ),
+      linear-gradient(
+        to bottom,
+        oklch(0.86 0.014 140) 0%,
+        oklch(0.9 0.012 120) 45%,
+        var(--background) 100%
+      );
+  }
+
+  /* Parallax drift: nearer ridges travel further and faster, so the band
+     reads as depth. Plain ease-in-out rather than --ease-in-out: the strong
+     curve parks each layer at its ends for most of a long cycle, which reads
+     as frozen. Distances are SVG user units; the paths overhang by 40 so no
+     edge is ever exposed. */
+  .ridge-far {
+    animation: ridge-far 18s ease-in-out infinite alternate;
+  }
+
+  .ridge-mid {
+    animation: ridge-mid 13s ease-in-out infinite alternate;
+  }
+
+  .ridge-near {
+    animation: ridge-near 9s ease-in-out infinite alternate;
+  }
+
+  @keyframes ridge-far {
+    from {
+      transform: translateX(-10px);
+    }
+    to {
+      transform: translateX(10px);
+    }
+  }
+
+  @keyframes ridge-mid {
+    from {
+      transform: translateX(18px);
+    }
+    to {
+      transform: translateX(-18px);
+    }
+  }
+
+  @keyframes ridge-near {
+    from {
+      transform: translateX(-28px);
+    }
+    to {
+      transform: translateX(28px);
+    }
+  }
+
+  /* Rules ---------------------------------------------------------------- */
+
+  .rule-top {
+    border-block-start: var(--rule);
+  }
+
+  .rule-bottom {
+    border-block-end: var(--rule);
+  }
+
+  /* A list where each row is divided by a hairline rather than boxed. */
+  .divide-rule > * + * {
+    border-block-start: var(--rule);
+  }
+
+  /* Readability ---------------------------------------------------------- */
+
+  /* Caps line length at roughly 66 characters — the comfortable range for
+     body copy. Patient pages run at 18px, so this matters more than usual. */
+  .measure {
+    max-width: 34rem;
+  }
+
+  .body-copy {
+    line-height: 1.65;
+    letter-spacing: 0.004em;
+  }
+
+  /* Interaction ---------------------------------------------------------- */
+
+  /* The 3D body canvas fills ~91% of a phone's width. Without this, a
+     vertical swipe is captured by OrbitControls and the page cannot be
+     scrolled at all, stranding the patient above the "Done marking" button.
+
+     pan-y hands vertical gestures back to the page; horizontal drags still
+     rotate the model. This viewer locks the polar angle
+     (minPolarAngle === maxPolarAngle), so vertical dragging never rotated
+     anything here — nothing is lost by giving that axis to the page.
+
+     !important is required: three.js writes touch-action inline on the
+     canvas element, and an inline style beats an ordinary rule. */
+  .body-canvas-scroll-safe canvas {
+    touch-action: pan-y !important;
+  }
+
+  /* Read-only body map, shown beside the questions. A wrapper set to
+     pointer-events: none is not enough on its own — a descendant may
+     re-enable hit testing, and three.js writes pointer-events inline on
+     the canvas — so the canvas is locked directly. */
+  .body-canvas-locked canvas {
+    pointer-events: none !important;
+    touch-action: pan-y !important;
   }
 
   .pressable {
@@ -149,11 +416,40 @@
       color 160ms ease,
       border-color 160ms ease,
       opacity 160ms ease,
-      box-shadow 160ms ease;
+      box-shadow 160ms ease,
+      filter 160ms ease;
   }
 
   .pressable:active:not(:disabled) {
     transform: scale(0.97);
+  }
+
+  /* First paint of a page: children rise into place 50ms apart. The cap at
+     the fifth child keeps late siblings from waiting. */
+  .stagger-in > * {
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      opacity 240ms var(--ease-out),
+      transform 240ms var(--ease-out);
+
+    @starting-style {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+
+  .stagger-in > :nth-child(2) {
+    transition-delay: 50ms;
+  }
+  .stagger-in > :nth-child(3) {
+    transition-delay: 100ms;
+  }
+  .stagger-in > :nth-child(4) {
+    transition-delay: 150ms;
+  }
+  .stagger-in > :nth-child(n + 5) {
+    transition-delay: 200ms;
   }
 
   .enter-fade {
@@ -171,10 +467,14 @@
 
   .chat-bubble {
     opacity: 1;
-    transition: opacity 160ms var(--ease-out);
+    transform: translateY(0);
+    transition:
+      opacity 180ms var(--ease-out),
+      transform 180ms var(--ease-out);
 
     @starting-style {
       opacity: 0;
+      transform: translateY(6px);
     }
   }
 
@@ -187,6 +487,12 @@
     }
   }
 
+  /* Leaves the way it came, faster than it arrived. */
+  .drawer-in.drawer-out {
+    transform: translateX(100%);
+    transition: transform 200ms var(--ease-drawer);
+  }
+
   .scrim-in {
     opacity: 1;
     transition: opacity 200ms var(--ease-out);
@@ -195,6 +501,84 @@
       opacity: 0;
     }
   }
+
+  .scrim-in.scrim-out {
+    opacity: 0;
+    transition-duration: 200ms;
+  }
+}
+
+/* Type scale ------------------------------------------------------------- */
+
+@utility type-title {
+  font-family: var(--font-sans);
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 600;
+  letter-spacing: -0.7px;
+}
+
+@utility type-section {
+  font-family: var(--font-sans);
+  font-size: 19px;
+  line-height: 24px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+}
+
+/* Clinic body copy and small labels (dates, tabs, meta). Patient body copy
+   stays at 18px. */
+@utility type-body {
+  font-family: var(--font-sans);
+  font-size: 14.5px;
+  line-height: 18px;
+  font-weight: 400;
+  letter-spacing: 0.3px;
+}
+
+/* Button fills. Never flat: a top-lit gradient, the inset highlight and a
+   soft drop shadow. Use with `!` to restyle an upstream component. */
+
+@utility button-raised {
+  background-color: var(--primary);
+  background-image: linear-gradient(
+    to bottom,
+    color-mix(in oklch, var(--primary), white 16%),
+    var(--primary)
+  );
+  color: var(--primary-foreground);
+  border-color: transparent;
+  box-shadow:
+    var(--button-highlight),
+    0 1px 2px oklch(0.235 0.013 135 / 0.12),
+    0 6px 14px -6px oklch(0.345 0.035 148 / 0.55);
+}
+
+@utility button-raised-soft {
+  background-color: var(--card);
+  background-image: linear-gradient(
+    to bottom,
+    var(--card),
+    color-mix(in oklch, var(--card), var(--background) 70%)
+  );
+  color: var(--text);
+  border-color: transparent;
+  box-shadow: var(--button-highlight-soft), var(--button-drop);
+}
+
+@utility button-raised-alert {
+  background-color: color-mix(in oklch, var(--destructive), var(--card) 90%);
+  background-image: linear-gradient(
+    to bottom,
+    color-mix(in oklch, var(--destructive), var(--card) 94%),
+    color-mix(in oklch, var(--destructive), var(--card) 86%)
+  );
+  color: var(--destructive);
+  border-color: transparent;
+  box-shadow:
+    var(--button-highlight-soft),
+    0 0 0 1px oklch(0.49 0.196 27 / 0.1),
+    var(--button-drop);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -205,8 +589,21 @@
   .enter-fade,
   .drawer-in,
   .chat-bubble,
-  .scrim-in {
+  .scrim-in,
+  .stagger-in > *:nth-child(n) {
     transition: opacity 200ms ease;
     transform: none;
+  }
+
+  .drawer-in.drawer-out {
+    opacity: 0;
+    transform: none;
+    transition: opacity 200ms ease;
+  }
+
+  .ridge-far,
+  .ridge-mid,
+  .ridge-near {
+    animation: none;
   }
 }

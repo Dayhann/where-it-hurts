@@ -1,5 +1,6 @@
 'use client';
 
+import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import BodyViewer, {
@@ -8,10 +9,10 @@ import BodyViewer, {
 import { ChatComposer } from '@/components/chat/ChatComposer';
 import { ChatThread } from '@/components/chat/ChatThread';
 import { replyChips } from '@/components/chat/chips';
-import { QuestionProgress } from '@/components/chat/QuestionProgress';
+import { progressLabel } from '@/components/chat/progress';
 import { chatHasStarted, turnFromSession } from '@/components/chat/resume-turn';
 import { patientCopy } from '@/components/i18n/patient';
-import { TaskSteps } from '@/components/interior/task-steps';
+import { StepCard } from '@/components/layout/StepCard';
 import { PatientRecap } from '@/components/recap/PatientRecap';
 import { RedFlagStop } from '@/components/red-flag/RedFlagStop';
 import { buttonVariants } from '@/components/ui/button';
@@ -27,7 +28,6 @@ import {
   type MarkSaveState,
 } from '@/lib/api-client/mark-save-queue';
 import { cn } from '@/lib/utils';
-import { checkinStep } from './steps';
 
 export function CheckinSession({ sessionId }: { sessionId: string }) {
   const [session, setSession] = useState<Session | null>(null);
@@ -37,7 +37,6 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
   const [loadError, setLoadError] = useState(false);
   const [saveState, setSaveState] = useState<MarkSaveState | 'idle'>('idle');
   const [chatStarted, setChatStarted] = useState(false);
-  const [bodyExpanded, setBodyExpanded] = useState(false);
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
@@ -124,7 +123,6 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
       await saveQueue.current?.waitForIdle();
       await getApiClient().putMarks(sessionId, { marks, snapshots });
       setSaveState('saved');
-      setBodyExpanded(false);
       setChatStarted(true);
     } catch {
       setSaveState('local');
@@ -162,26 +160,15 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
     );
   }
 
-  const steps = (
-    <TaskSteps
-      label={copy.checkin.stepsLabel}
-      steps={copy.checkin.steps.map((label, index) => ({
-        id: String(index),
-        label,
-      }))}
-      current={checkinStep({
-        chatStarted,
-        turn,
-        confirmed: confirmed || session?.status === 'confirmed',
-      })}
-      className="[&_li]:h-9 [&_li>span.truncate]:text-lg!"
-    />
-  );
-
   if (turn?.type === 'done' && session) {
     return (
       <div dir={direction} className="flex flex-col gap-5">
-        {steps}
+        <StepCard
+          step={3}
+          stepName={copy.checkin.steps[2]}
+          title={confirmed ? copy.recap.thanks : copy.recap.title}
+          body={confirmed ? copy.recap.sent : copy.recap.instructions}
+        />
         <PatientRecap
           sessionId={sessionId}
           alreadyConfirmed={session.status === 'confirmed'}
@@ -195,70 +182,70 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
   const messages: Message[] = session?.messages ?? [];
   const questionTurn = turn?.type === 'question' ? turn : undefined;
   const showChat = chatStarted;
-  const compactBody = showChat && !bodyExpanded;
 
   return (
     <div dir={direction} className="flex flex-col gap-5">
-      {steps}
       {showChat ? (
-        <div className="flex flex-col gap-1">
-          <p className="text-lg text-muted-foreground">
-            {copy.checkin.label} {sessionId}
-          </p>
-          <h1 className="display-title text-2xl font-semibold tracking-tight">
-            {copy.checkin.questions}
-          </h1>
-          {questionTurn && (
-            <p className="text-lg text-muted-foreground">
-              <QuestionProgress progress={questionTurn.progress} lang={lang} />
-            </p>
-          )}
-          {session?.carerMode && (
-            <p className="rounded-lg bg-muted px-3 py-2">
-              {copy.checkin.carerBanner}
-            </p>
-          )}
-        </div>
+        <StepCard
+          step={2}
+          stepName={copy.checkin.steps[1]}
+          title={copy.checkin.questions}
+          body={
+            questionTurn
+              ? progressLabel(questionTurn.progress, lang)
+              : copy.checkin.stepsLabel
+          }
+        />
       ) : (
-        <div className="flex flex-col gap-1">
-          <p className="text-lg text-muted-foreground">
-            {copy.checkin.label} {sessionId}
-          </p>
-          <h1 className="display-title text-2xl font-semibold tracking-tight">
-            {session?.carerMode
+        <StepCard
+          step={1}
+          stepName={copy.checkin.steps[0]}
+          title={
+            session?.carerMode
               ? copy.checkin.bodyTitleCarer
-              : copy.checkin.bodyTitle}
-          </h1>
-          <p>
-            {session?.carerMode
+              : copy.checkin.bodyTitle
+          }
+          body={
+            session?.carerMode
               ? copy.checkin.bodyInstructionsCarer
-              : copy.checkin.bodyInstructions}
-          </p>
-        </div>
+              : copy.checkin.bodyInstructions
+          }
+        />
+      )}
+      {showChat && session?.carerMode && (
+        <p className="surface-inset bg-accent px-4 py-3 text-accent-foreground">
+          {copy.checkin.carerBanner}
+        </p>
       )}
 
-      <BodyViewer
-        marks={marks}
-        onChange={setMarks}
-        variant={compactBody ? 'thumbnail' : 'full'}
-        onExpand={compactBody ? () => setBodyExpanded(true) : undefined}
-        onDone={!showChat && !loadError ? finishMarking : undefined}
-        lang={lang}
-        carerMode={session?.carerMode === true}
-      />
-      {showChat && bodyExpanded && (
-        <button
-          type="button"
-          onClick={() => setBodyExpanded(false)}
-          className={cn(
-            buttonVariants({ variant: 'outline', size: 'touch' }),
-            'text-lg',
-          )}
-        >
-          {copy.checkin.backToQuestions}
-        </button>
-      )}
-      <p className="text-lg text-muted-foreground" aria-live="polite">
+      {/* Once the questions start the body map is a read-only reminder of
+          what was marked. Editing it in place would let answers drift out
+          of step with the marks they were given about, so changing it is
+          an explicit trip back to the marking step. */}
+      <div className="surface !p-4 sm:!p-6">
+        <BodyViewer
+          marks={marks}
+          onChange={setMarks}
+          variant={showChat ? 'thumbnail' : 'full'}
+          onDone={!showChat && !loadError ? finishMarking : undefined}
+          lang={lang}
+          carerMode={session?.carerMode === true}
+        />
+        {showChat && (
+          <button
+            type="button"
+            onClick={() => setChatStarted(false)}
+            className={cn(
+              buttonVariants({ variant: 'outline', size: 'touch' }),
+              'mt-3 w-full',
+            )}
+          >
+            <ArrowLeft aria-hidden className="size-4 rtl:-scale-x-100" />
+            {copy.checkin.backToBody}
+          </button>
+        )}
+      </div>
+      <p className="type-body text-muted-foreground" aria-live="polite">
         {saveState === 'saving' && copy.checkin.saving}
         {saveState === 'saved' && copy.checkin.saved}
         {saveState === 'local' && copy.checkin.local}
@@ -290,15 +277,23 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
         </p>
       )}
 
-      <Link
-        href="/"
-        className={cn(
-          buttonVariants({ variant: 'outline', size: 'touch' }),
-          'text-lg',
-        )}
-      >
-        {copy.checkin.back}
-      </Link>
+      <footer className="mt-4 flex flex-col gap-4 border-t border-track pt-6">
+        <Link
+          href="/"
+          className={cn(
+            buttonVariants({ variant: 'ghost', size: 'touch' }),
+            'self-start text-muted-foreground',
+          )}
+        >
+          {copy.checkin.back}
+        </Link>
+        {/* Kept for support ("read me the reference at the bottom") but
+            demoted — it used to sit above the page heading at 18px, which
+            made the first thing a patient in pain read a random string. */}
+        <p className="font-mono text-xs break-all text-muted-foreground/70">
+          {copy.checkin.label} {sessionId}
+        </p>
+      </footer>
     </div>
   );
 }

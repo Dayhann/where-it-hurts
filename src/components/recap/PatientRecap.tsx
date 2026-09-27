@@ -69,12 +69,10 @@ export function PatientRecap({
 
   if (confirmed) {
     return (
-      <section className="enter-fade flex flex-1 flex-col justify-center gap-6 py-8">
+      <section className="enter-fade flex flex-1 flex-col justify-center gap-8 py-8">
         <div className="flex flex-col gap-2">
           <p className="text-lg text-muted-foreground">{copy.complete}</p>
-          <h1 className="display-title text-3xl font-semibold tracking-tight">
-            {copy.thanks}
-          </h1>
+          <h1 className="type-title">{copy.thanks}</h1>
           <p>{copy.sent}</p>
         </div>
         <Link
@@ -88,12 +86,12 @@ export function PatientRecap({
   }
 
   return (
-    <section className="flex flex-col gap-6">
+    <section className="flex flex-col gap-8">
       <header className="flex flex-col gap-2">
-        <p className="text-lg text-muted-foreground">
+        <p className="type-body text-muted-foreground">
           {patientCopy(lang).checkin.label} {sessionId}
         </p>
-        <h1 className="text-2xl font-semibold tracking-tight">{copy.title}</h1>
+        <h1 className="type-title">{copy.title}</h1>
         <p>{copy.instructions}</p>
       </header>
 
@@ -104,16 +102,14 @@ export function PatientRecap({
       ) : (
         <div className="flex flex-col gap-4">
           {lines.length === 0 ? (
-            <p className="rounded-xl border border-border bg-card p-4">
-              {copy.empty}
-            </p>
+            <p className="surface">{copy.empty}</p>
           ) : (
             lines.map((line, index) => (
               <label
                 key={`${line.slot}-${index}`}
-                className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4"
+                className="surface flex flex-col gap-3"
               >
-                <span className="font-medium">
+                <span className="type-section">
                   {copy.answer} {index + 1}
                 </span>
                 <textarea
@@ -128,7 +124,7 @@ export function PatientRecap({
                       ),
                     );
                   }}
-                  className="min-h-11 resize-y rounded-lg border border-input bg-background px-3 py-2 text-lg leading-7 outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                  className="field min-h-14 resize-y px-4 py-3 text-lg leading-relaxed outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
                 />
               </label>
             ))
@@ -148,7 +144,7 @@ export function PatientRecap({
         pendingLabel={copy.sending}
         successLabel={copy.sentShort}
         errorLabel={copy.retry}
-        className="h-12! w-full rounded-lg! border-primary! bg-primary! text-lg! hover:bg-primary/85! [&>span>span]:text-primary-foreground!"
+        className="button-raised! h-[46px]! w-full rounded-full! text-base! hover:brightness-110 [&>span>span]:text-primary-foreground!"
       >
         {copy.confirm}
       </LoadingButton>

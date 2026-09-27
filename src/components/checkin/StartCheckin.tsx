@@ -5,9 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { patientCopy } from '@/components/i18n/patient';
 import { LoadingButton } from '@/components/interior/loading-button';
-import { TextReveal } from '@/components/interior/text-reveal';
+import { StepCard } from '@/components/layout/StepCard';
 import { buttonVariants } from '@/components/ui/button';
-import FluidOrb from '@/components/ui/fluid-orb';
 import { getApiClient } from '@/lib/api-client';
 import { cn } from '@/lib/utils';
 
@@ -37,36 +36,22 @@ export function StartCheckin() {
   };
 
   return (
-    <main className="flex flex-1 flex-col justify-center gap-7 py-4">
-      <header className="flex flex-col gap-3">
-        <FluidOrb size={160} color="#23636B" className="self-center" />
-        <p className="text-sm font-medium tracking-wide text-primary uppercase">
-          {copy.home.badge}
-        </p>
-        <h1 className="display-title text-3xl font-semibold tracking-tight">
-          <TextReveal
-            text={copy.home.title}
-            by="character"
-            className="text-foreground!"
-          />
-        </h1>
-        <p>
-          <TextReveal
-            text={copy.home.description}
-            by="word"
-            className="text-foreground!"
-          />
-        </p>
-      </header>
+    <main className="stagger-in flex flex-1 flex-col py-2 [&>*+*]:mt-7">
+      <StepCard
+        step={1}
+        stepName={copy.home.stepName}
+        title={copy.home.stepTitle}
+        body={copy.home.description}
+      />
 
-      <label className="flex min-h-11 items-center gap-3 rounded-lg border border-border bg-card px-4 py-3">
+      <label className="card-row cursor-pointer py-3 transition-colors hover:bg-muted/40">
         <input
           type="checkbox"
           checked={carerMode}
           onChange={(event) => setCarerMode(event.target.checked)}
           className="size-5 accent-primary"
         />
-        <span>{copy.home.carer}</span>
+        <span className="text-[18px] leading-[1.4]">{copy.home.carer}</span>
       </label>
 
       {error && (
@@ -75,54 +60,64 @@ export function StartCheckin() {
         </p>
       )}
 
+      {/* The patient action is the only filled button on the page. The two
+          demo entrances are visually demoted so the primary path is obvious
+          at a glance. */}
       <nav className="flex flex-col gap-3" aria-label="Demo screens">
         <LoadingButton
           onAction={start}
           pendingLabel={copy.home.starting}
           successLabel={copy.home.opening}
           errorLabel={copy.recap.retry}
-          className="h-12! w-full rounded-lg! border-primary! bg-primary! text-lg! hover:bg-primary/85! [&>span>span]:text-primary-foreground!"
+          className="button-raised! h-[46px]! w-full rounded-full! text-base! hover:brightness-110 [&>span>span]:text-primary-foreground!"
         >
           {copy.home.start}
         </LoadingButton>
-        <Link
-          href="/clinic"
-          className={cn(
-            buttonVariants({ variant: 'outline', size: 'touch' }),
-            'w-full text-lg',
-          )}
-        >
-          {copy.home.clinic}
-        </Link>
-        <Link
-          href="/reception"
-          className={cn(
-            buttonVariants({ variant: 'outline', size: 'touch' }),
-            'w-full text-lg',
-          )}
-        >
-          {copy.home.reception}
-        </Link>
+        <div className="mt-2 grid grid-cols-2 gap-3">
+          <Link
+            href="/clinic"
+            className={cn(
+              buttonVariants({ variant: 'outline', size: 'touch' }),
+              'w-full',
+            )}
+          >
+            {copy.home.clinic}
+          </Link>
+          <Link
+            href="/reception"
+            className={cn(
+              buttonVariants({ variant: 'outline', size: 'touch' }),
+              'w-full',
+            )}
+          >
+            {copy.home.reception}
+          </Link>
+        </div>
       </nav>
 
-      <p className="text-sm leading-6 text-muted-foreground">
-        {copy.home.prototype}{' '}
-        <a className="underline underline-offset-2" href="tel:000">
-          {copy.home.emergency}
-        </a>
-      </p>
-      <p className="text-sm leading-6 text-muted-foreground">
-        {copy.home.credit}{' '}
-        <a
-          className="underline underline-offset-2"
-          href="https://rareui.com"
-          target="_blank"
-          rel="noreferrer"
-        >
-          Rare UI
-        </a>
-        .
-      </p>
+      <footer className="type-body border-t border-track pt-6 text-muted-foreground [&>p+p]:mt-2">
+        <p>
+          {copy.home.prototype}{' '}
+          <a
+            className="font-medium text-foreground underline underline-offset-4"
+            href="tel:000"
+          >
+            {copy.home.emergency}
+          </a>
+        </p>
+        <p>
+          {copy.home.credit}{' '}
+          <a
+            className="underline underline-offset-4"
+            href="https://rareui.com"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Rare UI
+          </a>
+          .
+        </p>
+      </footer>
     </main>
   );
 }

@@ -21,17 +21,19 @@ export function RedFlagStop({ lang }: { lang: Lang }) {
         role="alert"
         aria-live="assertive"
         aria-labelledby="red-flag-heading"
-        className="enter-fade flex w-full max-w-md flex-col gap-6"
+        className="enter-fade flex w-full max-w-md flex-col gap-8"
       >
         <h1
           ref={headingRef}
           id="red-flag-heading"
           tabIndex={-1}
-          className="display-title text-2xl font-semibold tracking-tight"
+          className="type-title text-destructive"
         >
           {copy.title}
         </h1>
-        <p className="text-lg leading-7">{copy.notified}</p>
+        <p className="body-copy text-lg text-muted-foreground">
+          {copy.notified}
+        </p>
         <a
           href="tel:000"
           className={cn(buttonVariants({ size: 'touch' }), 'text-lg')}

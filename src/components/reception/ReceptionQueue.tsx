@@ -106,7 +106,7 @@ export function ReceptionQueue() {
   }, []);
 
   return (
-    <main className="flex flex-1 flex-col gap-5">
+    <main className="flex flex-1 flex-col gap-8">
       <LiveActivity
         activity={activity}
         onDismiss={dismiss}
@@ -114,15 +114,11 @@ export function ReceptionQueue() {
         dismissLabel="Dismiss alert"
         className="fixed inset-x-0 top-4 z-50"
       />
-      <header className="flex flex-wrap items-center justify-between gap-3">
+      <header className="flex flex-wrap items-end justify-between gap-4 border-b border-track pb-6">
         <div>
-          <p className="text-sm font-medium tracking-wide text-primary uppercase">
-            Riverside Family Clinic
-          </p>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Reception queue
-          </h1>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground">Riverside Family Clinic</p>
+          <h1 className="type-title mt-1">Reception queue</h1>
+          <p className="mt-1 text-muted-foreground">
             Today&apos;s pre-consult check-ins
           </p>
         </div>
@@ -134,9 +130,9 @@ export function ReceptionQueue() {
         </Link>
       </header>
 
-      <dl className="grid grid-cols-2 gap-3">
-        <div className="rounded-xl border border-border bg-card p-4">
-          <dt className="text-sm text-muted-foreground">Checked in</dt>
+      <dl className="grid grid-cols-2 gap-5">
+        <div className="surface">
+          <dt className="text-muted-foreground">Checked in</dt>
           <dd>
             <ValueFlash
               value={items.length}
@@ -145,8 +141,8 @@ export function ReceptionQueue() {
             />
           </dd>
         </div>
-        <div className="rounded-xl border border-border bg-card p-4">
-          <dt className="text-sm text-muted-foreground">Red flags</dt>
+        <div className="surface">
+          <dt className="text-muted-foreground">Red flags</dt>
           <dd>
             <ValueFlash
               value={redFlags}
@@ -160,7 +156,7 @@ export function ReceptionQueue() {
         </div>
       </dl>
 
-      <div className="flex items-center justify-between gap-3 text-sm text-muted-foreground">
+      <div className="flex items-center justify-between gap-3 text-muted-foreground">
         <p aria-live="polite">
           {loading
             ? 'Updating queue…'
@@ -177,17 +173,14 @@ export function ReceptionQueue() {
 
       {error && (
         <p
-          className="rounded-lg bg-destructive/10 p-3 text-destructive"
+          className="pinned surface-inset bg-card py-3 ps-5 pe-4 text-destructive [--pin:var(--destructive)]"
           role="alert"
         >
           The queue could not be refreshed. The last update remains visible.
         </p>
       )}
 
-      <section
-        className="relative overflow-hidden rounded-xl border border-border bg-card"
-        aria-label="Today's check-ins"
-      >
+      <section className="relative" aria-label="Today's check-ins">
         <NewItemsPill
           count={unread}
           onJump={jump}
@@ -197,20 +190,23 @@ export function ReceptionQueue() {
         />
         <div
           {...scrollProps}
-          className="max-h-[60vh] overflow-y-auto outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+          className="-m-3 max-h-[60vh] overflow-y-auto rounded-card p-3 outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
         >
           {items.length === 0 && !loading ? (
-            <p className="p-6 text-muted-foreground">No check-ins yet today.</p>
+            <p className="surface text-muted-foreground">
+              No check-ins yet today.
+            </p>
           ) : (
-            <ul className="divide-y divide-border">
+            <ul className="flex flex-col gap-3">
               {items.map((item) => (
                 <li
                   key={item.sessionId}
                   id={rowId(item.sessionId)}
                   tabIndex={-1}
                   className={cn(
-                    'grid min-h-20 grid-cols-[6rem_1fr_auto] items-center gap-4 px-5 py-4 outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-inset',
-                    item.redFlag && 'bg-destructive/10',
+                    'surface-inset grid min-h-20 grid-cols-[6rem_1fr_auto] items-center gap-5 bg-card px-6 py-4 outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+                    item.redFlag &&
+                      'pinned bg-[color-mix(in_oklch,var(--destructive),var(--card)_93%)] [--pin:var(--destructive)]',
                   )}
                 >
                   <time className="font-semibold">
@@ -218,13 +214,11 @@ export function ReceptionQueue() {
                   </time>
                   <div>
                     <p className="font-semibold">{item.patientDisplayName}</p>
-                    <p className="text-sm text-muted-foreground">
-                      Phone consultation
-                    </p>
+                    <p className="text-muted-foreground">Phone consultation</p>
                   </div>
                   <span
                     className={cn(
-                      'rounded-full px-3 py-1 text-sm font-semibold',
+                      'rounded-full px-3 py-1.5 font-medium',
                       item.redFlag
                         ? 'bg-destructive text-white'
                         : item.status === 'confirmed'

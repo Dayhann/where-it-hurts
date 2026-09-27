@@ -3,7 +3,6 @@
 import { Mic, Square } from 'lucide-react';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { patientCopy } from '@/components/i18n/patient';
-import { PressDepth } from '@/components/interior/press-depth';
 import { Ripple } from '@/components/interior/ripple';
 import type { Lang, Question, QuestionOption } from '@/contracts/types';
 import { buttonVariants } from '@/components/ui/button';
@@ -99,15 +98,21 @@ export function ChatComposer({
   };
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-5">
       <div
-        className="flex flex-wrap gap-2"
+        className="flex flex-wrap gap-2.5"
         role="group"
         aria-label={copy.quickAnswers}
       >
+        {/* Plain buttons rather than PressDepth: that component paints a
+            raised "key cap" slab behind the face at a fixed 9px radius, so a
+            pill-shaped face left the slab poking out at the corners. Its
+            stone greys are off-palette here too. `.pressable` keeps the
+            press feedback, consistently with every other button. */}
         {chips.map((option) => (
-          <PressDepth
+          <button
             key={option.id}
+            type="button"
             disabled={disabled}
             onClick={async () => {
               if (option.id === SOMETHING_ELSE.id) {
@@ -123,12 +128,13 @@ export function ChatComposer({
               }
             }}
             className={cn(
-              'h-11! px-4! text-lg! leading-7!',
-              option.id.startsWith('scale_') && 'min-w-11 px-3!',
+              buttonVariants({ variant: 'outline' }),
+              'h-[46px] px-5 text-base',
+              option.id.startsWith('scale_') && 'min-w-[46px] px-3',
             )}
           >
             {optionLabel(option, lang)}
-          </PressDepth>
+          </button>
         ))}
       </div>
       <label className="flex flex-col gap-2">
@@ -150,13 +156,13 @@ export function ChatComposer({
               void sendText();
             }
           }}
-          className="min-h-11 w-full resize-y rounded-lg border border-input bg-background px-3 py-2 text-lg leading-7 outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+          className="field min-h-14 w-full resize-y px-4 py-3 text-lg leading-relaxed outline-none transition-shadow focus-visible:ring-3 focus-visible:ring-ring/50"
         />
       </label>
       {voiceSupported && (
         <MatrixOrb
           size={44}
-          color="#23636B"
+          color="#2E2823"
           state={listening ? 'listening' : disabled ? 'thinking' : 'idle'}
           labels={{
             idle: copy.voiceIdle,
@@ -167,7 +173,7 @@ export function ChatComposer({
         />
       )}
       <div
-        className={cn('grid gap-2', voiceSupported && 'grid-cols-[auto_1fr]')}
+        className={cn('grid gap-3', voiceSupported && 'grid-cols-[auto_1fr]')}
       >
         {voiceSupported && (
           <button
@@ -189,7 +195,7 @@ export function ChatComposer({
           disabled={disabled || text.trim().length === 0}
           onPress={() => void sendText()}
           tintClassName="bg-white/30"
-          className="min-h-11 rounded-lg! border-primary! bg-primary! text-lg! text-primary-foreground!"
+          className="button-raised! h-[46px] rounded-full! text-lg!"
         >
           {copy.send}
         </Ripple>

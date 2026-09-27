@@ -28,7 +28,7 @@ export function ChatThread({
 
   return (
     <div
-      className="flex max-h-[40vh] flex-col gap-3 overflow-y-auto pr-1"
+      className="flex max-h-[42vh] flex-col gap-4 overflow-y-auto pr-1"
       role="log"
       aria-live="polite"
       aria-relevant="additions"
@@ -40,7 +40,7 @@ export function ChatThread({
           <div
             key={message.id}
             className={cn(
-              'chat-bubble max-w-[85%] rounded-2xl px-4 py-3 text-lg leading-7',
+              'chat-bubble max-w-[86%] rounded-2xl px-5 py-3.5 text-lg leading-relaxed',
               fromPatient
                 ? 'ms-auto bg-primary text-primary-foreground'
                 : 'me-auto bg-secondary text-secondary-foreground',

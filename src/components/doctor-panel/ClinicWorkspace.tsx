@@ -50,78 +50,103 @@ export function ClinicWorkspace() {
   const selected = items.find((item) => item.sessionId === selectedId);
 
   return (
-    <main className="flex min-h-[calc(100vh-3rem)] flex-col gap-4">
-      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
+    <main className="flex min-h-[calc(100vh-3rem)] flex-col gap-8">
+      <header className="flex flex-wrap items-end justify-between gap-4 border-b border-track pb-6">
         <div>
-          <p className="text-sm font-medium tracking-wide text-primary uppercase">
-            Riverside Family Clinic
-          </p>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Consultation workspace
-          </h1>
+          <p className="text-muted-foreground">Riverside Family Clinic</p>
+          <h1 className="type-title mt-1">Consultation workspace</h1>
         </div>
         <Link
           href="/"
-          className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}
+          className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }))}
         >
           Exit demo
         </Link>
       </header>
 
       {error && (
-        <p className="rounded-lg bg-destructive/10 p-3 text-destructive">
+        <p className="pinned surface-inset bg-card py-4 ps-5 pe-4 text-destructive [--pin:var(--destructive)]">
           Today&apos;s appointments could not be loaded.
         </p>
       )}
 
-      <div className="grid flex-1 gap-4 md:grid-cols-[18rem_1fr]">
-        <aside className="rounded-xl border border-border bg-card">
-          <h2 className="border-b border-border p-4 font-semibold">
+      <div className="grid flex-1 gap-6 md:grid-cols-[19rem_1fr]">
+        <aside className="surface h-fit !p-0 !pb-2">
+          <h2 className="type-section border-b border-track px-5 py-4">
             Today&apos;s patients
           </h2>
           {loading ? (
-            <p className="p-4 text-muted-foreground">Loading appointments…</p>
+            <p className="px-5 py-5 text-muted-foreground">
+              Loading appointments…
+            </p>
           ) : items.length === 0 ? (
-            <p className="p-4 text-muted-foreground">
+            <p className="py-5 text-muted-foreground">
               No appointments scheduled.
             </p>
           ) : (
-            <HookSidebar
-              aria-label="Today's patients"
-              className="p-4"
-              color="var(--primary)"
-              value={items.findIndex((item) => item.sessionId === selectedId)}
-              onChange={(index) => setSelectedId(items[index].sessionId)}
-              items={items.map((item) =>
-                [
-                  item.patientDisplayName,
-                  appointmentTime(item.startsAt),
-                  item.redFlag ? 'Red flag' : null,
-                ]
-                  .filter(Boolean)
-                  .join(' · '),
+            <>
+              {/* HookSidebar renders plain strings, so a flagged patient is
+                  indistinguishable from an appointment time in the list.
+                  This strip restores the at-a-glance alarm that the list
+                  itself can no longer carry, and jumps straight to them. */}
+              {items.some((item) => item.redFlag) && (
+                <div className="border-b border-track py-3">
+                  {items
+                    .filter((item) => item.redFlag)
+                    .map((item) => (
+                      <button
+                        key={item.sessionId}
+                        type="button"
+                        onClick={() => setSelectedId(item.sessionId)}
+                        className="pressable button-raised-alert mx-3 flex min-h-[42px] items-center justify-between gap-3 rounded-full py-1.5 ps-4 pe-1.5 text-left hover:brightness-[0.98]"
+                      >
+                        <span className="font-semibold">
+                          {item.patientDisplayName}
+                        </span>
+                        <span className="rounded-full bg-destructive px-2.5 py-1 font-medium text-background">
+                          Red flag
+                        </span>
+                      </button>
+                    ))}
+                </div>
               )}
-            />
+              <HookSidebar
+                aria-label="Today's patients"
+                className="py-4"
+                color="var(--primary)"
+                value={items.findIndex((item) => item.sessionId === selectedId)}
+                onChange={(index) => setSelectedId(items[index].sessionId)}
+                items={items.map((item) =>
+                  [
+                    item.patientDisplayName,
+                    appointmentTime(item.startsAt),
+                    item.redFlag ? 'Red flag' : null,
+                  ]
+                    .filter(Boolean)
+                    .join(' · '),
+                )}
+              />
+            </>
           )}
         </aside>
 
-        <section className="flex flex-col gap-4 rounded-xl border border-border bg-card p-5">
+        <section className="surface flex flex-col gap-7 !p-7">
           {selected ? (
             <>
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-muted-foreground">
                     {appointmentTime(selected.startsAt)} phone consultation
                   </p>
-                  <h2 className="flex items-center gap-2 text-xl font-semibold">
+                  <h2 className="type-title mt-1 flex items-center gap-3">
                     {selected.patientDisplayName}
                     {selected.redFlag && (
-                      <span className="rounded-full bg-destructive/10 px-2 py-1 text-xs font-semibold text-destructive">
+                      <span className="type-body rounded-full bg-destructive px-2.5 py-1 font-medium text-background">
                         Red flag
                       </span>
                     )}
                   </h2>
-                  <p className="mt-1 text-sm text-muted-foreground">
+                  <p className="mt-1 text-muted-foreground">
                     Check-in status: {selected.status.replaceAll('_', ' ')}
                   </p>
                 </div>
@@ -134,9 +159,9 @@ export function ClinicWorkspace() {
                 </button>
               </div>
               <label className="flex flex-1 flex-col gap-2">
-                <span className="font-semibold">Consult notes</span>
+                <span className="type-section">Consult notes</span>
                 <textarea
-                  className="min-h-80 flex-1 resize-none rounded-lg border border-input bg-background p-4 outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                  className="field min-h-80 flex-1 resize-none p-4 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
                   placeholder="Record notes during the consultation…"
                 />
               </label>
