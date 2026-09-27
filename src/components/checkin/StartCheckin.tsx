@@ -36,7 +36,7 @@ export function StartCheckin() {
   };
 
   return (
-    <main className="flex flex-1 flex-col py-2 [&>*+*]:mt-7">
+    <main className="stagger-in flex flex-1 flex-col py-2 [&>*+*]:mt-7">
       <StepCard
         step={1}
         stepName={copy.home.stepName}

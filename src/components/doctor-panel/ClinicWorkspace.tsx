@@ -65,7 +65,7 @@ export function ClinicWorkspace() {
       </header>
 
       {error && (
-        <p className="surface-inset bg-destructive/8 p-4 text-destructive">
+        <p className="pinned surface-inset bg-card py-4 ps-5 pe-4 text-destructive [--pin:var(--destructive)]">
           Today&apos;s appointments could not be loaded.
         </p>
       )}
@@ -161,7 +161,7 @@ export function ClinicWorkspace() {
               <label className="flex flex-1 flex-col gap-2">
                 <span className="type-section">Consult notes</span>
                 <textarea
-                  className="surface-inset min-h-80 flex-1 resize-none bg-card p-4 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+                  className="field min-h-80 flex-1 resize-none p-4 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
                   placeholder="Record notes during the consultation…"
                 />
               </label>

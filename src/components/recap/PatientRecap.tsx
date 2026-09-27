@@ -124,7 +124,7 @@ export function PatientRecap({
                       ),
                     );
                   }}
-                  className="surface-inset min-h-14 resize-y bg-background px-4 py-3 text-lg leading-relaxed outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+                  className="field min-h-14 resize-y px-4 py-3 text-lg leading-relaxed outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
                 />
               </label>
             ))

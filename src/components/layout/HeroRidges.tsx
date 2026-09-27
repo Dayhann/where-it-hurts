@@ -17,13 +17,13 @@ export function HeroRidges({ className }: { className?: string }) {
       <defs>
         <linearGradient id="hero-sky" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="oklch(0.88 0.016 155)" />
-          <stop offset="100%" stopColor="oklch(0.951 0.009 92)" />
+          <stop offset="100%" stopColor="oklch(0.938 0.006 80)" />
         </linearGradient>
         <linearGradient id="hero-fade" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="oklch(0.951 0.009 92 / 0)" />
-          <stop offset="55%" stopColor="oklch(0.951 0.009 92 / 0.66)" />
-          <stop offset="88%" stopColor="oklch(0.951 0.009 92)" />
-          <stop offset="100%" stopColor="oklch(0.951 0.009 92)" />
+          <stop offset="0%" stopColor="oklch(0.938 0.006 80 / 0)" />
+          <stop offset="55%" stopColor="oklch(0.938 0.006 80 / 0.66)" />
+          <stop offset="88%" stopColor="oklch(0.938 0.006 80)" />
+          <stop offset="100%" stopColor="oklch(0.938 0.006 80)" />
         </linearGradient>
       </defs>
 

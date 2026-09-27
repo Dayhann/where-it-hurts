@@ -156,7 +156,7 @@ export function ChatComposer({
               void sendText();
             }
           }}
-          className="min-h-14 w-full resize-y rounded-inset bg-card px-4 py-3 text-lg leading-relaxed shadow-[var(--elevation-1)] outline-none transition-shadow focus-visible:ring-3 focus-visible:ring-ring/50"
+          className="field min-h-14 w-full resize-y px-4 py-3 text-lg leading-relaxed outline-none transition-shadow focus-visible:ring-3 focus-visible:ring-ring/50"
         />
       </label>
       {voiceSupported && (
