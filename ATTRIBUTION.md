@@ -59,10 +59,11 @@ This prototype is **not clinical guidance**.
 
 ## AI tools used (planning and code)
 
-| Tool               | Used for                                                                                                    |
-| ------------------ | ----------------------------------------------------------------------------------------------------------- |
-| Cursor             | In-editor agent for repo setup and Face tickets                                                             |
-| Claude (Anthropic) | Research and planning of BUILD_PLAN.md / agent kits (not called at runtime unless `LLM_PROVIDER=anthropic`) |
+| Tool                | Used for                                                                                                    |
+| ------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Cursor              | In-editor agent for repo setup and Face tickets                                                             |
+| emilkowalski/skills | Design-engineering and animation guidance applied to Face UI polish                                         |
+| Claude (Anthropic)  | Research and planning of BUILD_PLAN.md / agent kits (not called at runtime unless `LLM_PROVIDER=anthropic`) |
 
 ## Still to add when they land
 

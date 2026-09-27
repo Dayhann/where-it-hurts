@@ -34,7 +34,7 @@ export function ChatThread({
           <p
             key={message.id}
             className={cn(
-              'max-w-[85%] rounded-2xl px-4 py-3 text-lg leading-7',
+              'chat-bubble max-w-[85%] rounded-2xl px-4 py-3 text-lg leading-7',
               fromPatient
                 ? 'ms-auto bg-primary text-primary-foreground'
                 : 'me-auto bg-secondary text-secondary-foreground',
@@ -46,7 +46,7 @@ export function ChatThread({
       })}
       {typing && (
         <p
-          className="me-auto rounded-2xl bg-secondary px-4 py-3 text-lg text-muted-foreground"
+          className="wait-pulse me-auto rounded-2xl bg-secondary px-4 py-3 text-lg text-muted-foreground"
           aria-label={copy.waiting}
         >
           …

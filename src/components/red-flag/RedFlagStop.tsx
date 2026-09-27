@@ -21,13 +21,13 @@ export function RedFlagStop({ lang }: { lang: Lang }) {
         role="alert"
         aria-live="assertive"
         aria-labelledby="red-flag-heading"
-        className="flex w-full max-w-md flex-col gap-6"
+        className="enter-fade flex w-full max-w-md flex-col gap-6"
       >
         <h1
           ref={headingRef}
           id="red-flag-heading"
           tabIndex={-1}
-          className="text-2xl font-semibold tracking-tight"
+          className="display-title text-2xl font-semibold tracking-tight"
         >
           {copy.title}
         </h1>
