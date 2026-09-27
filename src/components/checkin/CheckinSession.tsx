@@ -1,5 +1,6 @@
 'use client';
 
+import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import BodyViewer, {
@@ -36,7 +37,6 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
   const [loadError, setLoadError] = useState(false);
   const [saveState, setSaveState] = useState<MarkSaveState | 'idle'>('idle');
   const [chatStarted, setChatStarted] = useState(false);
-  const [bodyExpanded, setBodyExpanded] = useState(false);
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
@@ -123,7 +123,6 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
       await saveQueue.current?.waitForIdle();
       await getApiClient().putMarks(sessionId, { marks, snapshots });
       setSaveState('saved');
-      setBodyExpanded(false);
       setChatStarted(true);
     } catch {
       setSaveState('local');
@@ -183,7 +182,6 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
   const messages: Message[] = session?.messages ?? [];
   const questionTurn = turn?.type === 'question' ? turn : undefined;
   const showChat = chatStarted;
-  const compactBody = showChat && !bodyExpanded;
 
   return (
     <div dir={direction} className="flex flex-col gap-5">
@@ -220,29 +218,33 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
         </p>
       )}
 
+      {/* Once the questions start the body map is a read-only reminder of
+          what was marked. Editing it in place would let answers drift out
+          of step with the marks they were given about, so changing it is
+          an explicit trip back to the marking step. */}
       <div className="surface !p-4 sm:!p-6">
         <BodyViewer
           marks={marks}
           onChange={setMarks}
-          variant={compactBody ? 'thumbnail' : 'full'}
-          onExpand={compactBody ? () => setBodyExpanded(true) : undefined}
+          variant={showChat ? 'thumbnail' : 'full'}
           onDone={!showChat && !loadError ? finishMarking : undefined}
           lang={lang}
           carerMode={session?.carerMode === true}
         />
+        {showChat && (
+          <button
+            type="button"
+            onClick={() => setChatStarted(false)}
+            className={cn(
+              buttonVariants({ variant: 'outline', size: 'touch' }),
+              'mt-3 w-full',
+            )}
+          >
+            <ArrowLeft aria-hidden className="size-4 rtl:-scale-x-100" />
+            {copy.checkin.backToBody}
+          </button>
+        )}
       </div>
-      {showChat && bodyExpanded && (
-        <button
-          type="button"
-          onClick={() => setBodyExpanded(false)}
-          className={cn(
-            buttonVariants({ variant: 'outline', size: 'touch' }),
-            'text-lg',
-          )}
-        >
-          {copy.checkin.backToQuestions}
-        </button>
-      )}
       <p className="text-sm text-muted-foreground" aria-live="polite">
         {saveState === 'saving' && copy.checkin.saving}
         {saveState === 'saved' && copy.checkin.saved}

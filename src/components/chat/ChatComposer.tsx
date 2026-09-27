@@ -3,7 +3,6 @@
 import { Mic, Square } from 'lucide-react';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { patientCopy } from '@/components/i18n/patient';
-import { PressDepth } from '@/components/interior/press-depth';
 import { Ripple } from '@/components/interior/ripple';
 import type { Lang, Question, QuestionOption } from '@/contracts/types';
 import { buttonVariants } from '@/components/ui/button';
@@ -105,9 +104,15 @@ export function ChatComposer({
         role="group"
         aria-label={copy.quickAnswers}
       >
+        {/* Plain buttons rather than PressDepth: that component paints a
+            raised "key cap" slab behind the face at a fixed 9px radius, so a
+            pill-shaped face left the slab poking out at the corners. Its
+            stone greys are off-palette here too. `.pressable` keeps the
+            press feedback, consistently with every other button. */}
         {chips.map((option) => (
-          <PressDepth
+          <button
             key={option.id}
+            type="button"
             disabled={disabled}
             onClick={async () => {
               if (option.id === SOMETHING_ELSE.id) {
@@ -123,12 +128,13 @@ export function ChatComposer({
               }
             }}
             className={cn(
-              'h-12! rounded-full! px-5! text-lg! leading-7!',
-              option.id.startsWith('scale_') && 'min-w-11 px-3!',
+              buttonVariants({ variant: 'outline' }),
+              'h-12 rounded-full px-5 text-base',
+              option.id.startsWith('scale_') && 'min-w-12 px-3',
             )}
           >
             {optionLabel(option, lang)}
-          </PressDepth>
+          </button>
         ))}
       </div>
       <label className="flex flex-col gap-2">

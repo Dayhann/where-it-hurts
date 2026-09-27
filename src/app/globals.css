@@ -330,6 +330,15 @@
     touch-action: pan-y !important;
   }
 
+  /* Read-only body map, shown beside the questions. A wrapper set to
+     pointer-events: none is not enough on its own — a descendant may
+     re-enable hit testing, and three.js writes pointer-events inline on
+     the canvas — so the canvas is locked directly. */
+  .body-canvas-locked canvas {
+    pointer-events: none !important;
+    touch-action: pan-y !important;
+  }
+
   .pressable {
     transition:
       transform 160ms var(--ease-out),
