@@ -16,7 +16,6 @@ import {
   PutMarksRequestSchema,
   PutMarksResponseSchema,
 } from '@/contracts/api';
-import { QuestionSchema } from '@/contracts/schemas';
 import type {
   AssistantTurn,
   ClinicianSummary,
@@ -27,13 +26,23 @@ import type {
   SlotFact,
   SocratesSlot,
 } from '@/contracts/types';
-import questionBankJson from '../../data/question-bank.json';
+import { questionBank } from '@/server/questions/bank';
 import { mockConfirmedSummary, mockSessions } from './fixtures';
 
-const questions = QuestionSchema.array().min(1).parse(questionBankJson);
+const questions = questionBank;
 const questionById = new Map(
   questions.map((question) => [question.id, question]),
 );
+const demoQuestions = [
+  'Q_OPEN',
+  'Q_ONSET',
+  'Q_CHAR',
+  'RF_SADDLE',
+  'RF_BLADDER',
+  'RF_BILAT_WEAK',
+  'RF_FEVER_TRAUMA',
+  'Q_SEV',
+].map(question);
 const slots: SocratesSlot[] = [
   'site',
   'onset',
@@ -54,7 +63,7 @@ function question(id: string): Question {
 }
 
 function nextQuestion(session: Session): Question | undefined {
-  return questions.find(
+  return demoQuestions.find(
     (candidate) => !session.askedQuestionIds.includes(candidate.id),
   );
 }
@@ -75,7 +84,7 @@ function questionTurn(session: Session, next: Question): AssistantTurn {
     question: next,
     progress: {
       asked: session.askedQuestionIds.length,
-      estimatedTotal: questions.length,
+      estimatedTotal: demoQuestions.length,
     },
   };
 }
@@ -95,6 +104,10 @@ function safetyHit(
     asked?.mandatory &&
     (answer.choiceId === 'yes' ||
       answer.choiceId === 'not_sure' ||
+      (asked.id === 'RF_FEVER_TRAUMA' &&
+        answer.choiceId !== undefined &&
+        answer.choiceId !== 'none' &&
+        answer.choiceId !== 'something_else') ||
       /^(yes|not sure|نعم|لست متأكداً)\.?$/i.test(answer.text.trim()))
   ) {
     return {

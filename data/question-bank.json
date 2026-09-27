@@ -48,6 +48,7 @@
     "slot": "redflag",
     "kind": "single",
     "mandatory": true,
+    "appliesTo": ["back"],
     "text": {
       "en": "Any numbness around your bottom, groin or inner thighs?",
       "ar": "هل يوجد خدر حول المقعدة أو أعلى الفخذين؟"
@@ -67,6 +68,7 @@
     "slot": "redflag",
     "kind": "single",
     "mandatory": true,
+    "appliesTo": ["back"],
     "text": {
       "en": "Any new trouble controlling your bladder or bowels, or trouble passing urine?",
       "ar": "هل ظهرت مشكلة جديدة في التحكم بالبول أو البراز أو في التبول؟"
@@ -86,6 +88,7 @@
     "slot": "redflag",
     "kind": "single",
     "mandatory": true,
+    "appliesTo": ["back"],
     "text": {
       "en": "Any new weakness in both legs?",
       "ar": "هل ظهر ضعف جديد في كلتا الساقين؟"
@@ -106,12 +109,27 @@
     "kind": "single",
     "mandatory": true,
     "text": {
-      "en": "Any fever, recent fall or injury, history of cancer, or unexplained weight loss?",
-      "ar": "هل لديك حمى أو سقوط أو إصابة حديثة أو تاريخ مرضي بالسرطان أو فقدان وزن غير مفسر؟"
+      "en": "Do any of these apply to you? Choose one if so.",
+      "ar": "هل ينطبق عليك أي مما يلي؟ اختر واحداً إن كان كذلك."
     },
     "options": [
-      { "id": "yes", "label": { "en": "Yes", "ar": "نعم" } },
-      { "id": "no", "label": { "en": "No", "ar": "لا" } },
+      { "id": "fever", "label": { "en": "Fever", "ar": "حمى" } },
+      {
+        "id": "recent_fall_or_injury",
+        "label": { "en": "Recent fall or injury", "ar": "سقوط أو إصابة حديثة" }
+      },
+      {
+        "id": "history_of_cancer",
+        "label": { "en": "History of cancer", "ar": "تاريخ مرضي بالسرطان" }
+      },
+      {
+        "id": "unexplained_weight_loss",
+        "label": { "en": "Unexplained weight loss", "ar": "فقدان وزن غير مفسر" }
+      },
+      {
+        "id": "none",
+        "label": { "en": "None of these", "ar": "لا شيء مما سبق" }
+      },
       { "id": "not_sure", "label": { "en": "Not sure", "ar": "لست متأكداً" } },
       {
         "id": "something_else",
@@ -126,6 +144,175 @@
     "text": {
       "en": "On a scale of 0 to 10, how bad is it at its worst?",
       "ar": "على مقياس من ٠ إلى ١٠، ما شدة الألم في أسوأ حالاته؟"
+    }
+  },
+  {
+    "id": "Q_SITE_DETAIL",
+    "slot": "site",
+    "kind": "open",
+    "text": {
+      "en": "Where do you feel it most?",
+      "ar": "أين تشعر به أكثر شيء؟"
+    }
+  },
+  {
+    "id": "Q_ONSET_EVENT",
+    "slot": "onset",
+    "kind": "open",
+    "text": {
+      "en": "What were you doing when it started, if you remember?",
+      "ar": "ماذا كنت تفعل عندما بدأ، إن كنت تتذكر؟"
+    }
+  },
+  {
+    "id": "Q_CHAR_WORDS",
+    "slot": "character",
+    "kind": "single",
+    "text": {
+      "en": "Which word best describes how it feels?",
+      "ar": "أي كلمة تصف شعورك به بشكل أفضل؟"
+    },
+    "options": [
+      { "id": "aching", "label": { "en": "Aching", "ar": "وجع" } },
+      {
+        "id": "sharp",
+        "label": { "en": "Sharp or stabbing", "ar": "حاد أو كالوخز" }
+      },
+      { "id": "burning", "label": { "en": "Burning", "ar": "حارق" } },
+      { "id": "tingling", "label": { "en": "Tingling", "ar": "تنميل" } },
+      { "id": "throbbing", "label": { "en": "Throbbing", "ar": "نابض" } },
+      { "id": "not_sure", "label": { "en": "Not sure", "ar": "لست متأكداً" } },
+      {
+        "id": "something_else",
+        "label": { "en": "Something else", "ar": "شيء آخر" }
+      }
+    ]
+  },
+  {
+    "id": "Q_RAD",
+    "slot": "radiation",
+    "kind": "open",
+    "text": {
+      "en": "Does it stay in one place or spread anywhere else? Where?",
+      "ar": "هل يبقى في مكان واحد أم يمتد إلى مكان آخر؟ إلى أين؟"
+    }
+  },
+  {
+    "id": "Q_ASSOC",
+    "slot": "associated",
+    "kind": "open",
+    "text": {
+      "en": "Have you noticed anything else along with it, such as numbness, weakness or swelling?",
+      "ar": "هل لاحظت شيئاً آخر معه، مثل الخدر أو الضعف أو التورم؟"
+    }
+  },
+  {
+    "id": "Q_TIMING",
+    "slot": "timing",
+    "kind": "single",
+    "text": {
+      "en": "Is it there all the time, or does it come and go?",
+      "ar": "هل تشعر به طوال الوقت أم يأتي ويذهب؟"
+    },
+    "options": [
+      {
+        "id": "constant",
+        "label": { "en": "All the time", "ar": "طوال الوقت" }
+      },
+      {
+        "id": "comes_and_goes",
+        "label": { "en": "Comes and goes", "ar": "يأتي ويذهب" }
+      },
+      { "id": "not_sure", "label": { "en": "Not sure", "ar": "لست متأكداً" } },
+      {
+        "id": "something_else",
+        "label": { "en": "Something else", "ar": "شيء آخر" }
+      }
+    ]
+  },
+  {
+    "id": "Q_EXAC_OPEN",
+    "slot": "exacerbating",
+    "kind": "open",
+    "text": {
+      "en": "What makes it feel worse?",
+      "ar": "ما الذي يزيد شعورك به؟"
+    }
+  },
+  {
+    "id": "Q_EXAC_SIT_STAND",
+    "slot": "exacerbating",
+    "kind": "single",
+    "appliesTo": ["back"],
+    "text": {
+      "en": "Is it worse when sitting, standing, both, or neither?",
+      "ar": "هل يزيد عند الجلوس أم الوقوف أم كليهما أم لا شيء منهما؟"
+    },
+    "options": [
+      { "id": "sitting", "label": { "en": "Sitting", "ar": "الجلوس" } },
+      { "id": "standing", "label": { "en": "Standing", "ar": "الوقوف" } },
+      { "id": "both", "label": { "en": "Both", "ar": "كلاهما" } },
+      { "id": "neither", "label": { "en": "Neither", "ar": "لا شيء منهما" } },
+      { "id": "not_sure", "label": { "en": "Not sure", "ar": "لست متأكداً" } },
+      {
+        "id": "something_else",
+        "label": { "en": "Something else", "ar": "شيء آخر" }
+      }
+    ]
+  },
+  {
+    "id": "Q_EXAC_MOVE",
+    "slot": "exacerbating",
+    "kind": "open",
+    "appliesTo": ["shoulder", "elbow", "wrist", "hip", "knee", "ankle"],
+    "text": {
+      "en": "Does any movement or activity make it feel worse?",
+      "ar": "هل تزيد أي حركة أو نشاط من شعورك به؟"
+    }
+  },
+  {
+    "id": "Q_RELIEF",
+    "slot": "relieving",
+    "kind": "open",
+    "text": {
+      "en": "Does anything make it feel better?",
+      "ar": "هل هناك شيء يخفف منه؟"
+    }
+  },
+  {
+    "id": "Q_SEV_NOW",
+    "slot": "severity",
+    "kind": "scale",
+    "text": {
+      "en": "On a scale of 0 to 10, how strong is it right now?",
+      "ar": "على مقياس من ٠ إلى ١٠، ما شدته الآن؟"
+    }
+  },
+  {
+    "id": "Q_MEDS",
+    "slot": "meds_tried",
+    "kind": "open",
+    "text": {
+      "en": "Have you taken or tried anything for it? What was it?",
+      "ar": "هل تناولت أو جربت شيئاً من أجله؟ ماذا كان؟"
+    }
+  },
+  {
+    "id": "Q_MEDS_EFFECT",
+    "slot": "meds_tried",
+    "kind": "open",
+    "text": {
+      "en": "If you tried something, did it change how you felt?",
+      "ar": "إذا جربت شيئاً، هل غيّر شعورك؟"
+    }
+  },
+  {
+    "id": "Q_TIMING_PATTERN",
+    "slot": "timing",
+    "kind": "open",
+    "text": {
+      "en": "Is there a time of day when you notice it more?",
+      "ar": "هل هناك وقت من اليوم تلاحظه فيه أكثر؟"
     }
   }
 ]
