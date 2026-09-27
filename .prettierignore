@@ -10,3 +10,10 @@ public/models
 *.glb
 *.ico
 .next-env.d.ts
+
+# Upstream UI components kept byte-for-byte (see ATTRIBUTION.md)
+src/components/interior/*.tsx
+src/components/ui/hook-sidebar.tsx
+src/components/ui/fluid-orb.tsx
+src/components/ui/matrix-orb.tsx
+src/components/ui/grid-reveal.tsx

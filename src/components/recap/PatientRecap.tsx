@@ -3,24 +3,29 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { patientCopy } from '@/components/i18n/patient';
+import { LoadingButton } from '@/components/interior/loading-button';
 import { buttonVariants } from '@/components/ui/button';
 import type { Lang, PatientRecapLine } from '@/contracts/types';
 import { getApiClient } from '@/lib/api-client';
 import { cn } from '@/lib/utils';
 import { recapEdits } from './recap';
+const SHOW_SENT_MS = 700;
 
 export function PatientRecap({
   sessionId,
   alreadyConfirmed,
+  onConfirmed,
   lang,
 }: {
   sessionId: string;
   alreadyConfirmed: boolean;
+  onConfirmed?: () => void;
   lang: Lang;
 }) {
   const [lines, setLines] = useState<PatientRecapLine[]>([]);
   const [loading, setLoading] = useState(!alreadyConfirmed);
   const [submitting, setSubmitting] = useState(false);
+  const [sent, setSent] = useState(false);
   const [confirmed, setConfirmed] = useState(alreadyConfirmed);
   const [error, setError] = useState(false);
   const copy = patientCopy(lang).recap;
@@ -45,15 +50,20 @@ export function PatientRecap({
   }, [alreadyConfirmed, sessionId]);
 
   const confirm = async () => {
+    if (sent) return;
     setSubmitting(true);
     setError(false);
     try {
       await getApiClient().confirm(sessionId, { edits: recapEdits(lines) });
-      setConfirmed(true);
-    } catch {
+      setSent(true);
+      setTimeout(() => {
+        setConfirmed(true);
+        onConfirmed?.();
+      }, SHOW_SENT_MS);
+    } catch (cause) {
       setError(true);
-    } finally {
       setSubmitting(false);
+      throw cause;
     }
   };
 
@@ -132,14 +142,16 @@ export function PatientRecap({
         </p>
       )}
 
-      <button
-        type="button"
-        disabled={loading || submitting || lines.length === 0}
-        onClick={() => void confirm()}
-        className={cn(buttonVariants({ size: 'touch' }), 'text-lg')}
+      <LoadingButton
+        onAction={confirm}
+        disabled={loading || lines.length === 0}
+        pendingLabel={copy.sending}
+        successLabel={copy.sentShort}
+        errorLabel={copy.retry}
+        className="h-12! w-full rounded-lg! border-primary! bg-primary! text-lg! hover:bg-primary/85! [&>span>span]:text-primary-foreground!"
       >
-        {submitting ? copy.sending : copy.confirm}
-      </button>
+        {copy.confirm}
+      </LoadingButton>
 
       <Link
         href="/"

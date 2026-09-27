@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { patientCopy } from '@/components/i18n/patient';
+import { StreamingText } from '@/components/interior/streaming-text';
 import { TypingIndicator } from '@/components/interior/typing-indicator';
 import type { Lang, Message } from '@/contracts/types';
 import { cn } from '@/lib/utils';
@@ -16,6 +17,9 @@ export function ChatThread({
   lang: Lang;
 }) {
   const endRef = useRef<HTMLDivElement>(null);
+  const [initialIds] = useState(
+    () => new Set(messages.map((message) => message.id)),
+  );
   const copy = patientCopy(lang).chat;
 
   useEffect(() => {
@@ -31,8 +35,9 @@ export function ChatThread({
     >
       {messages.map((message) => {
         const fromPatient = message.role === 'patient';
+        const stream = !fromPatient && !initialIds.has(message.id);
         return (
-          <p
+          <div
             key={message.id}
             className={cn(
               'chat-bubble max-w-[85%] rounded-2xl px-4 py-3 text-lg leading-7',
@@ -41,18 +46,25 @@ export function ChatThread({
                 : 'me-auto bg-secondary text-secondary-foreground',
             )}
           >
-            {message.text}
-          </p>
+            {stream ? (
+              <StreamingText
+                text={message.text}
+                showSkip={false}
+                label={copy.typist}
+                className="text-lg! leading-7! text-secondary-foreground!"
+              />
+            ) : (
+              message.text
+            )}
+          </div>
         );
       })}
-      {typing && (
-        <TypingIndicator
-          active
-          label={copy.waiting}
-          size={48}
-          className="me-auto"
-        />
-      )}
+      <TypingIndicator
+        typists={typing ? [copy.typist] : []}
+        showLabel={false}
+        size={44}
+        className="me-auto shrink-0"
+      />
       <div ref={endRef} />
     </div>
   );

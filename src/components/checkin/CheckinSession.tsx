@@ -11,6 +11,7 @@ import { replyChips } from '@/components/chat/chips';
 import { QuestionProgress } from '@/components/chat/QuestionProgress';
 import { chatHasStarted, turnFromSession } from '@/components/chat/resume-turn';
 import { patientCopy } from '@/components/i18n/patient';
+import { TaskSteps } from '@/components/interior/task-steps';
 import { PatientRecap } from '@/components/recap/PatientRecap';
 import { RedFlagStop } from '@/components/red-flag/RedFlagStop';
 import { buttonVariants } from '@/components/ui/button';
@@ -26,6 +27,7 @@ import {
   type MarkSaveState,
 } from '@/lib/api-client/mark-save-queue';
 import { cn } from '@/lib/utils';
+import { checkinStep } from './steps';
 
 export function CheckinSession({ sessionId }: { sessionId: string }) {
   const [session, setSession] = useState<Session | null>(null);
@@ -38,6 +40,7 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
   const [bodyExpanded, setBodyExpanded] = useState(false);
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState(false);
+  const [confirmed, setConfirmed] = useState(false);
   const saveQueue = useRef<MarkSaveQueue | null>(null);
   const skipNextSave = useRef(true);
 
@@ -159,12 +162,30 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
     );
   }
 
+  const steps = (
+    <TaskSteps
+      label={copy.checkin.stepsLabel}
+      steps={copy.checkin.steps.map((label, index) => ({
+        id: String(index),
+        label,
+      }))}
+      current={checkinStep({
+        chatStarted,
+        turn,
+        confirmed: confirmed || session?.status === 'confirmed',
+      })}
+      className="[&_li]:h-9 [&_li>span.truncate]:text-lg!"
+    />
+  );
+
   if (turn?.type === 'done' && session) {
     return (
-      <div dir={direction}>
+      <div dir={direction} className="flex flex-col gap-5">
+        {steps}
         <PatientRecap
           sessionId={sessionId}
           alreadyConfirmed={session.status === 'confirmed'}
+          onConfirmed={() => setConfirmed(true)}
           lang={lang}
         />
       </div>
@@ -178,6 +199,7 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
 
   return (
     <div dir={direction} className="flex flex-col gap-5">
+      {steps}
       {showChat ? (
         <div className="flex flex-col gap-1">
           <p className="text-lg text-muted-foreground">
