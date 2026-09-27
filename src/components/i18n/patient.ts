@@ -4,7 +4,11 @@ const COPY = {
   en: {
     home: {
       badge: 'Pre-consult check-in',
-      title: 'Where It Hurts',
+      greeting: 'Good to see you,',
+      title: "Let's get started.",
+      wordmark: 'Where It Hurts',
+      stepName: 'Mark the body',
+      stepTitle: 'Tap where it hurts',
       description:
         'Show where the pain is, answer a few questions, and send a short recap to the clinician before the call.',
       language: 'Language',
@@ -61,7 +65,8 @@ const COPY = {
       showFull: 'Show the full body map',
       undo: 'Undo last change',
       clear: 'Clear all marks',
-      holdClear: 'Hold to clear all',
+      holdClear: 'Hold to clear',
+      tapHint: 'Tap the area where you feel pain',
       cleared: 'Marks cleared',
       sliderLabel: 'How bad is it',
       noPainShort: 'No pain',
@@ -132,7 +137,11 @@ const COPY = {
   ar: {
     home: {
       badge: 'تسجيل ما قبل الاستشارة',
-      title: 'أين يؤلمك؟',
+      greeting: 'سعداء برؤيتك،',
+      title: 'لنبدأ.',
+      wordmark: 'أين يؤلمك؟',
+      stepName: 'حدّد مكان الألم',
+      stepTitle: 'اضغط على مكان الألم',
       description:
         'حدّد مكان الألم، وأجب عن بعض الأسئلة، وأرسل ملخصاً قصيراً إلى الطبيب قبل المكالمة.',
       language: 'اللغة',
@@ -189,7 +198,8 @@ const COPY = {
       showFull: 'عرض خريطة الجسم كاملة',
       undo: 'التراجع عن آخر تغيير',
       clear: 'مسح جميع العلامات',
-      holdClear: 'اضغط مطولاً لمسح جميع العلامات',
+      holdClear: 'اضغط للمسح',
+      tapHint: 'اضغط على المنطقة التي تشعر فيها بالألم',
       cleared: 'تم مسح العلامات',
       sliderLabel: 'ما شدة الألم',
       noPainShort: 'بلا ألم',

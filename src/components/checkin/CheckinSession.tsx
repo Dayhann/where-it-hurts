@@ -198,8 +198,8 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
   const compactBody = showChat && !bodyExpanded;
 
   return (
-    <div dir={direction} className="flex flex-col gap-8">
-      {steps}
+    <div dir={direction} className="flex flex-col gap-5">
+      <div className="surface">{steps}</div>
       {showChat ? (
         <div className="flex flex-col">
           <h1 className="display-title text-[1.75rem]">
@@ -211,7 +211,7 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
             </p>
           )}
           {session?.carerMode && (
-            <p className="mt-4 rounded-xs bg-accent px-4 py-3 text-base text-accent-foreground">
+            <p className="mt-4 rounded-xl bg-accent px-4 py-3 text-base text-accent-foreground">
               {copy.checkin.carerBanner}
             </p>
           )}
@@ -231,15 +231,17 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
         </div>
       )}
 
-      <BodyViewer
-        marks={marks}
-        onChange={setMarks}
-        variant={compactBody ? 'thumbnail' : 'full'}
-        onExpand={compactBody ? () => setBodyExpanded(true) : undefined}
-        onDone={!showChat && !loadError ? finishMarking : undefined}
-        lang={lang}
-        carerMode={session?.carerMode === true}
-      />
+      <div className="surface">
+        <BodyViewer
+          marks={marks}
+          onChange={setMarks}
+          variant={compactBody ? 'thumbnail' : 'full'}
+          onExpand={compactBody ? () => setBodyExpanded(true) : undefined}
+          onDone={!showChat && !loadError ? finishMarking : undefined}
+          lang={lang}
+          carerMode={session?.carerMode === true}
+        />
+      </div>
       {showChat && bodyExpanded && (
         <button
           type="button"
