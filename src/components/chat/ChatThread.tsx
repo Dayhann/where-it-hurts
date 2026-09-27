@@ -40,7 +40,7 @@ export function ChatThread({
           <div
             key={message.id}
             className={cn(
-              'chat-bubble max-w-[86%] px-5 py-3.5 text-lg leading-relaxed',
+              'chat-bubble max-w-[86%] rounded-2xl px-5 py-3.5 text-lg leading-relaxed',
               fromPatient
                 ? 'ms-auto bg-primary text-primary-foreground'
                 : 'me-auto bg-secondary text-secondary-foreground',

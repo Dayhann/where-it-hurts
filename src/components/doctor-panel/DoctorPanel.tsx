@@ -73,7 +73,7 @@ function SummaryQuoteLine({
         )}
       </button>
       {open && (
-        <div className="enter-fade mt-2 origin-top rounded-xs border border-border bg-popover p-4">
+        <div className="enter-fade mt-2 origin-top rounded-xl border border-border bg-popover p-4">
           <p className="label-caps">Patient&apos;s words</p>
           {line.quotes.map((quote, quoteIndex) => (
             <blockquote
@@ -213,7 +213,7 @@ export function DoctorPanel({
                 </ul>
               </section>
             ) : (
-              <p className="rounded-xs bg-muted p-4 font-medium">
+              <p className="rounded-xl bg-muted p-4 font-medium">
                 No red flags reported
               </p>
             ))}
@@ -307,7 +307,7 @@ export function DoctorPanel({
                     ]}
                   />
                 </div>
-                <div className="flex h-44 items-center justify-center overflow-hidden rounded-xs border border-border bg-muted">
+                <div className="flex h-44 items-center justify-center overflow-hidden rounded-xl border border-border bg-muted">
                   {snapshot ? (
                     snapshotAspect ? (
                       <GridReveal
@@ -385,7 +385,7 @@ export function DoctorPanel({
 
               <Accordion
                 maxPanelHeight={260}
-                className="shrink-0 rounded-xs! border-border! bg-card! shadow-none! [&_button]:min-h-11 [&_button>span]:text-sm! [&_button>span:first-child]:text-base! [&_button>span:first-child]:font-semibold! [&_button>span:first-child]:text-foreground!"
+                className="shrink-0 rounded-xl! border-border! bg-card! shadow-none! [&_button]:min-h-11 [&_button>span]:text-sm! [&_button>span:first-child]:text-base! [&_button>span:first-child]:font-semibold! [&_button>span:first-child]:text-foreground!"
                 items={[
                   {
                     id: 'transcript',
@@ -421,7 +421,7 @@ export function DoctorPanel({
                 value={feedback}
                 onChange={(event) => setFeedback(event.target.value)}
                 rows={2}
-                className="rounded-xs border border-input bg-background p-2"
+                className="rounded-xl border border-input bg-background p-2"
               />
               <button
                 type="button"

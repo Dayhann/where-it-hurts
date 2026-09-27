@@ -73,12 +73,14 @@ export function ClinicWorkspace() {
       )}
 
       <div className="grid flex-1 gap-6 md:grid-cols-[19rem_1fr]">
-        <aside className="h-fit border-t-2 border-foreground/80">
-          <h2 className="label-caps border-b border-border py-4">
+        <aside className="surface h-fit !p-0 !pb-2">
+          <h2 className="label-caps border-b border-border px-5 py-4">
             Today&apos;s patients
           </h2>
           {loading ? (
-            <p className="py-5 text-muted-foreground">Loading appointments…</p>
+            <p className="px-5 py-5 text-muted-foreground">
+              Loading appointments…
+            </p>
           ) : items.length === 0 ? (
             <p className="py-5 text-muted-foreground">
               No appointments scheduled.
@@ -98,12 +100,12 @@ export function ClinicWorkspace() {
                         key={item.sessionId}
                         type="button"
                         onClick={() => setSelectedId(item.sessionId)}
-                        className="pressable flex w-full items-center justify-between gap-3 border-l-2 border-destructive bg-destructive/8 py-3 pr-3 pl-3 text-left hover:bg-destructive/14"
+                        className="pressable mx-3 flex items-center justify-between gap-3 rounded-xl border border-destructive/30 bg-destructive/8 px-3 py-3 text-left hover:bg-destructive/14"
                       >
                         <span className="font-semibold text-destructive">
                           {item.patientDisplayName}
                         </span>
-                        <span className="label-caps bg-destructive px-2 py-1 text-background!">
+                        <span className="label-caps rounded-full bg-destructive px-2.5 py-1 text-background!">
                           Red flag
                         </span>
                       </button>
@@ -130,7 +132,7 @@ export function ClinicWorkspace() {
           )}
         </aside>
 
-        <section className="flex flex-col gap-7 border-t-2 border-foreground/80 pt-6">
+        <section className="surface flex flex-col gap-7 !p-7">
           {selected ? (
             <>
               <div className="flex flex-wrap items-start justify-between gap-4">

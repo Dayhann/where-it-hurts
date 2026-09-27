@@ -131,7 +131,7 @@ export function ReceptionQueue() {
       </header>
 
       <dl className="grid grid-cols-2 gap-5">
-        <div className="border-t-2 border-foreground/80 pt-5">
+        <div className="surface">
           <dt className="label-caps">Checked in</dt>
           <dd>
             <ValueFlash
@@ -141,7 +141,7 @@ export function ReceptionQueue() {
             />
           </dd>
         </div>
-        <div className="border-t-2 border-foreground/80 pt-5">
+        <div className="surface">
           <dt className="label-caps">Red flags</dt>
           <dd>
             <ValueFlash
@@ -181,7 +181,7 @@ export function ReceptionQueue() {
       )}
 
       <section
-        className="relative overflow-hidden border-t-2 border-foreground/80"
+        className="surface relative overflow-hidden !p-0"
         aria-label="Today's check-ins"
       >
         <NewItemsPill
@@ -220,7 +220,7 @@ export function ReceptionQueue() {
                   </div>
                   <span
                     className={cn(
-                      'label-caps px-2.5 py-1.5',
+                      'label-caps rounded-full px-3 py-1.5',
                       item.redFlag
                         ? 'bg-destructive text-white'
                         : item.status === 'confirmed'

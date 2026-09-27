@@ -7,7 +7,7 @@ import {
   useThree,
   type ThreeEvent,
 } from '@react-three/fiber';
-import { X } from 'lucide-react';
+import { ArrowRight, Check, ChevronRight, Hand, Plus, X } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import {
   forwardRef,
@@ -60,10 +60,10 @@ type Preset = keyof typeof PRESETS;
    amber — those two must remain unambiguous, so they are the only
    saturated colours in the scene. */
 const COLORS = {
-  skin: '#c2bbae',
-  hover: '#d6cfc2',
-  eyes: '#8a8377',
-  outline: '#f7f4ec',
+  skin: '#cfcec6',
+  hover: '#dedcd3',
+  eyes: '#95958c',
+  outline: '#fbfaf6',
   pain: '#b3342f',
   spread: '#c8862c',
 } as const;
@@ -351,7 +351,7 @@ export default function BodyViewer({
       {!compact && (
         <SegmentedControl
           label={copy.marking}
-          className="block w-full [&_span]:py-2.5 [&_span]:text-lg [&_span]:leading-7"
+          className="block w-full rounded-full! border-border! bg-muted! p-1! [&_span]:py-2.5 [&_span]:text-base [&_span]:leading-7 [&>div>div.pointer-events-none.absolute]:rounded-full! [&>div>div.pointer-events-none.absolute]:bg-primary!"
           value={kind}
           onValueChange={(next) => setKind(next as MarkKind)}
           options={MARK_KINDS.map((k) => ({
@@ -361,7 +361,7 @@ export default function BodyViewer({
         />
       )}
 
-      <div className="body-canvas-scroll-safe relative overflow-hidden rounded-xs border border-border bg-muted">
+      <div className="body-canvas-scroll-safe relative overflow-hidden rounded-xl border border-border bg-muted">
         <div
           role="img"
           aria-label={compact ? copy.thumbnail : copy.interactive}
@@ -383,8 +383,8 @@ export default function BodyViewer({
             gl={{ preserveDrawingBuffer: true, antialias: true }}
             dpr={[1, 1.5]}
           >
-            <color attach="background" args={['#efe9dc']} />
-            <hemisphereLight args={['#faf6ec', '#c0b8a8', 1.15]} />
+            <color attach="background" args={['#f7f6f1']} />
+            <hemisphereLight args={['#fdfcf7', '#c6c9bf', 1.2]} />
             <directionalLight position={[2.2, 4, 2.5]} intensity={1.15} />
             <directionalLight position={[-2, 1.5, -1.5]} intensity={0.35} />
             <Suspense fallback={null}>
@@ -429,12 +429,12 @@ export default function BodyViewer({
           </Canvas>
         </div>
         {hoveredLabel && !compact && (
-          <p className="pointer-events-none absolute top-2 left-2 rounded-xs bg-background/90 px-2 py-1 text-lg">
+          <p className="pointer-events-none absolute top-2 left-2 rounded-xl bg-background/90 px-2 py-1 text-lg">
             {hoveredLabel}
           </p>
         )}
         {calibrate && !compact && (
-          <p className="absolute right-2 bottom-2 rounded-xs bg-background/90 px-2 py-1 text-lg">
+          <p className="absolute right-2 bottom-2 rounded-xl bg-background/90 px-2 py-1 text-lg">
             {copy.calibration}
           </p>
         )}
@@ -455,7 +455,7 @@ export default function BodyViewer({
 
       {!compact && (
         <>
-          <div className="grid w-full grid-cols-2 gap-2">
+          <div className="grid w-full grid-cols-2 gap-2.5">
             {(Object.keys(PRESETS) as Preset[]).map((key) => (
               <button
                 key={key}
@@ -470,7 +470,7 @@ export default function BodyViewer({
                     variant: lock && preset === key ? 'default' : 'outline',
                     size: 'touch',
                   }),
-                  'text-lg',
+                  'rounded-xl text-base',
                 )}
               >
                 {presetLabel[key]}
@@ -478,14 +478,14 @@ export default function BodyViewer({
             ))}
           </div>
 
-          <div className="grid grid-cols-[auto_1fr] gap-2">
+          <div className="grid grid-cols-2 gap-2.5">
             <button
               type="button"
               onClick={undo}
               disabled={past.length === 0}
               className={cn(
                 buttonVariants({ variant: 'outline', size: 'touch' }),
-                'text-lg',
+                'rounded-xl text-base',
               )}
             >
               {copy.undo}
@@ -497,17 +497,26 @@ export default function BodyViewer({
                 setSelectedId(null);
                 commit([]);
               }}
-              className="h-11! w-full rounded-xs! border-border! bg-background! text-lg! text-foreground! [&>span.absolute]:bg-primary! [&>span.absolute]:text-primary-foreground!"
+              className="h-12! w-full rounded-xl! border-border! bg-card! text-base! text-foreground! [&>span.absolute]:bg-primary! [&>span.absolute]:text-primary-foreground!"
             >
               {copy.holdClear}
             </HoldToConfirm>
           </div>
 
           <section aria-label={copy.places} className="flex flex-col gap-3">
+            <p className="flex items-center gap-2.5 text-[0.9375rem] text-muted-foreground">
+              <Hand aria-hidden className="size-4 shrink-0" />
+              {copy.tapHint}
+            </p>
             {marks.length === 0 ? (
-              <p className="text-muted-foreground">{copy.nothing}</p>
+              <p className="text-[0.9375rem] text-muted-foreground">
+                {copy.nothing}
+              </p>
             ) : (
-              <ul className="flex flex-wrap gap-2">
+              /* Full-width rows, per the reference: a filled check circle
+                 in the mark's own colour, the region name, its intensity,
+                 and a dismiss control. */
+              <ul className="flex flex-col gap-2.5">
                 {marks.map((m) => {
                   const label =
                     REGION_BY_ID[m.regionId]?.label[lang] ?? m.regionId;
@@ -515,27 +524,25 @@ export default function BodyViewer({
                   return (
                     <li
                       key={m.id}
-                      className={cn(
-                        'flex min-h-11 items-center overflow-hidden rounded-full border bg-background text-lg',
-                        isSelected
-                          ? 'border-ring ring-2 ring-ring/40'
-                          : 'border-border',
-                      )}
+                      data-selected={isSelected}
+                      className="card-row overflow-hidden !px-0"
                     >
                       <button
                         type="button"
                         onClick={() => setSelectedId(isSelected ? null : m.id)}
                         aria-pressed={isSelected}
-                        className="flex min-h-11 items-center gap-2 pr-1 pl-3 outline-none focus-visible:bg-muted"
+                        className="flex min-h-13 flex-1 items-center gap-3 px-4 text-start text-[0.9375rem] outline-none focus-visible:bg-muted"
                       >
                         <span
                           aria-hidden
-                          className="size-3 rounded-full"
+                          className="flex size-5 shrink-0 items-center justify-center rounded-full"
                           style={{ backgroundColor: COLORS[m.kind] }}
-                        />
-                        {label}
+                        >
+                          <Check className="size-3 text-white" />
+                        </span>
+                        <span className="flex-1 truncate">{label}</span>
                         {m.intensity !== undefined && (
-                          <span className="text-muted-foreground">
+                          <span className="shrink-0 text-muted-foreground tabular-nums">
                             {m.intensity}/10
                           </span>
                         )}
@@ -547,7 +554,7 @@ export default function BodyViewer({
                           commit(removeMark(marks, m.id));
                         }}
                         aria-label={`${copy.remove} ${label}`}
-                        className="flex size-11 items-center justify-center text-muted-foreground outline-none hover:text-foreground focus-visible:bg-muted"
+                        className="flex size-12 shrink-0 items-center justify-center text-muted-foreground outline-none hover:text-foreground focus-visible:bg-muted"
                       >
                         <X className="size-4" aria-hidden />
                       </button>
@@ -558,7 +565,7 @@ export default function BodyViewer({
             )}
 
             {selected && (
-              <div className="flex flex-col gap-2 rounded-xs border border-border bg-background p-3">
+              <div className="flex flex-col gap-2 rounded-xl border border-border bg-background p-3">
                 <p>
                   {REGION_BY_ID[selected.regionId]?.label[lang]}:{' '}
                   {copy.severity}{' '}
@@ -597,44 +604,54 @@ export default function BodyViewer({
             )}
           </section>
 
-          <details className="rounded-xs border border-border bg-background p-3">
-            <summary className="min-h-11 cursor-pointer text-lg font-medium">
-              {copy.chooseList}
-            </summary>
-            <div className="mt-3 flex flex-col gap-3">
-              <Dropdown
-                label={`${copy.bodyPart}: ${listRegion.label[lang]}`}
-                value={listRegionId}
-                onChange={setListRegionId}
-                items={REGIONS.map((region) => {
-                  const marked = marks.find((m) => m.regionId === region.id);
-                  return {
-                    value: region.id,
-                    label: region.label[lang],
-                    hint: marked ? kindLabel[marked.kind] : undefined,
-                  };
-                })}
-                className="block w-full [&_li]:text-lg! [&_li_.font-mono]:font-sans! [&_li_.font-mono]:text-sm! [&_ul]:max-h-72! [&>button]:h-11! [&>button]:w-full [&>button]:justify-between [&>button]:border-input! [&>button]:bg-background! [&>button]:text-lg! [&>button]:font-normal! [&>button]:text-foreground! [&>div]:right-0"
+          <details className="card-row flex-col items-stretch !px-0 [&[open]]:pb-3">
+            <summary className="flex min-h-13 cursor-pointer list-none items-center gap-3 px-4 text-[0.9375rem] font-medium [&::-webkit-details-marker]:hidden">
+              <Plus
+                aria-hidden
+                className="size-4 shrink-0 text-muted-foreground"
               />
-              <button
-                type="button"
-                disabled={!regionPoints.has(listRegionId)}
-                onClick={() => {
-                  const point = regionPoints.get(listRegionId);
-                  if (point) handleTap(listRegionId, point);
-                }}
-                className={cn(
-                  buttonVariants({
-                    variant: listMark?.kind === kind ? 'outline' : 'default',
-                    size: 'touch',
-                  }),
-                  'text-lg',
-                )}
-              >
-                {listMark?.kind === kind
-                  ? `${copy.remove} ${listRegion.label[lang]}`
-                  : `${copy.mark} ${listRegion.label[lang]} ${copy.as} ${kindLabel[kind]}`}
-              </button>
+              <span className="flex-1">{copy.chooseList}</span>
+              <ChevronRight
+                aria-hidden
+                className="size-4 shrink-0 text-muted-foreground transition-transform rtl:-scale-x-100"
+              />
+            </summary>
+            <div className="px-4">
+              <div className="mt-1 flex flex-col gap-3">
+                <Dropdown
+                  label={`${copy.bodyPart}: ${listRegion.label[lang]}`}
+                  value={listRegionId}
+                  onChange={setListRegionId}
+                  items={REGIONS.map((region) => {
+                    const marked = marks.find((m) => m.regionId === region.id);
+                    return {
+                      value: region.id,
+                      label: region.label[lang],
+                      hint: marked ? kindLabel[marked.kind] : undefined,
+                    };
+                  })}
+                  className="block w-full [&_li]:text-lg! [&_li_.font-mono]:font-sans! [&_li_.font-mono]:text-sm! [&_ul]:max-h-72! [&>button]:h-11! [&>button]:w-full [&>button]:justify-between [&>button]:border-input! [&>button]:bg-background! [&>button]:text-lg! [&>button]:font-normal! [&>button]:text-foreground! [&>div]:right-0"
+                />
+                <button
+                  type="button"
+                  disabled={!regionPoints.has(listRegionId)}
+                  onClick={() => {
+                    const point = regionPoints.get(listRegionId);
+                    if (point) handleTap(listRegionId, point);
+                  }}
+                  className={cn(
+                    buttonVariants({
+                      variant: listMark?.kind === kind ? 'outline' : 'default',
+                      size: 'touch',
+                    }),
+                    'text-lg',
+                  )}
+                >
+                  {listMark?.kind === kind
+                    ? `${copy.remove} ${listRegion.label[lang]}`
+                    : `${copy.mark} ${listRegion.label[lang]} ${copy.as} ${kindLabel[kind]}`}
+                </button>
+              </div>
             </div>
           </details>
 
@@ -663,9 +680,13 @@ export default function BodyViewer({
                     setCapturing(false);
                   }
                 }}
-                className={cn(buttonVariants({ size: 'touch' }), 'text-lg')}
+                className={cn(
+                  buttonVariants({ size: 'touch' }),
+                  'h-14 rounded-2xl text-base',
+                )}
               >
                 {capturing ? copy.saving : copy.done}
+                <ArrowRight aria-hidden className="size-4 rtl:-scale-x-100" />
               </button>
             </>
           )}
