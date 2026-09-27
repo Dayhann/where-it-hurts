@@ -7,7 +7,7 @@ const COPY = {
       greeting: 'Good to see you,',
       title: "Let's get started.",
       wordmark: 'Where It Hurts',
-      headline: 'Where it Hurts?',
+      headline: 'Where it Hurts',
       description:
         'Show where the pain is, answer a few questions, and send a short recap to the clinician before the call.',
       language: 'Language',
