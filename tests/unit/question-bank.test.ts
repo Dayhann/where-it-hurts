@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { QuestionBankSchema, questionBank } from '@/server/questions/bank';
 
 describe('B-02 question bank', () => {
-  it('has 22 valid bilingual questions, every history slot, and the mandatory red flags', () => {
-    expect(questionBank).toHaveLength(22);
+  it('has 34 valid bilingual questions, every history slot, and the mandatory red flags', () => {
+    expect(questionBank).toHaveLength(34);
     expect(QuestionBankSchema.parse(questionBank)).toEqual(questionBank);
     expect(
       questionBank

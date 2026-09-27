@@ -116,7 +116,7 @@ describe('conversation engine', () => {
     );
     expect(invalid.turn.type).toBe('question');
     if (invalid.turn.type === 'question')
-      expect(invalid.turn.question.id).toBe('Q_ONSET');
+      expect(invalid.turn.question.id).toBe('Q_MARKED_KNEE_MOVE');
     const failed = await handlePatientMessage(
       started.session,
       {
@@ -129,7 +129,7 @@ describe('conversation engine', () => {
       },
     );
     if (failed.turn.type === 'question')
-      expect(failed.turn.question.id).toBe('Q_ONSET');
+      expect(failed.turn.question.id).toBe('Q_MARKED_KNEE_MOVE');
   });
 
   it('drops unsupported extracted quotes and accepts supported ones', async () => {

@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import { REGIONS } from '@/contracts/regions';
+import { REGIONS, REGION_BY_ID } from '@/contracts/regions';
 import type { PostMessageRequest } from '@/contracts/api';
 import type {
   AssistantTurn,
@@ -85,6 +85,41 @@ function mandatoryRemaining(session: Session): Question[] {
   );
 }
 
+function renderQuestion(question: Question, session: Session): Question {
+  if (!question.text.en.includes('{marked_areas}')) return question;
+  const relevant =
+    question.appliesTo?.length === 1
+      ? session.marks.filter((mark) =>
+          question.appliesTo?.includes(
+            REGION_BY_ID[mark.regionId]?.group ?? '',
+          ),
+        )
+      : session.marks;
+  const preferred = relevant.some((mark) => mark.kind === 'pain')
+    ? relevant.filter((mark) => mark.kind === 'pain')
+    : relevant;
+  const regions = [...new Set(preferred.map((mark) => mark.regionId))]
+    .map((id) => REGION_BY_ID[id])
+    .filter((region) => Boolean(region));
+  const areaText = (lang: Session['lang']) => {
+    const labels = regions.slice(0, 3).map((region) => region.label[lang]);
+    const more =
+      regions.length > 3
+        ? lang === 'ar'
+          ? '، ومناطق أخرى'
+          : ', and other areas'
+        : '';
+    return `${labels.join(lang === 'ar' ? '، ' : ', ')}${more}`;
+  };
+  return {
+    ...question,
+    text: {
+      en: question.text.en.replace('{marked_areas}', areaText('en')),
+      ar: question.text.ar.replace('{marked_areas}', areaText('ar')),
+    },
+  };
+}
+
 function clean(text: string): string {
   return text
     .normalize('NFKC')
@@ -137,10 +172,11 @@ function ask(
   question: Question,
   deps: EngineDependencies,
 ): AssistantTurn {
+  const rendered = renderQuestion(question, session);
   const message: Message = {
     id: deps.id?.() ?? nanoid(),
     role: 'assistant',
-    text: question.text[session.lang],
+    text: rendered.text[session.lang],
     questionId: question.id,
     createdAt: deps.now?.() ?? new Date().toISOString(),
   };
@@ -149,7 +185,7 @@ function ask(
   return {
     type: 'question',
     message,
-    question,
+    question: rendered,
     progress: {
       asked: session.askedQuestionIds.length,
       estimatedTotal: MAX_QUESTIONS,
@@ -180,11 +216,12 @@ export async function handlePatientMessage(
   if (session.status !== 'in_progress')
     throw new Error('Session is not accepting messages');
   const last = session.messages.at(-1);
-  const question =
+  const bankQuestion =
     last?.role === 'assistant' && last.questionId
       ? bankById.get(last.questionId)
       : undefined;
-  if (!question) throw new Error('No unanswered question exists');
+  if (!bankQuestion) throw new Error('No unanswered question exists');
+  const question = renderQuestion(bankQuestion, session);
   const option = question.options?.find((item) => item.id === input.choiceId);
   if (input.choiceId && !option)
     throw new Error('Unknown choice for current question');
@@ -256,16 +293,38 @@ export async function handlePatientMessage(
       !next.askedQuestionIds.includes(candidate.id) &&
       !covered.has(candidate.slot as SocratesSlot),
   );
+  // Ask one question grounded in the selected areas while there is room in the
+  // budget. The model still chooses only a bank ID, and mandatory screens remain.
+  const markedCandidates = next.askedQuestionIds.some((id) =>
+    id.startsWith('Q_MARKED_'),
+  )
+    ? []
+    : candidates.filter((candidate) => candidate.id.startsWith('Q_MARKED_'));
+  const specific = markedCandidates
+    .filter((candidate) => candidate.appliesTo?.length === 1)
+    .sort((a, b) => {
+      const firstMarkIndex = (question: Question) =>
+        next.marks.findIndex((mark) =>
+          question.appliesTo?.includes(
+            REGION_BY_ID[mark.regionId]?.group ?? '',
+          ),
+        );
+      return firstMarkIndex(a) - firstMarkIndex(b);
+    });
+  const contextual = specific.length ? specific : markedCandidates;
+  const offered = (contextual.length ? contextual : candidates).map(
+    (candidate) => renderQuestion(candidate, next),
+  );
   let selected: Question | undefined;
-  if (candidates.length && deps.select) {
+  if (offered.length && deps.select) {
     try {
-      const id = await deps.select(candidates, next);
-      selected = candidates.find((candidate) => candidate.id === id);
+      const id = await deps.select(offered, next);
+      selected = offered.find((candidate) => candidate.id === id);
     } catch {
       // An unavailable selector must not stop the check-in.
     }
   }
-  selected ??= fallback(candidates);
+  selected ??= fallback(offered);
   if (!selected) {
     next.status = 'awaiting_confirm';
     return { session: next, turn: { type: 'done' } };

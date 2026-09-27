@@ -314,5 +314,147 @@
       "en": "Is there a time of day when you notice it more?",
       "ar": "هل هناك وقت من اليوم تلاحظه فيه أكثر؟"
     }
+  },
+  {
+    "id": "Q_MARKED_ACTIVITY",
+    "slot": "exacerbating",
+    "kind": "open",
+    "appliesTo": [
+      "neck",
+      "chest",
+      "abdomen",
+      "back",
+      "shoulder",
+      "elbow",
+      "wrist",
+      "hip",
+      "knee",
+      "ankle"
+    ],
+    "text": {
+      "en": "You marked {marked_areas}. Does movement or activity make what you feel there worse?",
+      "ar": "لقد حددت {marked_areas}. هل تزيد الحركة أو النشاط ما تشعر به هناك؟"
+    }
+  },
+  {
+    "id": "Q_MARKED_OTHER",
+    "slot": "associated",
+    "kind": "open",
+    "appliesTo": [
+      "neck",
+      "chest",
+      "abdomen",
+      "back",
+      "shoulder",
+      "elbow",
+      "wrist",
+      "hip",
+      "knee",
+      "ankle"
+    ],
+    "text": {
+      "en": "You marked {marked_areas}. What else do you notice in or around those places?",
+      "ar": "لقد حددت {marked_areas}. ماذا تلاحظ أيضا في هذه الأماكن أو حولها؟"
+    }
+  },
+  {
+    "id": "Q_MARKED_NECK_MOVE",
+    "slot": "exacerbating",
+    "kind": "open",
+    "appliesTo": ["neck"],
+    "text": {
+      "en": "You marked {marked_areas}. Does turning or tilting your head make it feel worse?",
+      "ar": "لقد حددت {marked_areas}. هل يزيد تدوير رأسك أو إمالته ما تشعر به؟"
+    }
+  },
+  {
+    "id": "Q_MARKED_CHEST_MOVE",
+    "slot": "exacerbating",
+    "kind": "open",
+    "appliesTo": ["chest"],
+    "text": {
+      "en": "You marked {marked_areas}. Does breathing or moving your upper body make it feel worse?",
+      "ar": "لقد حددت {marked_areas}. هل يزيد التنفس أو تحريك الجزء العلوي من جسمك ما تشعر به؟"
+    }
+  },
+  {
+    "id": "Q_MARKED_ABDOMEN_MOVE",
+    "slot": "exacerbating",
+    "kind": "open",
+    "appliesTo": ["abdomen"],
+    "text": {
+      "en": "You marked {marked_areas}. Does moving or eating make it feel worse?",
+      "ar": "لقد حددت {marked_areas}. هل تزيد الحركة أو تناول الطعام ما تشعر به؟"
+    }
+  },
+  {
+    "id": "Q_MARKED_BACK_MOVE",
+    "slot": "exacerbating",
+    "kind": "open",
+    "appliesTo": ["back"],
+    "text": {
+      "en": "You marked {marked_areas}. Is it worse when you bend, sit, or stand?",
+      "ar": "لقد حددت {marked_areas}. هل يزداد ما تشعر به عند الانحناء أو الجلوس أو الوقوف؟"
+    }
+  },
+  {
+    "id": "Q_MARKED_SHOULDER_MOVE",
+    "slot": "exacerbating",
+    "kind": "open",
+    "appliesTo": ["shoulder"],
+    "text": {
+      "en": "You marked {marked_areas}. Is it worse when you lift your arm or reach overhead?",
+      "ar": "لقد حددت {marked_areas}. هل يزداد ما تشعر به عند رفع ذراعك أو الوصول إلى أعلى؟"
+    }
+  },
+  {
+    "id": "Q_MARKED_ELBOW_MOVE",
+    "slot": "exacerbating",
+    "kind": "open",
+    "appliesTo": ["elbow"],
+    "text": {
+      "en": "You marked {marked_areas}. Is it worse when you bend your elbow or grip something?",
+      "ar": "لقد حددت {marked_areas}. هل يزداد ما تشعر به عند ثني مرفقك أو إمساك شيء؟"
+    }
+  },
+  {
+    "id": "Q_MARKED_WRIST_MOVE",
+    "slot": "exacerbating",
+    "kind": "open",
+    "appliesTo": ["wrist"],
+    "text": {
+      "en": "You marked {marked_areas}. Is it worse when you move your wrist or use your hand?",
+      "ar": "لقد حددت {marked_areas}. هل يزداد ما تشعر به عند تحريك رسغك أو استخدام يدك؟"
+    }
+  },
+  {
+    "id": "Q_MARKED_HIP_MOVE",
+    "slot": "exacerbating",
+    "kind": "open",
+    "appliesTo": ["hip"],
+    "text": {
+      "en": "You marked {marked_areas}. Is it worse when you walk, climb steps, or stand up?",
+      "ar": "لقد حددت {marked_areas}. هل يزداد ما تشعر به عند المشي أو صعود الدرج أو الوقوف؟"
+    }
+  },
+  {
+    "id": "Q_MARKED_KNEE_MOVE",
+    "slot": "exacerbating",
+    "kind": "open",
+    "appliesTo": ["knee"],
+    "text": {
+      "en": "You marked {marked_areas}. Is it worse when you bend your knee, walk, or use stairs?",
+      "ar": "لقد حددت {marked_areas}. هل يزداد ما تشعر به عند ثني ركبتك أو المشي أو استخدام الدرج؟"
+    }
+  },
+  {
+    "id": "Q_MARKED_ANKLE_MOVE",
+    "slot": "exacerbating",
+    "kind": "open",
+    "appliesTo": ["ankle"],
+    "text": {
+      "en": "You marked {marked_areas}. Is it worse when you walk or put weight on that foot?",
+      "ar": "لقد حددت {marked_areas}. هل يزداد ما تشعر به عند المشي أو تحميل الوزن على تلك القدم؟"
+    }
   }
 ]

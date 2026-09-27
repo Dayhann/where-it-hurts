@@ -48,11 +48,13 @@ function question(id: string): Question {
 describe('LLM question selection', () => {
   const candidates = [question('Q_ONSET'), question('Q_CHAR')];
 
-  it('returns a valid offered ID and passes only candidate question data', async () => {
+  it('returns a valid offered ID and includes marked areas in the prompt', async () => {
     const completeJson = vi.fn(async (prompt: string) => {
       expect(prompt).toContain('"id":"Q_ONSET"');
       expect(prompt).toContain('"id":"Q_CHAR"');
       expect(prompt).toContain('REGION_GROUPS: ["knee"]');
+      expect(prompt).toContain('"label":"Left knee"');
+      expect(prompt).toContain('"kind":"pain"');
       expect(prompt).not.toContain('RF_SADDLE');
     });
     const provider: LlmProvider = {
@@ -122,8 +124,8 @@ describe('LLM question selection', () => {
         }
         calls.push('select');
         return schema.parse({
-          questionId: 'Q_CHAR',
-          reason: 'Clarify character',
+          questionId: 'Q_MARKED_KNEE_MOVE',
+          reason: 'Ask about selected area',
         });
       },
     };
@@ -138,10 +140,58 @@ describe('LLM question selection', () => {
     expect(calls).toEqual(['extract', 'select']);
     expect(result.turn.type).toBe('question');
     if (result.turn.type === 'question')
-      expect(result.turn.question.id).toBe('Q_CHAR');
+      expect(result.turn.question.id).toBe('Q_MARKED_KNEE_MOVE');
+    if (result.turn.type === 'question')
+      expect(result.turn.message.text).toContain('Left knee');
     expect(result.session.facts[0]?.sourceMessageIds).toEqual([
       result.session.messages[1]?.id,
     ]);
+  });
+
+  it.each([
+    ['neck', 'Q_MARKED_NECK_MOVE', 'Neck'],
+    ['chest_left', 'Q_MARKED_CHEST_MOVE', 'Left chest'],
+    ['abdomen_left', 'Q_MARKED_ABDOMEN_MOVE', 'Left abdomen'],
+    ['lower_back_left', 'Q_MARKED_BACK_MOVE', 'Left lower back'],
+    ['shoulder_left', 'Q_MARKED_SHOULDER_MOVE', 'Left shoulder'],
+    ['elbow_left', 'Q_MARKED_ELBOW_MOVE', 'Left elbow'],
+    ['wrist_hand_left', 'Q_MARKED_WRIST_MOVE', 'Left wrist and hand'],
+    ['hip_left', 'Q_MARKED_HIP_MOVE', 'Left hip'],
+    ['knee_left', 'Q_MARKED_KNEE_MOVE', 'Left knee'],
+    ['ankle_foot_left', 'Q_MARKED_ANKLE_MOVE', 'Left ankle and foot'],
+  ])(
+    'asks a %s-specific bank question after a mark',
+    async (regionId, expectedId, label) => {
+      const started = startConversation(session(regionId));
+      const result = await handlePatientMessage(started.session, {
+        text: 'It feels sore.',
+      });
+      expect(result.turn.type).toBe('question');
+      if (result.turn.type === 'question') {
+        expect(result.turn.question.id).toBe(expectedId);
+        expect(result.turn.message.text).toContain(label);
+        expect(result.turn.message.text).not.toContain('{marked_areas}');
+      }
+    },
+  );
+
+  it('names only the relevant area when several groups are marked', async () => {
+    const original = session('knee_left');
+    original.marks.push({
+      ...original.marks[0]!,
+      id: 'mark-2',
+      regionId: 'shoulder_right',
+    });
+    const started = startConversation(original);
+    const result = await handlePatientMessage(started.session, {
+      text: 'It feels sore.',
+    });
+    expect(result.turn.type).toBe('question');
+    if (result.turn.type === 'question') {
+      expect(result.turn.question.id).toBe('Q_MARKED_KNEE_MOVE');
+      expect(result.turn.message.text).toContain('Left knee');
+      expect(result.turn.message.text).not.toContain('Right shoulder');
+    }
   });
 
   it('stops on a red flag without calling either LLM step', async () => {
@@ -195,6 +245,7 @@ describe('LLM question selection', () => {
     expect(offered).not.toContain('Q_ONSET');
     expect(offered).not.toContain('Q_SITE_DETAIL');
     expect(offered).not.toContain('Q_EXAC_SIT_STAND');
+    expect(offered).not.toContain('Q_MARKED_');
     if (result.turn.type === 'question')
       expect(result.turn.question.id).toBe('Q_CHAR');
   });
