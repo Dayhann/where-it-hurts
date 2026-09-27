@@ -3,6 +3,7 @@ import type { Session, SlotFact } from '@/contracts/types';
 import {
   handlePatientMessage,
   startConversation,
+  withRecoveredFacts,
 } from '@/server/engine/conversation';
 
 function session(regionId?: string): Session {
@@ -62,6 +63,61 @@ describe('conversation engine', () => {
       result.session.messages.at(-1)?.id,
     );
     expect(extract).not.toHaveBeenCalled();
+  });
+
+  it('retains a literal answer when extraction returns no usable facts', async () => {
+    const started = startConversation(session('knee_left'));
+    const result = await handlePatientMessage(
+      started.session,
+      { text: 'My left knee feels sore.' },
+      { extract: async () => [] },
+    );
+    expect(result.session.facts).toEqual([
+      expect.objectContaining({
+        slot: 'site',
+        quote: 'My left knee feels sore.',
+        sourceMessageIds: [result.session.messages[1]?.id],
+      }),
+    ]);
+    expect(result.turn.type).toBe('question');
+  });
+
+  it('recovers older literal answers without treating red-flag replies as facts', () => {
+    const started = startConversation(session('lower_back_left')).session;
+    const old = {
+      ...started,
+      messages: [
+        ...started.messages,
+        {
+          id: 'p1',
+          role: 'patient' as const,
+          text: 'My back aches.',
+          createdAt: '2026-01-01T09:01:00Z',
+        },
+        {
+          id: 'rf1',
+          role: 'assistant' as const,
+          text: 'Any new weakness in both legs?',
+          questionId: 'RF_BILAT_WEAK',
+          createdAt: '2026-01-01T09:02:00Z',
+        },
+        {
+          id: 'p2',
+          role: 'patient' as const,
+          text: 'No',
+          choiceId: 'no',
+          createdAt: '2026-01-01T09:03:00Z',
+        },
+      ],
+    };
+    expect(withRecoveredFacts(old).facts).toEqual([
+      expect.objectContaining({
+        slot: 'site',
+        quote: 'My back aches.',
+        sourceMessageIds: ['p1'],
+      }),
+    ]);
+    expect(old.facts).toEqual([]);
   });
 
   it('asks all applicable mandatory questions before finishing at eight', async () => {

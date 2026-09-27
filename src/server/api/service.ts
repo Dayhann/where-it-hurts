@@ -24,6 +24,7 @@ import type {
 import {
   handlePatientMessage,
   startConversation,
+  withRecoveredFacts,
 } from '@/server/engine/conversation';
 import { llmEngineDependencies } from '@/server/engine/llm-deps';
 import type { LlmProvider } from '@/server/llm/provider';
@@ -64,7 +65,10 @@ export function createServerApi(
         throw new Error('LLM unavailable');
       },
     };
-    const summary = await generateSummary(provider ?? unavailable, session);
+    const summary = await generateSummary(
+      provider ?? unavailable,
+      withRecoveredFacts(session),
+    );
     summaries.set(session.id, summary);
     return summary;
   }
@@ -133,7 +137,7 @@ export function createServerApi(
     async getRecap(id) {
       const session = await get(id);
       const edits = recapEdits.get(id);
-      const lines = generateRecap(session).map((line) => ({
+      const lines = generateRecap(withRecoveredFacts(session)).map((line) => ({
         ...line,
         text: edits?.get(line.slot) ?? line.text,
       }));
