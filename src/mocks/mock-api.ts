@@ -26,6 +26,7 @@ import type {
   SocratesSlot,
 } from '@/contracts/types';
 import { questionBank } from '@/server/questions/bank';
+import { generateRecap } from '@/server/recap/generate';
 import { checkRedFlags } from '@/server/redflags/check';
 import { verifyLine } from '@/server/summary/validate';
 import { mockConfirmedSummary, mockSessions } from './fixtures';
@@ -270,14 +271,9 @@ export function createMockApi({
       await wait();
       const session = get(id);
       const edits = recapEdits.get(id);
-      const lines = session.facts.map((fact) => ({
-        text:
-          edits?.get(fact.slot) ??
-          (fact.status === 'unsure'
-            ? `You said you are not sure: ${fact.quote}`
-            : `You said: ${fact.quote}`),
-        slot: fact.slot,
-        editable: true as const,
+      const lines = generateRecap(session).map((line) => ({
+        ...line,
+        text: edits?.get(line.slot) ?? line.text,
       }));
       return GetRecapResponseSchema.parse({ lines });
     },
