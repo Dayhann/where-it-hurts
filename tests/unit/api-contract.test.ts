@@ -71,6 +71,11 @@ describe('mock and real API contracts', () => {
     expect(Object.keys(real.message.turn).sort()).toEqual(
       Object.keys(mock.message.turn).sort(),
     );
+    expect(real.message.turn.type).toBe('question');
+    if (real.message.turn.type === 'question') {
+      expect(real.message.turn.question.id).toBe('Q_MARKED_BACK_MOVE');
+      expect(real.message.turn.message.text).toContain('Left lower back');
+    }
   });
 
   it('supports recap edits, confirmation, feedback, and the safety stop', async () => {
