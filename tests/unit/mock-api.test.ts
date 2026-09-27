@@ -74,7 +74,10 @@ describe('mock API', () => {
     while (turn.type === 'question') {
       const body =
         turn.question.slot === 'redflag'
-          ? { text: '', choiceId: 'no' }
+          ? {
+              text: '',
+              choiceId: turn.question.id === 'RF_FEVER_TRAUMA' ? 'none' : 'no',
+            }
           : {
               text:
                 turn.question.id === 'Q_OPEN'
@@ -147,6 +150,32 @@ describe('mock API', () => {
       ).rejects.toThrow();
     },
   );
+
+  it('stops on a specific systemic or injury choice from the combined red-flag question', async () => {
+    const api = createMockApi({ delayMs: 0 });
+    const { session, firstTurn } = await api.createSession({
+      appointment,
+      lang: 'en',
+      carerMode: false,
+    });
+    let turn = firstTurn;
+    while (turn.type === 'question' && turn.question.id !== 'RF_FEVER_TRAUMA') {
+      const result = await api.postMessage(session.id, {
+        text: '',
+        ...(turn.question.slot === 'redflag'
+          ? { choiceId: 'no' }
+          : { text: 'A few days ago.' }),
+      });
+      turn = result.turn;
+    }
+    expect(turn.type).toBe('question');
+    const result = await api.postMessage(session.id, {
+      text: '',
+      choiceId: 'fever',
+    });
+    expect(result.turn.type).toBe('redflag_stop');
+    expect(result.session.status).toBe('redflag_stopped');
+  });
 
   it('returns independent copies and rejects invalid input', async () => {
     const api = createMockApi({ delayMs: 0 });
