@@ -99,9 +99,9 @@ export function ChatComposer({
   };
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-5">
       <div
-        className="flex flex-wrap gap-2"
+        className="flex flex-wrap gap-2.5"
         role="group"
         aria-label={copy.quickAnswers}
       >
@@ -123,7 +123,7 @@ export function ChatComposer({
               }
             }}
             className={cn(
-              'h-11! px-4! text-lg! leading-7!',
+              'h-12! rounded-full! px-5! text-lg! leading-7!',
               option.id.startsWith('scale_') && 'min-w-11 px-3!',
             )}
           >
@@ -150,7 +150,7 @@ export function ChatComposer({
               void sendText();
             }
           }}
-          className="min-h-11 w-full resize-y rounded-lg border border-input bg-background px-3 py-2 text-lg leading-7 outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+          className="min-h-14 w-full resize-y rounded-xl border border-input bg-card px-4 py-3 text-lg leading-relaxed outline-none transition-shadow focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
         />
       </label>
       {voiceSupported && (
@@ -167,7 +167,7 @@ export function ChatComposer({
         />
       )}
       <div
-        className={cn('grid gap-2', voiceSupported && 'grid-cols-[auto_1fr]')}
+        className={cn('grid gap-3', voiceSupported && 'grid-cols-[auto_1fr]')}
       >
         {voiceSupported && (
           <button
@@ -189,7 +189,7 @@ export function ChatComposer({
           disabled={disabled || text.trim().length === 0}
           onPress={() => void sendText()}
           tintClassName="bg-white/30"
-          className="min-h-11 rounded-lg! border-primary! bg-primary! text-lg! text-primary-foreground!"
+          className="min-h-12 rounded-xl! border-primary! bg-primary! text-lg! text-primary-foreground!"
         >
           {copy.send}
         </Ripple>

@@ -198,38 +198,32 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
   const compactBody = showChat && !bodyExpanded;
 
   return (
-    <div dir={direction} className="flex flex-col gap-5">
+    <div dir={direction} className="flex flex-col gap-8">
       {steps}
       {showChat ? (
-        <div className="flex flex-col gap-1">
-          <p className="text-lg text-muted-foreground">
-            {copy.checkin.label} {sessionId}
-          </p>
-          <h1 className="display-title text-2xl font-semibold tracking-tight">
+        <div className="flex flex-col">
+          <h1 className="display-title text-[1.75rem]">
             {copy.checkin.questions}
           </h1>
           {questionTurn && (
-            <p className="text-lg text-muted-foreground">
+            <p className="mt-2 text-base text-muted-foreground">
               <QuestionProgress progress={questionTurn.progress} lang={lang} />
             </p>
           )}
           {session?.carerMode && (
-            <p className="rounded-lg bg-muted px-3 py-2">
+            <p className="mt-4 rounded-lg bg-accent px-4 py-3 text-base text-accent-foreground">
               {copy.checkin.carerBanner}
             </p>
           )}
         </div>
       ) : (
-        <div className="flex flex-col gap-1">
-          <p className="text-lg text-muted-foreground">
-            {copy.checkin.label} {sessionId}
-          </p>
-          <h1 className="display-title text-2xl font-semibold tracking-tight">
+        <div className="flex flex-col">
+          <h1 className="display-title text-[1.75rem]">
             {session?.carerMode
               ? copy.checkin.bodyTitleCarer
               : copy.checkin.bodyTitle}
           </h1>
-          <p>
+          <p className="measure body-copy mt-3 text-muted-foreground">
             {session?.carerMode
               ? copy.checkin.bodyInstructionsCarer
               : copy.checkin.bodyInstructions}
@@ -258,7 +252,7 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
           {copy.checkin.backToQuestions}
         </button>
       )}
-      <p className="text-lg text-muted-foreground" aria-live="polite">
+      <p className="text-sm text-muted-foreground" aria-live="polite">
         {saveState === 'saving' && copy.checkin.saving}
         {saveState === 'saved' && copy.checkin.saved}
         {saveState === 'local' && copy.checkin.local}
@@ -290,15 +284,23 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
         </p>
       )}
 
-      <Link
-        href="/"
-        className={cn(
-          buttonVariants({ variant: 'outline', size: 'touch' }),
-          'text-lg',
-        )}
-      >
-        {copy.checkin.back}
-      </Link>
+      <footer className="mt-4 flex flex-col gap-4 border-t border-border pt-6">
+        <Link
+          href="/"
+          className={cn(
+            buttonVariants({ variant: 'ghost', size: 'touch' }),
+            'self-start text-muted-foreground',
+          )}
+        >
+          {copy.checkin.back}
+        </Link>
+        {/* Kept for support ("read me the reference at the bottom") but
+            demoted — it used to sit above the page heading at 18px, which
+            made the first thing a patient in pain read a random string. */}
+        <p className="font-mono text-xs break-all text-muted-foreground/70">
+          {copy.checkin.label} {sessionId}
+        </p>
+      </footer>
     </div>
   );
 }
