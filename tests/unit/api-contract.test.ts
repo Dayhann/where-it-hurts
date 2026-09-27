@@ -181,6 +181,83 @@ describe('mock and real API contracts', () => {
     expect(stopped.turn.type).toBe('redflag_stop');
     expect(completeJson).not.toHaveBeenCalled();
   });
+
+  it('shows a recap for a completed older session with no extracted facts', async () => {
+    const store = new MemoryStore();
+    const api = createServerApi(store);
+    const created = await api.createSession({
+      appointment,
+      lang: 'en',
+      carerMode: false,
+    });
+    await store.update({
+      ...created.session,
+      status: 'awaiting_confirm',
+      messages: [
+        ...created.session.messages,
+        {
+          id: 'old-answer',
+          role: 'patient',
+          text: 'My left knee aches.',
+          createdAt: appointment.startsAt,
+        },
+      ],
+    });
+    const recap = await api.getRecap(created.session.id);
+    expect(recap.lines[0]?.text).toContain('My left knee aches.');
+    expect(await api.confirm(created.session.id, { edits: [] })).toEqual({
+      ok: true,
+    });
+    const { summary } = await api.getSummary(created.session.id);
+    expect(summary.lines[0]?.quotes).toEqual(['My left knee aches.']);
+    expect(summary.lines[0]?.verified).toBe(true);
+  });
+
+  it('keeps separate edits for two answers in the same history slot', async () => {
+    const store = new MemoryStore();
+    const api = createServerApi(store);
+    const created = await api.createSession({
+      appointment,
+      lang: 'en',
+      carerMode: false,
+    });
+    await store.update({
+      ...created.session,
+      status: 'awaiting_confirm',
+      messages: [
+        ...created.session.messages,
+        {
+          id: 'p1',
+          role: 'patient',
+          text: 'My knee aches.',
+          createdAt: appointment.startsAt,
+        },
+        {
+          id: 'q2',
+          role: 'assistant',
+          questionId: 'Q_SITE_DETAIL',
+          text: 'Where most?',
+          createdAt: appointment.startsAt,
+        },
+        {
+          id: 'p2',
+          role: 'patient',
+          text: 'The front of my knee.',
+          createdAt: appointment.startsAt,
+        },
+      ],
+    });
+    expect((await api.getRecap(created.session.id)).lines).toHaveLength(2);
+    await api.confirm(created.session.id, {
+      edits: [
+        { slot: 'site', text: 'First edited answer' },
+        { slot: 'site', text: 'Second edited answer' },
+      ],
+    });
+    expect(
+      (await api.getRecap(created.session.id)).lines.map((line) => line.text),
+    ).toEqual(['First edited answer', 'Second edited answer']);
+  });
 });
 
 describe('HTTP route validation', () => {

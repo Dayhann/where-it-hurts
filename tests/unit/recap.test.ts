@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Session, SlotFact, SocratesSlot } from '@/contracts/types';
-import { generateRecap } from '@/server/recap/generate';
+import { generateAnswerRecap, generateRecap } from '@/server/recap/generate';
 
 function session(facts: SlotFact[]): Session {
   return {
@@ -45,6 +45,57 @@ function fact(
 }
 
 describe('patient recap generator', () => {
+  it('keeps repeated history answers in order and omits screening replies', () => {
+    const input = session([]);
+    input.messages = [
+      {
+        id: 'q1',
+        role: 'assistant',
+        questionId: 'Q_OPEN',
+        text: "What's the issue?",
+        createdAt: input.createdAt,
+      },
+      {
+        id: 'p1',
+        role: 'patient',
+        text: 'My left knee aches.',
+        createdAt: input.createdAt,
+      },
+      {
+        id: 'q2',
+        role: 'assistant',
+        questionId: 'Q_SITE_DETAIL',
+        text: 'Where most?',
+        createdAt: input.createdAt,
+      },
+      {
+        id: 'p2',
+        role: 'patient',
+        text: 'At the front of the knee.',
+        createdAt: input.createdAt,
+      },
+      {
+        id: 'q3',
+        role: 'assistant',
+        questionId: 'RF_FEVER_TRAUMA',
+        text: 'Any of these?',
+        createdAt: input.createdAt,
+      },
+      {
+        id: 'p3',
+        role: 'patient',
+        text: 'None of these',
+        choiceId: 'none',
+        createdAt: input.createdAt,
+      },
+    ];
+    const lines = generateAnswerRecap(input);
+    expect(lines).toHaveLength(2);
+    expect(lines.map((line) => line.slot)).toEqual(['site', 'site']);
+    expect(lines[0]?.text).toContain('My left knee aches.');
+    expect(lines[1]?.text).toContain('At the front of the knee.');
+  });
+
   it('uses plain second-person labels and the patient quote for each slot', () => {
     const quotes: [SocratesSlot, string][] = [
       ['site', 'My lower back hurts'],

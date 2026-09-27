@@ -5,6 +5,7 @@ import type {
   SocratesSlot,
 } from '@/contracts/types';
 import { verifyLine } from '@/server/summary/validate';
+import { questionBank } from '@/server/questions/bank';
 
 const TOPIC: Record<SocratesSlot, string> = {
   site: 'where it hurts',
@@ -56,4 +57,33 @@ export function generateRecap(session: Session): PatientRecapLine[] {
         editable: true,
       }),
     );
+}
+
+/** Review every answer to a history question, including repeated topics. */
+export function generateAnswerRecap(session: Session): PatientRecapLine[] {
+  const questions = new Map(
+    questionBank.map((question) => [question.id, question]),
+  );
+  const lines = session.messages.flatMap((message, index) => {
+    if (message.role !== 'patient') return [];
+    const previous = session.messages[index - 1];
+    const question = previous?.questionId
+      ? questions.get(previous.questionId)
+      : undefined;
+    if (!question || question.slot === 'redflag') return [];
+    const topic = TOPIC[question.slot];
+    return [
+      PatientRecapLineSchema.parse({
+        slot: question.slot,
+        text:
+          message.choiceId === 'not_sure'
+            ? `You weren't sure about ${topic}.`
+            : CLINICAL_JARGON.test(message.text)
+              ? `You mentioned ${topic}. Please check the wording before you send this.`
+              : `You said this about ${topic}: ${sentence(message.text)}`,
+        editable: true,
+      }),
+    ];
+  });
+  return lines.length ? lines : generateRecap(session);
 }

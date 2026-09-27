@@ -26,7 +26,7 @@ import type {
   SocratesSlot,
 } from '@/contracts/types';
 import { questionBank } from '@/server/questions/bank';
-import { generateRecap } from '@/server/recap/generate';
+import { generateAnswerRecap } from '@/server/recap/generate';
 import { checkRedFlags } from '@/server/redflags/check';
 import { verifyLine } from '@/server/summary/validate';
 import { mockConfirmedSummary, mockSessions } from './fixtures';
@@ -177,7 +177,7 @@ export function createMockApi({
     mockSessions.map((session) => [session.id, structuredClone(session)]),
   );
   const feedback = new Map<string, { lineIndex: number; note: string }[]>();
-  const recapEdits = new Map<string, Map<SocratesSlot, string>>();
+  const recapEdits = new Map<string, { slot: SocratesSlot; text: string }[]>();
 
   async function wait() {
     if (delayMs > 0)
@@ -271,9 +271,10 @@ export function createMockApi({
       await wait();
       const session = get(id);
       const edits = recapEdits.get(id);
-      const lines = generateRecap(session).map((line) => ({
+      const lines = generateAnswerRecap(session).map((line, index) => ({
         ...line,
-        text: edits?.get(line.slot) ?? line.text,
+        text:
+          edits?.[index]?.slot === line.slot ? edits[index].text : line.text,
       }));
       return GetRecapResponseSchema.parse({ lines });
     },
@@ -288,9 +289,22 @@ export function createMockApi({
       ) {
         throw new Error('This mock session is not ready to confirm');
       }
-      const edits = recapEdits.get(id) ?? new Map<SocratesSlot, string>();
-      input.edits?.forEach((edit) => edits.set(edit.slot, edit.text));
-      recapEdits.set(id, edits);
+      if (input.edits) {
+        const lines = generateAnswerRecap(session);
+        const ordered =
+          input.edits.length === lines.length &&
+          input.edits.every((edit, index) => edit.slot === lines[index]?.slot);
+        recapEdits.set(
+          id,
+          lines.map((line, index) => ({
+            slot: line.slot,
+            text: ordered
+              ? input.edits![index]!.text
+              : (input.edits!.find((edit) => edit.slot === line.slot)?.text ??
+                line.text),
+          })),
+        );
+      }
       session.status = 'confirmed';
       return ConfirmResponseSchema.parse({ ok: true });
     },

@@ -159,6 +159,31 @@ function directFact(message: Message, question: Question): SlotFact[] {
   ];
 }
 
+/** Restore literal answers from older sessions whose model extraction failed. */
+export function withRecoveredFacts(session: Session): Session {
+  const existingSlots = new Set(session.facts.map((fact) => fact.slot));
+  const recovered = new Map<SocratesSlot, SlotFact>();
+  session.messages.forEach((message, index) => {
+    if (message.role !== 'patient') return;
+    const previous = session.messages[index - 1];
+    const question = previous?.questionId
+      ? bankById.get(previous.questionId)
+      : undefined;
+    if (
+      !question ||
+      question.slot === 'redflag' ||
+      existingSlots.has(question.slot)
+    )
+      return;
+    const fact = directFact(message, question)[0];
+    if (fact) recovered.set(fact.slot, fact);
+  });
+  return {
+    ...session,
+    facts: [...session.facts, ...recovered.values()],
+  };
+}
+
 function fallback(candidates: Question[]): Question | undefined {
   return [...candidates].sort(
     (a, b) =>
@@ -256,7 +281,12 @@ export async function handlePatientMessage(
   const extracted = deps.extract
     ? await deps.extract(answer, next, question)
     : directFact(answer, question);
-  for (const fact of extracted.filter((item) => supported(item, answer))) {
+  const supportedFacts = extracted.filter((item) => supported(item, answer));
+  // If extraction is unavailable, retain the patient's exact answer as a
+  // literal fact for the recap. This adds no clinical interpretation.
+  for (const fact of supportedFacts.length
+    ? supportedFacts
+    : directFact(answer, question)) {
     next.facts = next.facts.filter((old) => old.slot !== fact.slot);
     next.facts.push(fact);
   }
