@@ -19,6 +19,7 @@ const COPY = {
       prototype:
         'This is a prototype with made-up patients only. It does not diagnose, treat, or give medical advice.',
       emergency: 'If this is an emergency, call 000.',
+      credit: 'Some screen parts come from',
     },
     checkin: {
       loading: 'Loading your check-in…',
@@ -89,6 +90,8 @@ const COPY = {
       progressFallback: 'A few questions',
       progress: (asked: number, total: number) =>
         `Question ${asked} of about ${total}`,
+      progressBefore: 'Question',
+      progressAfter: (total: number) => `of about ${total}`,
     },
     recap: {
       complete: 'Check-in complete',
@@ -131,6 +134,7 @@ const COPY = {
       prototype:
         'هذا نموذج أولي يستخدم بيانات مرضى غير حقيقية فقط. لا يقدّم تشخيصاً أو علاجاً أو نصيحة طبية.',
       emergency: 'إذا كانت هذه حالة طارئة، فاتصل بالرقم 000.',
+      credit: 'بعض أجزاء الشاشة مأخوذة من',
     },
     checkin: {
       loading: 'جارٍ تحميل التسجيل…',
@@ -201,6 +205,8 @@ const COPY = {
       progressFallback: 'بعض الأسئلة',
       progress: (asked: number, total: number) =>
         `السؤال ${asked} من نحو ${total}`,
+      progressBefore: 'السؤال',
+      progressAfter: (total: number) => `من نحو ${total}`,
     },
     recap: {
       complete: 'اكتمل التسجيل',

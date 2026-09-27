@@ -4,8 +4,8 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import type { GetClinicQueueResponse } from '@/contracts/api';
 import { buttonVariants } from '@/components/ui/button';
+import { HookSidebar } from '@/components/ui/hook-sidebar';
 import { getApiClient } from '@/lib/api-client';
-import { cn } from '@/lib/utils';
 import { DoctorPanel } from './DoctorPanel';
 
 type QueueItem = GetClinicQueueResponse['items'][number];
@@ -85,20 +85,16 @@ export function ClinicWorkspace() {
               No appointments scheduled.
             </p>
           ) : (
-            <ul>
-              {items.map((item) => (
-                <li key={item.sessionId} className="border-b border-border">
-                  <button
-                    type="button"
-                    onClick={() => setSelectedId(item.sessionId)}
-                    aria-pressed={selectedId === item.sessionId}
-                    className={cn(
-                      'flex min-h-16 w-full items-center justify-between gap-3 px-4 py-3 text-left outline-none',
-                      selectedId === item.sessionId
-                        ? 'bg-accent text-accent-foreground'
-                        : 'hover:bg-muted',
-                    )}
-                  >
+            <HookSidebar
+              aria-label="Today's patients"
+              className="p-3"
+              itemClassName="flex min-h-16 items-center justify-between gap-3"
+              value={items.findIndex((item) => item.sessionId === selectedId)}
+              onChange={(index) => setSelectedId(items[index].sessionId)}
+              items={items.map((item) => ({
+                key: item.sessionId,
+                label: (
+                  <>
                     <span>
                       <strong className="block">
                         {item.patientDisplayName}
@@ -112,10 +108,10 @@ export function ClinicWorkspace() {
                         Alert
                       </span>
                     )}
-                  </button>
-                </li>
-              ))}
-            </ul>
+                  </>
+                ),
+              }))}
+            />
           )}
         </aside>
 

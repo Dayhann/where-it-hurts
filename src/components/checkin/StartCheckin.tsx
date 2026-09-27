@@ -98,6 +98,18 @@ export function StartCheckin() {
           {copy.home.emergency}
         </a>
       </p>
+      <p className="text-sm leading-6 text-muted-foreground">
+        {copy.home.credit}{' '}
+        <a
+          className="underline underline-offset-2"
+          href="https://rareui.com"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Rare UI
+        </a>
+        .
+      </p>
     </main>
   );
 }
