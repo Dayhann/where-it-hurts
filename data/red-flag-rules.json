@@ -1,0 +1,128 @@
+[
+  {
+    "id": "RF_CAUDA_SADDLE",
+    "label": "New numbness around the groin or bottom",
+    "allOf": [
+      [
+        "numb",
+        "numbness",
+        "no feeling",
+        "can't feel",
+        "cannot feel",
+        "pins and needles",
+        "خدر",
+        "تنميل",
+        "فقدت الإحساس",
+        "لا أشعر"
+      ],
+      [
+        "groin",
+        "bottom",
+        "bum",
+        "buttock",
+        "private parts",
+        "inner thigh",
+        "inner thighs",
+        "saddle",
+        "between my legs",
+        "الفخذين",
+        "المقعدة",
+        "الأعضاء التناسلية",
+        "بين ساقي"
+      ]
+    ]
+  },
+  {
+    "id": "RF_CAUDA_BLADDER",
+    "label": "New bladder or bowel difficulty",
+    "anyOf": [
+      "can't pee",
+      "cannot pee",
+      "cannot urinate",
+      "unable to pee",
+      "unable to urinate",
+      "trouble passing urine",
+      "difficulty passing urine",
+      "wet myself",
+      "lost control of my bladder",
+      "can't control my bladder",
+      "lost control of my bowels",
+      "lost bowel control",
+      "bowel incontinence",
+      "urinary incontinence",
+      "urinary retention",
+      "لا أستطيع التبول",
+      "صعوبة التبول",
+      "فقدت التحكم بالبول",
+      "فقدت التحكم بالبراز"
+    ]
+  },
+  {
+    "id": "RF_BILATERAL",
+    "label": "Weakness in both legs",
+    "allOf": [
+      ["both legs", "both my legs", "كلتا ساقي", "الساقين"],
+      [
+        "weak",
+        "weakness",
+        "giving way",
+        "can't walk",
+        "cannot walk",
+        "ضعف",
+        "لا أستطيع المشي"
+      ]
+    ]
+  },
+  {
+    "id": "RF_CHEST",
+    "label": "Chest pain",
+    "anyOf": [
+      "chest pain",
+      "pain in my chest",
+      "tight chest",
+      "chest feels tight",
+      "tightness in my chest",
+      "ألم في الصدر",
+      "ألم بصدري",
+      "ضيق في الصدر"
+    ]
+  },
+  {
+    "id": "RF_BREATH",
+    "label": "Breathing difficulty",
+    "anyOf": [
+      "can't breathe",
+      "cannot breathe",
+      "struggling to breathe",
+      "short of breath",
+      "difficulty breathing",
+      "can't get enough air",
+      "severe breathlessness",
+      "لا أستطيع التنفس",
+      "صعوبة في التنفس",
+      "ضيق في التنفس"
+    ]
+  },
+  {
+    "id": "RF_MANDATORY_YES",
+    "label": "Positive or uncertain answer to a mandatory nerve-symptom question",
+    "questionAnswer": {
+      "questionIds": ["RF_SADDLE", "RF_BLADDER", "RF_BILAT_WEAK"],
+      "choiceIds": ["yes", "not_sure"]
+    }
+  },
+  {
+    "id": "RF_SYSTEMIC",
+    "label": "Systemic or injury concern",
+    "questionAnswer": {
+      "questionIds": ["RF_FEVER_TRAUMA"],
+      "choiceIds": [
+        "fever",
+        "recent_fall_or_injury",
+        "history_of_cancer",
+        "unexplained_weight_loss",
+        "not_sure"
+      ]
+    }
+  }
+]
