@@ -5,7 +5,7 @@
  * The orb file in `src/components/ui/fluid-orb.tsx` stays untouched; this
  * drops the circular mask, fills the masthead, and tints to forest green.
  */
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 
 const FOREST = '#2D3E2F';
@@ -56,7 +56,7 @@ float fbm(vec2 p) {
 
 void main() {
   vec2 uv = gl_FragCoord.xy / u_resolution.xy;
-  float t = u_time * 0.22;
+  float t = u_time * 0.48;
   float aspect = u_resolution.x / max(u_resolution.y, 1.0);
 
   vec2 drift = vec2(
@@ -64,14 +64,14 @@ void main() {
     cos(t * 0.8) + 0.6 * cos(t * 1.3 + 2.1)
   );
 
-  vec2 p = vec2(uv.x * aspect, uv.y) + drift * 0.7;
+  vec2 p = vec2(uv.x * aspect, uv.y) + drift * 1.15;
 
   vec2 q = vec2(fbm(p + drift), fbm(p + vec2(3.2, 1.5) - drift));
   float f = fbm(p + 1.2 * q);
 
   float g = clamp(uv.y, 0.0, 1.0);
   float anchor = smoothstep(0.0, 0.3, uv.y);
-  float shade = clamp(g + (f - 0.5) * 0.85 * anchor, 0.0, 1.0);
+  float shade = clamp(g + (f - 0.5) * 0.95 * anchor, 0.0, 1.0);
 
   vec3 white = vec3(0.925, 0.918, 0.902);
   vec3 light = mix(white, u_color, 0.5);
@@ -110,28 +110,43 @@ function compile(gl: WebGLRenderingContext, type: number, src: string) {
 export function HeroFluid({ className }: { className?: string }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [fallback, setFallback] = useState(false);
 
   useEffect(() => {
     const wrap = wrapRef.current;
     const canvas = canvasRef.current;
     if (!wrap || !canvas) return;
 
-    const gl = canvas.getContext('webgl', {
+    const opts: WebGLContextAttributes = {
       antialias: true,
       alpha: false,
       preserveDrawingBuffer: true,
-    });
-    if (!gl) return;
+    };
+    const gl = (canvas.getContext('webgl', opts) ??
+      canvas.getContext(
+        'experimental-webgl',
+        opts,
+      )) as WebGLRenderingContext | null;
+    if (!gl) {
+      setFallback(true);
+      return;
+    }
 
     const program = gl.createProgram();
     const vert = compile(gl, gl.VERTEX_SHADER, VERT);
     const frag = compile(gl, gl.FRAGMENT_SHADER, FRAG);
-    if (!program || !vert || !frag) return;
+    if (!program || !vert || !frag) {
+      setFallback(true);
+      return;
+    }
 
     gl.attachShader(program, vert);
     gl.attachShader(program, frag);
     gl.linkProgram(program);
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) return;
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      setFallback(true);
+      return;
+    }
     gl.useProgram(program);
 
     const buffer = gl.createBuffer();
@@ -197,7 +212,11 @@ export function HeroFluid({ className }: { className?: string }) {
       if (reduce) render(start);
     });
     ro.observe(wrap);
-    reduceMq.addEventListener('change', onReduce);
+    if (typeof reduceMq.addEventListener === 'function') {
+      reduceMq.addEventListener('change', onReduce);
+    } else {
+      reduceMq.addListener(onReduce);
+    }
     document.addEventListener('visibilitychange', onVisibility);
     kick();
 
@@ -205,7 +224,11 @@ export function HeroFluid({ className }: { className?: string }) {
       running = false;
       cancelAnimationFrame(raf);
       ro.disconnect();
-      reduceMq.removeEventListener('change', onReduce);
+      if (typeof reduceMq.removeEventListener === 'function') {
+        reduceMq.removeEventListener('change', onReduce);
+      } else {
+        reduceMq.removeListener(onReduce);
+      }
       document.removeEventListener('visibilitychange', onVisibility);
       gl.deleteProgram(program);
       gl.deleteShader(vert);
@@ -220,18 +243,23 @@ export function HeroFluid({ className }: { className?: string }) {
       aria-hidden
       className={cn(
         'pointer-events-none absolute inset-0 z-0 overflow-hidden',
+        fallback && 'hero-fluid-css',
         className,
       )}
     >
-      <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
-      {/* Same ground fade the ridges used, so the greeting sits on the page colour. */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            'linear-gradient(to bottom, transparent 78%, var(--background) 100%)',
-        }}
+      <canvas
+        ref={canvasRef}
+        className={cn('absolute inset-0 h-full w-full', fallback && 'hidden')}
       />
+      {!fallback && (
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(to bottom, transparent 88%, var(--background) 100%)',
+          }}
+        />
+      )}
     </div>
   );
 }

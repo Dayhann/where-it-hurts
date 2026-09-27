@@ -285,6 +285,43 @@
       var(--elevation-1);
   }
 
+  /* CSS stand-in when WebGL is missing. Only transform, so it stays on the GPU. */
+  .hero-fluid-css {
+    background: linear-gradient(
+      to bottom,
+      oklch(0.345 0.035 148) 0%,
+      oklch(0.55 0.03 150 / 0.55) 55%,
+      var(--background) 100%
+    );
+  }
+
+  .hero-fluid-css::after {
+    content: '';
+    position: absolute;
+    inset: -40% -50%;
+    background:
+      radial-gradient(
+        50% 60% at 30% 40%,
+        oklch(0.7 0.02 140 / 0.55) 0%,
+        transparent 62%
+      ),
+      radial-gradient(
+        45% 55% at 72% 55%,
+        oklch(0.28 0.03 148 / 0.5) 0%,
+        transparent 58%
+      );
+    animation: hero-fluid-drift 10s ease-in-out infinite alternate;
+  }
+
+  @keyframes hero-fluid-drift {
+    from {
+      transform: translate3d(-6%, -4%, 0);
+    }
+    to {
+      transform: translate3d(6%, 5%, 0);
+    }
+  }
+
   /* Rules ---------------------------------------------------------------- */
 
   .rule-top {
@@ -540,5 +577,9 @@
     opacity: 0;
     transform: none;
     transition: opacity 200ms ease;
+  }
+
+  .hero-fluid-css::after {
+    animation: none;
   }
 }
