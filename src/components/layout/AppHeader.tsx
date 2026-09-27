@@ -32,7 +32,7 @@ export function AppHeader({
   date?: Date;
   /** Small line above the title, e.g. "Good to see you,". */
   greeting?: string;
-  /** Serif headline. Sits over the hero, as in the design reference. */
+  /** Page headline. Sits over the hero, as in the design reference. */
   title?: string;
 }) {
   const today = date ?? new Date();
@@ -54,11 +54,8 @@ export function AppHeader({
           </p>
         </div>
 
-        <p className="flex items-center gap-2 rounded-full bg-card/85 px-3.5 py-2 text-xs font-medium text-foreground shadow-[var(--elevation-1)] backdrop-blur-sm">
-          <CalendarDays
-            aria-hidden
-            className="size-3.5 text-muted-foreground"
-          />
+        <p className="type-body flex items-center gap-2 rounded-full bg-card/85 px-3.5 py-2 text-foreground shadow-[var(--elevation-1)] backdrop-blur-sm">
+          <CalendarDays aria-hidden className="size-3.5 text-strong" />
           <time dateTime={today.toISOString().slice(0, 10)}>{label}</time>
         </p>
       </div>
@@ -66,11 +63,9 @@ export function AppHeader({
       {(greeting ?? title) && (
         <header className="relative mt-7 flex flex-col">
           {greeting && (
-            <p className="text-base text-muted-foreground">{greeting}</p>
+            <p className="type-body text-muted-foreground">{greeting}</p>
           )}
-          {title && (
-            <h1 className="display-title mt-1 text-[2.125rem]">{title}</h1>
-          )}
+          {title && <h1 className="type-title mt-1">{title}</h1>}
         </header>
       )}
     </div>

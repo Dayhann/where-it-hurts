@@ -27,7 +27,7 @@ export function RedFlagStop({ lang }: { lang: Lang }) {
           ref={headingRef}
           id="red-flag-heading"
           tabIndex={-1}
-          className="display-title text-[1.875rem] text-destructive"
+          className="type-title text-destructive"
         >
           {copy.title}
         </h1>

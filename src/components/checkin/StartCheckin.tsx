@@ -51,7 +51,7 @@ export function StartCheckin() {
           onChange={(event) => setCarerMode(event.target.checked)}
           className="size-5 accent-primary"
         />
-        <span className="text-[0.9375rem]">{copy.home.carer}</span>
+        <span className="text-[18px] leading-[1.4]">{copy.home.carer}</span>
       </label>
 
       {error && (
@@ -69,7 +69,7 @@ export function StartCheckin() {
           pendingLabel={copy.home.starting}
           successLabel={copy.home.opening}
           errorLabel={copy.recap.retry}
-          className="h-14! w-full rounded-2xl! border-primary! bg-primary! text-base! hover:bg-primary/90! [&>span>span]:text-primary-foreground!"
+          className="button-raised! h-[46px]! w-full rounded-full! text-base! hover:brightness-110 [&>span>span]:text-primary-foreground!"
         >
           {copy.home.start}
         </LoadingButton>
@@ -95,7 +95,7 @@ export function StartCheckin() {
         </div>
       </nav>
 
-      <footer className="border-t border-border pt-6 text-sm leading-relaxed text-muted-foreground [&>p+p]:mt-2">
+      <footer className="type-body border-t border-track pt-6 text-muted-foreground [&>p+p]:mt-2">
         <p>
           {copy.home.prototype}{' '}
           <a

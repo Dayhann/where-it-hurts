@@ -51,12 +51,10 @@ export function ClinicWorkspace() {
 
   return (
     <main className="flex min-h-[calc(100vh-3rem)] flex-col gap-8">
-      <header className="flex flex-wrap items-end justify-between gap-4 border-b border-border pb-6">
+      <header className="flex flex-wrap items-end justify-between gap-4 border-b border-track pb-6">
         <div>
-          <p className="eyebrow">Riverside Family Clinic</p>
-          <h1 className="display-title mt-2 text-[1.75rem]">
-            Consultation workspace
-          </h1>
+          <p className="text-muted-foreground">Riverside Family Clinic</p>
+          <h1 className="type-title mt-1">Consultation workspace</h1>
         </div>
         <Link
           href="/"
@@ -67,14 +65,14 @@ export function ClinicWorkspace() {
       </header>
 
       {error && (
-        <p className="border-l-2 border-destructive bg-destructive/8 p-4 text-destructive">
+        <p className="surface-inset bg-destructive/8 p-4 text-destructive">
           Today&apos;s appointments could not be loaded.
         </p>
       )}
 
       <div className="grid flex-1 gap-6 md:grid-cols-[19rem_1fr]">
         <aside className="surface h-fit !p-0 !pb-2">
-          <h2 className="label-caps border-b border-border px-5 py-4">
+          <h2 className="type-section border-b border-track px-5 py-4">
             Today&apos;s patients
           </h2>
           {loading ? (
@@ -92,7 +90,7 @@ export function ClinicWorkspace() {
                   This strip restores the at-a-glance alarm that the list
                   itself can no longer carry, and jumps straight to them. */}
               {items.some((item) => item.redFlag) && (
-                <div className="border-b border-border py-3">
+                <div className="border-b border-track py-3">
                   {items
                     .filter((item) => item.redFlag)
                     .map((item) => (
@@ -100,12 +98,12 @@ export function ClinicWorkspace() {
                         key={item.sessionId}
                         type="button"
                         onClick={() => setSelectedId(item.sessionId)}
-                        className="pressable mx-3 flex items-center justify-between gap-3 rounded-xl border border-destructive/30 bg-destructive/8 px-3 py-3 text-left hover:bg-destructive/14"
+                        className="pressable button-raised-alert mx-3 flex min-h-[42px] items-center justify-between gap-3 rounded-full py-1.5 ps-4 pe-1.5 text-left hover:brightness-[0.98]"
                       >
-                        <span className="font-semibold text-destructive">
+                        <span className="font-semibold">
                           {item.patientDisplayName}
                         </span>
-                        <span className="label-caps rounded-full bg-destructive px-2.5 py-1 text-background!">
+                        <span className="rounded-full bg-destructive px-2.5 py-1 font-medium text-background">
                           Red flag
                         </span>
                       </button>
@@ -137,18 +135,18 @@ export function ClinicWorkspace() {
             <>
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-muted-foreground">
                     {appointmentTime(selected.startsAt)} phone consultation
                   </p>
-                  <h2 className="display-title flex items-center gap-3 text-[1.625rem]">
+                  <h2 className="type-title mt-1 flex items-center gap-3">
                     {selected.patientDisplayName}
                     {selected.redFlag && (
-                      <span className="label-caps bg-destructive px-2 py-1 text-background!">
+                      <span className="type-body rounded-full bg-destructive px-2.5 py-1 font-medium text-background">
                         Red flag
                       </span>
                     )}
                   </h2>
-                  <p className="mt-1 text-sm text-muted-foreground">
+                  <p className="mt-1 text-muted-foreground">
                     Check-in status: {selected.status.replaceAll('_', ' ')}
                   </p>
                 </div>
@@ -161,9 +159,9 @@ export function ClinicWorkspace() {
                 </button>
               </div>
               <label className="flex flex-1 flex-col gap-2">
-                <span className="label-caps">Consult notes</span>
+                <span className="type-section">Consult notes</span>
                 <textarea
-                  className="min-h-80 flex-1 resize-none border border-input bg-card p-4 outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                  className="surface-inset min-h-80 flex-1 resize-none bg-card p-4 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
                   placeholder="Record notes during the consultation…"
                 />
               </label>

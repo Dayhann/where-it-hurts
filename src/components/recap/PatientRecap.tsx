@@ -72,9 +72,7 @@ export function PatientRecap({
       <section className="enter-fade flex flex-1 flex-col justify-center gap-8 py-8">
         <div className="flex flex-col gap-2">
           <p className="text-lg text-muted-foreground">{copy.complete}</p>
-          <h1 className="display-title text-3xl font-semibold tracking-tight">
-            {copy.thanks}
-          </h1>
+          <h1 className="type-title">{copy.thanks}</h1>
           <p>{copy.sent}</p>
         </div>
         <Link
@@ -90,10 +88,10 @@ export function PatientRecap({
   return (
     <section className="flex flex-col gap-8">
       <header className="flex flex-col gap-2">
-        <p className="text-lg text-muted-foreground">
+        <p className="type-body text-muted-foreground">
           {patientCopy(lang).checkin.label} {sessionId}
         </p>
-        <h1 className="text-2xl font-semibold tracking-tight">{copy.title}</h1>
+        <h1 className="type-title">{copy.title}</h1>
         <p>{copy.instructions}</p>
       </header>
 
@@ -111,7 +109,7 @@ export function PatientRecap({
                 key={`${line.slot}-${index}`}
                 className="surface flex flex-col gap-3"
               >
-                <span className="font-medium">
+                <span className="type-section">
                   {copy.answer} {index + 1}
                 </span>
                 <textarea
@@ -126,7 +124,7 @@ export function PatientRecap({
                       ),
                     );
                   }}
-                  className="min-h-14 resize-y rounded-xl border border-input bg-background px-4 py-3 text-lg leading-relaxed outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                  className="surface-inset min-h-14 resize-y bg-background px-4 py-3 text-lg leading-relaxed outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
                 />
               </label>
             ))
@@ -146,7 +144,7 @@ export function PatientRecap({
         pendingLabel={copy.sending}
         successLabel={copy.sentShort}
         errorLabel={copy.retry}
-        className="h-14! w-full rounded-2xl! border-primary! bg-primary! text-base! hover:bg-primary/90! [&>span>span]:text-primary-foreground!"
+        className="button-raised! h-[46px]! w-full rounded-full! text-base! hover:brightness-110 [&>span>span]:text-primary-foreground!"
       >
         {copy.confirm}
       </LoadingButton>

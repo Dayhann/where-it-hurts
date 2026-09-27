@@ -5,7 +5,7 @@ import { BottomNav } from './BottomNav';
 
 type PageShellProps = {
   children: ReactNode;
-  /** Greeting + serif headline rendered over the hero, as in the reference. */
+  /** Greeting + headline rendered over the hero, as in the reference. */
   greeting?: string;
   title?: string;
   /** Patient check-in: 18px type, phone-width column. Clinic: full width. */
@@ -29,7 +29,7 @@ export function PageShell({
       className={cn(
         'flex min-h-full flex-1 justify-center',
         'px-5 py-8 sm:px-8 sm:py-12 lg:py-16',
-        patient ? 'text-[18px] leading-[1.65]' : 'text-base leading-relaxed',
+        patient ? 'text-[18px] leading-[1.65]' : 'type-body',
       )}
     >
       <div
