@@ -63,7 +63,10 @@ function SummaryQuoteLine({
         type="button"
         onClick={onToggle}
         aria-expanded={open}
-        className="pressable w-full border-b border-track bg-transparent py-4 pe-2 text-left font-medium hover:bg-muted/50"
+        className={cn(
+          'pressable pinned surface-inset w-full bg-card py-3.5 ps-5 pe-4 text-left font-medium hover:bg-popover',
+          !line.verified && '[--pin:var(--muted)]',
+        )}
       >
         <span>{line.text}</span>
         {!line.verified && (
@@ -114,6 +117,15 @@ export function DoctorPanel({
   const [feedback, setFeedback] = useState('');
   const [feedbackSent, setFeedbackSent] = useState(false);
   const [openLine, setOpenLine] = useState<number | null>(null);
+  const [closing, setClosing] = useState(false);
+
+  // transitionend is the signal to unmount; the timer covers the case where
+  // it never fires (tab hidden, element already off screen).
+  useEffect(() => {
+    if (!closing) return;
+    const timer = window.setTimeout(onClose, 320);
+    return () => window.clearTimeout(timer);
+  }, [closing, onClose]);
 
   useEffect(() => {
     let cancelled = false;
@@ -160,14 +172,23 @@ export function DoctorPanel({
       <button
         type="button"
         aria-label="Close patient summary"
-        onClick={onClose}
-        className="scrim-in fixed inset-0 z-30 cursor-default bg-foreground/20"
+        onClick={() => setClosing(true)}
+        className={cn(
+          'scrim-in fixed inset-0 z-30 cursor-default bg-foreground/20',
+          closing && 'scrim-out',
+        )}
       />
       <aside
         role="dialog"
         aria-modal="true"
         aria-labelledby="summary-panel-title"
-        className="drawer-in fixed inset-y-0 right-0 z-40 flex w-full max-w-[460px] flex-col bg-background shadow-[var(--elevation-3)]"
+        onTransitionEnd={(event) => {
+          if (closing && event.target === event.currentTarget) onClose();
+        }}
+        className={cn(
+          'drawer-in fixed inset-y-0 right-0 z-40 flex w-full max-w-[460px] flex-col bg-background shadow-[var(--elevation-3)]',
+          closing && 'drawer-out',
+        )}
       >
         <header className="flex items-center justify-between border-b border-track px-6 py-5">
           <div>
@@ -178,7 +199,7 @@ export function DoctorPanel({
           </div>
           <button
             type="button"
-            onClick={onClose}
+            onClick={() => setClosing(true)}
             aria-label="Close patient summary"
             className={cn(
               buttonVariants({ variant: 'outline', size: 'icon-lg' }),
@@ -198,7 +219,7 @@ export function DoctorPanel({
           {summary &&
             session &&
             (summary.redFlags.length > 0 ? (
-              <section className="surface-inset bg-destructive/8 p-4 text-destructive">
+              <section className="pinned surface-inset bg-card py-4 ps-5 pe-4 text-destructive [--pin:var(--destructive)]">
                 <h3 className="type-section">Red flag reported</h3>
                 <ul className="mt-1 list-disc pl-5">
                   {summary.redFlags.map((hit) => (
@@ -209,7 +230,7 @@ export function DoctorPanel({
                 </ul>
               </section>
             ) : (
-              <p className="surface-inset bg-muted p-4 font-medium">
+              <p className="surface-inset bg-card p-4 font-medium">
                 No red flags reported
               </p>
             ))}
@@ -295,7 +316,7 @@ export function DoctorPanel({
                   <h3 className="type-section">Body map</h3>
                   <SegmentedControl
                     label="Body view"
-                    className="rounded-full! border-transparent! bg-muted! [&>div>div.pointer-events-none.absolute]:button-raised! [&>div>div.pointer-events-none.absolute]:rounded-full!"
+                    className="rounded-full! border-transparent! bg-background! shadow-[var(--sunken)]! [&>div>div.pointer-events-none.absolute]:button-raised! [&>div>div.pointer-events-none.absolute]:rounded-full!"
                     value={view}
                     onValueChange={(next) => setView(next as 'front' | 'back')}
                     options={[
@@ -414,7 +435,7 @@ export function DoctorPanel({
                 value={feedback}
                 onChange={(event) => setFeedback(event.target.value)}
                 rows={2}
-                className="surface-inset bg-background p-2"
+                className="field p-3"
               />
               <button
                 type="button"

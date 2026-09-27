@@ -362,7 +362,7 @@ export default function BodyViewer({
       {!compact && (
         <SegmentedControl
           label={copy.marking}
-          className="block w-full rounded-full! border-transparent! bg-muted! p-1! [&_span]:py-2.5 [&_span]:text-base [&_span]:leading-7 [&>div>div.pointer-events-none.absolute]:button-raised! [&>div>div.pointer-events-none.absolute]:rounded-full!"
+          className="block w-full rounded-full! border-transparent! bg-background! p-1! shadow-[var(--sunken)]! [&_span]:py-2.5 [&_span]:text-base [&_span]:leading-7 [&>div>div.pointer-events-none.absolute]:button-raised! [&>div>div.pointer-events-none.absolute]:rounded-full!"
           value={kind}
           onValueChange={(next) => setKind(next as MarkKind)}
           options={MARK_KINDS.map((k) => ({
@@ -670,7 +670,7 @@ export default function BodyViewer({
               <span className="flex-1">{copy.chooseList}</span>
               <ChevronRight
                 aria-hidden
-                className="size-4 shrink-0 text-strong transition-transform rtl:-scale-x-100"
+                className="size-4 shrink-0 text-strong transition-transform duration-200 ease-[var(--ease-out)] rtl:-scale-x-100 [details[open]_&]:rotate-90 rtl:[details[open]_&]:-rotate-90"
               />
             </summary>
             <div className="px-4">

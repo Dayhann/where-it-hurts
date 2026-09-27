@@ -173,17 +173,14 @@ export function ReceptionQueue() {
 
       {error && (
         <p
-          className="surface-inset bg-destructive/8 p-3 text-destructive"
+          className="pinned surface-inset bg-card py-3 ps-5 pe-4 text-destructive [--pin:var(--destructive)]"
           role="alert"
         >
           The queue could not be refreshed. The last update remains visible.
         </p>
       )}
 
-      <section
-        className="surface relative overflow-hidden !p-0"
-        aria-label="Today's check-ins"
-      >
+      <section className="relative" aria-label="Today's check-ins">
         <NewItemsPill
           count={unread}
           onJump={jump}
@@ -193,20 +190,23 @@ export function ReceptionQueue() {
         />
         <div
           {...scrollProps}
-          className="max-h-[60vh] overflow-y-auto outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+          className="-m-3 max-h-[60vh] overflow-y-auto rounded-card p-3 outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
         >
           {items.length === 0 && !loading ? (
-            <p className="p-6 text-muted-foreground">No check-ins yet today.</p>
+            <p className="surface text-muted-foreground">
+              No check-ins yet today.
+            </p>
           ) : (
-            <ul className="divide-y divide-track">
+            <ul className="flex flex-col gap-3">
               {items.map((item) => (
                 <li
                   key={item.sessionId}
                   id={rowId(item.sessionId)}
                   tabIndex={-1}
                   className={cn(
-                    'grid min-h-24 grid-cols-[6rem_1fr_auto] items-center gap-5 px-6 py-5 outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-inset',
-                    item.redFlag && 'bg-destructive/10',
+                    'surface-inset grid min-h-20 grid-cols-[6rem_1fr_auto] items-center gap-5 bg-card px-6 py-4 outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+                    item.redFlag &&
+                      'pinned bg-[color-mix(in_oklch,var(--destructive),var(--card)_93%)] [--pin:var(--destructive)]',
                   )}
                 >
                   <time className="font-semibold">

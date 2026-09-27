@@ -27,30 +27,23 @@ export function BottomNav() {
   return (
     <nav
       aria-label="Sections"
-      className="sticky bottom-0 z-20 -mx-5 mt-10 border-t border-track bg-card/95 px-5 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur-sm sm:-mx-8 sm:px-8"
+      className="sticky bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-20 mt-10 rounded-full bg-card/85 p-1.5 shadow-[var(--elevation-3)] backdrop-blur-md"
     >
-      <ul className="mx-auto flex max-w-md items-stretch justify-between">
+      <ul className="flex items-center justify-between">
         {TABS.map(({ href, label, icon: Icon }) => {
           const active = isActive(href);
           const isCheckin = href === '/checkin';
           const content = (
             <>
-              <span
-                className={cn(
-                  'flex size-[38px] items-center justify-center rounded-full transition-shadow',
-                  active ? 'button-raised-soft text-primary' : 'text-strong',
-                )}
-              >
-                <Icon aria-hidden className="size-5" />
-              </span>
-              <span className="type-body">{label}</span>
+              <Icon aria-hidden className="size-5" />
+              <span className="sr-only">{label}</span>
             </>
           );
           const className = cn(
-            'flex min-h-16 min-w-16 flex-col items-center justify-center gap-0.5 rounded-xl px-2 transition-colors',
+            'flex size-[46px] items-center justify-center rounded-full',
             active
-              ? 'text-foreground'
-              : 'text-muted-foreground hover:text-foreground',
+              ? 'button-raised text-primary-foreground'
+              : 'text-strong hover:bg-foreground/5',
           );
 
           // /checkin only exists under a session id, so it is a label here
@@ -60,6 +53,7 @@ export function BottomNav() {
               {isCheckin ? (
                 <span
                   aria-current={active ? 'page' : undefined}
+                  title={label}
                   className={cn(className, 'cursor-default')}
                 >
                   {content}
@@ -68,7 +62,8 @@ export function BottomNav() {
                 <Link
                   href={href}
                   aria-current={active ? 'page' : undefined}
-                  className={className}
+                  title={label}
+                  className={cn(className, 'pressable')}
                 >
                   {content}
                 </Link>
