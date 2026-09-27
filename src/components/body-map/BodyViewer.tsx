@@ -374,7 +374,7 @@ export default function BodyViewer({
 
       <div
         className={cn(
-          !compact && 'grid grid-cols-[1fr_7rem] items-stretch gap-2.5',
+          !compact && 'grid grid-cols-[1fr_8.5rem] items-stretch gap-2.5',
         )}
       >
         <div
@@ -496,11 +496,11 @@ export default function BodyViewer({
                 buttonVariants({
                   variant: lock && preset === 'left' ? 'default' : 'outline',
                 }),
-                'h-[46px] text-[14.5px] leading-[18px] tracking-[0.3px] w-full justify-start gap-1 px-2.5 whitespace-normal',
+                'h-[46px] text-[14.5px] leading-[18px] tracking-[0.3px] w-full justify-center gap-1 px-2.5',
               )}
             >
               <ChevronLeft aria-hidden className="size-3.5 shrink-0" />
-              <span className="flex-1 text-start">{presetLabel.left}</span>
+              {presetLabel.left}
             </button>
 
             <button
@@ -514,10 +514,10 @@ export default function BodyViewer({
                 buttonVariants({
                   variant: lock && preset === 'right' ? 'default' : 'outline',
                 }),
-                'h-[46px] text-[14.5px] leading-[18px] tracking-[0.3px] w-full justify-start gap-1 px-2.5 whitespace-normal',
+                'h-[46px] text-[14.5px] leading-[18px] tracking-[0.3px] w-full justify-center gap-1 px-2.5',
               )}
             >
-              <span className="flex-1 text-start">{presetLabel.right}</span>
+              {presetLabel.right}
               <ChevronRight aria-hidden className="size-3.5 shrink-0" />
             </button>
 
@@ -527,11 +527,11 @@ export default function BodyViewer({
               disabled={past.length === 0}
               className={cn(
                 buttonVariants({ variant: 'outline' }),
-                'h-[46px] text-[14.5px] leading-[18px] tracking-[0.3px] w-full justify-start gap-1.5 px-2.5 text-start whitespace-normal',
+                'h-[46px] text-[14.5px] leading-[18px] tracking-[0.3px] w-full justify-center gap-1 px-2.5',
               )}
             >
               <Undo2 aria-hidden className="size-3.5 shrink-0" />
-              <span className="flex-1">{copy.undo}</span>
+              {copy.undo}
             </button>
 
             <HoldToConfirm
@@ -541,10 +541,10 @@ export default function BodyViewer({
                 setSelectedId(null);
                 commit([]);
               }}
-              className="button-raised-soft! type-body! h-[46px]! w-full rounded-full! px-2.5! [&>span.absolute]:bg-primary! [&>span.absolute]:text-primary-foreground! [&_span]:justify-start! [&_span]:gap-2!"
+              className="button-raised-soft! h-[46px]! w-full rounded-full! px-2! text-[11px]! leading-[14px]! tracking-[0.15px]! [&>span.absolute]:bg-primary! [&>span.absolute]:text-primary-foreground! [&>span.absolute]:px-2! [&_span.flex]:justify-center! [&_span.flex]:gap-1!"
             >
-              <Trash2 aria-hidden className="size-3.5 shrink-0" />
-              <span className="flex-1 text-start">{copy.clearShort}</span>
+              <Trash2 aria-hidden className="size-3 shrink-0" />
+              {copy.clearShort}
             </HoldToConfirm>
           </div>
         )}
