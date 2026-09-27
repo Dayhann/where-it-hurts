@@ -194,6 +194,34 @@ describe('LLM question selection', () => {
     }
   });
 
+  it('offers a knee symptom question after movement is already described', async () => {
+    const started = startConversation(session('knee_left'));
+    let offered: string[] = [];
+    const result = await handlePatientMessage(
+      started.session,
+      { text: 'My left knee hurts when I walk.' },
+      {
+        extract: async (message) =>
+          (['site', 'exacerbating'] as const).map((slot) => ({
+            slot,
+            value: message.text,
+            status: 'answered' as const,
+            sourceMessageIds: [message.id],
+            quote: message.text,
+          })),
+        select: async (questions) => {
+          offered = questions.map((item) => item.id);
+          return 'Q_REGION_KNEE_ASSOC';
+        },
+      },
+    );
+    expect(offered).toContain('Q_REGION_KNEE_ASSOC');
+    expect(offered).not.toContain('Q_REGION_HIP_ASSOC');
+    expect(result.turn.type).toBe('question');
+    if (result.turn.type === 'question')
+      expect(result.turn.question.id).toBe('Q_REGION_KNEE_ASSOC');
+  });
+
   it('stops on a red flag without calling either LLM step', async () => {
     const completeJson = vi.fn(async () => {
       throw new Error('must not be called');

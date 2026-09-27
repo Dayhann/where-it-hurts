@@ -2,14 +2,39 @@ import { describe, expect, it } from 'vitest';
 import { QuestionBankSchema, questionBank } from '@/server/questions/bank';
 
 describe('B-02 question bank', () => {
-  it('has 34 valid bilingual questions, every history slot, and the mandatory red flags', () => {
-    expect(questionBank).toHaveLength(34);
+  it('has 44 valid bilingual questions, every history slot, and the mandatory red flags', () => {
+    expect(questionBank).toHaveLength(44);
     expect(QuestionBankSchema.parse(questionBank)).toEqual(questionBank);
     expect(
       questionBank
         .filter((question) => question.mandatory)
         .map((question) => question.id),
     ).toEqual(['RF_SADDLE', 'RF_BLADDER', 'RF_BILAT_WEAK', 'RF_FEVER_TRAUMA']);
+  });
+
+  it('has an accompanying-symptoms question for every mapped region group', () => {
+    const groups = [
+      'neck',
+      'chest',
+      'abdomen',
+      'back',
+      'shoulder',
+      'elbow',
+      'wrist',
+      'hip',
+      'knee',
+      'ankle',
+    ];
+    for (const group of groups) {
+      expect(
+        questionBank.some(
+          (question) =>
+            question.slot === 'associated' &&
+            question.appliesTo?.length === 1 &&
+            question.appliesTo[0] === group,
+        ),
+      ).toBe(true);
+    }
   });
 
   it('rejects duplicate IDs and missing history slots', () => {

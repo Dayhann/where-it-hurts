@@ -456,5 +456,105 @@
       "en": "You marked {marked_areas}. Is it worse when you walk or put weight on that foot?",
       "ar": "لقد حددت {marked_areas}. هل يزداد ما تشعر به عند المشي أو تحميل الوزن على تلك القدم؟"
     }
+  },
+  {
+    "id": "Q_REGION_NECK_ASSOC",
+    "slot": "associated",
+    "kind": "open",
+    "appliesTo": ["neck"],
+    "text": {
+      "en": "With the neck problem, have you also noticed a headache, stiffness, or tingling in an arm?",
+      "ar": "مع مشكلة الرقبة، هل لاحظت أيضًا صداعًا أو تيبسًا أو وخزًا في إحدى الذراعين؟"
+    }
+  },
+  {
+    "id": "Q_REGION_CHEST_ASSOC",
+    "slot": "associated",
+    "kind": "open",
+    "appliesTo": ["chest"],
+    "text": {
+      "en": "With the chest problem, have you noticed a cough, difficulty breathing, or discomfort anywhere else?",
+      "ar": "مع مشكلة الصدر، هل لاحظت سعالًا أو صعوبة في التنفس أو انزعاجًا في مكان آخر؟"
+    }
+  },
+  {
+    "id": "Q_REGION_ABDOMEN_ASSOC",
+    "slot": "associated",
+    "kind": "open",
+    "appliesTo": ["abdomen"],
+    "text": {
+      "en": "With the abdominal problem, have you noticed nausea, vomiting, or a change in your bowel movements?",
+      "ar": "مع مشكلة البطن، هل لاحظت غثيانًا أو قيئًا أو تغيرًا في حركة الأمعاء؟"
+    }
+  },
+  {
+    "id": "Q_REGION_BACK_ASSOC",
+    "slot": "associated",
+    "kind": "open",
+    "appliesTo": ["back"],
+    "text": {
+      "en": "With the back problem, have you noticed tingling, numbness, or weakness in a leg?",
+      "ar": "مع مشكلة الظهر، هل لاحظت وخزًا أو خدرًا أو ضعفًا في إحدى الساقين؟"
+    }
+  },
+  {
+    "id": "Q_REGION_SHOULDER_ASSOC",
+    "slot": "associated",
+    "kind": "open",
+    "appliesTo": ["shoulder"],
+    "text": {
+      "en": "With the shoulder problem, have you noticed stiffness, weakness, or trouble reaching overhead?",
+      "ar": "مع مشكلة الكتف، هل لاحظت تيبسًا أو ضعفًا أو صعوبة في رفع الذراع فوق الرأس؟"
+    }
+  },
+  {
+    "id": "Q_REGION_ELBOW_ASSOC",
+    "slot": "associated",
+    "kind": "open",
+    "appliesTo": ["elbow"],
+    "text": {
+      "en": "With the elbow problem, have you noticed swelling, stiffness, or tingling in your hand?",
+      "ar": "مع مشكلة المرفق، هل لاحظت تورمًا أو تيبسًا أو وخزًا في يدك؟"
+    }
+  },
+  {
+    "id": "Q_REGION_WRIST_ASSOC",
+    "slot": "associated",
+    "kind": "open",
+    "appliesTo": ["wrist"],
+    "text": {
+      "en": "With the wrist or hand problem, have you noticed swelling, numbness, tingling, or difficulty gripping?",
+      "ar": "مع مشكلة الرسغ أو اليد، هل لاحظت تورمًا أو خدرًا أو وخزًا أو صعوبة في الإمساك بالأشياء؟"
+    }
+  },
+  {
+    "id": "Q_REGION_HIP_ASSOC",
+    "slot": "associated",
+    "kind": "open",
+    "appliesTo": ["hip"],
+    "text": {
+      "en": "With the hip problem, have you noticed stiffness, a limp, or discomfort in your groin?",
+      "ar": "مع مشكلة الورك، هل لاحظت تيبسًا أو عرجًا أو انزعاجًا في منطقة الفخذ؟"
+    }
+  },
+  {
+    "id": "Q_REGION_KNEE_ASSOC",
+    "slot": "associated",
+    "kind": "open",
+    "appliesTo": ["knee"],
+    "text": {
+      "en": "With the knee problem, have you noticed swelling, locking, or the knee giving way?",
+      "ar": "مع مشكلة الركبة، هل لاحظت تورمًا أو انغلاق الركبة أو شعورًا بأنها تخونك؟"
+    }
+  },
+  {
+    "id": "Q_REGION_ANKLE_ASSOC",
+    "slot": "associated",
+    "kind": "open",
+    "appliesTo": ["ankle"],
+    "text": {
+      "en": "With the ankle or foot problem, have you noticed swelling, bruising, or difficulty walking?",
+      "ar": "مع مشكلة الكاحل أو القدم، هل لاحظت تورمًا أو كدمات أو صعوبة في المشي؟"
+    }
   }
 ]

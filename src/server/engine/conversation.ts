@@ -185,11 +185,16 @@ export function withRecoveredFacts(session: Session): Session {
 }
 
 function fallback(candidates: Question[]): Question | undefined {
-  return [...candidates].sort(
-    (a, b) =>
+  return [...candidates].sort((a, b) => {
+    const priority =
       PRIORITY.indexOf(a.slot as SocratesSlot) -
-      PRIORITY.indexOf(b.slot as SocratesSlot),
-  )[0];
+      PRIORITY.indexOf(b.slot as SocratesSlot);
+    if (priority) return priority;
+    return (
+      Number(Boolean(b.appliesTo?.length)) -
+      Number(Boolean(a.appliesTo?.length))
+    );
+  })[0];
 }
 
 function ask(
@@ -330,7 +335,10 @@ export async function handlePatientMessage(
   )
     ? []
     : candidates.filter((candidate) => candidate.id.startsWith('Q_MARKED_'));
-  const specific = markedCandidates
+  const regionSpecific = candidates.filter((candidate) =>
+    candidate.id.startsWith('Q_REGION_'),
+  );
+  const specific = [...markedCandidates, ...regionSpecific]
     .filter((candidate) => candidate.appliesTo?.length === 1)
     .sort((a, b) => {
       const firstMarkIndex = (question: Question) =>
