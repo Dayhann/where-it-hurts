@@ -3,6 +3,12 @@
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
+import { CopyButton } from '@/components/interior/copy-button';
+import { SegmentedControl } from '@/components/interior/segmented-control';
+import {
+  SkeletonLines,
+  useSkeletonSwap,
+} from '@/components/interior/skeleton-swap';
 import { buttonVariants } from '@/components/ui/button';
 import type { ClinicianSummary, Session, SummaryLine } from '@/contracts/types';
 import { getApiClient } from '@/lib/api-client';
@@ -88,7 +94,6 @@ export function DoctorPanel({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [view, setView] = useState<'front' | 'back'>('front');
-  const [copied, setCopied] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedback, setFeedback] = useState('');
   const [feedbackSent, setFeedbackSent] = useState(false);
@@ -116,15 +121,7 @@ export function DoctorPanel({
     };
   }, [sessionId]);
 
-  const copy = async () => {
-    if (!summary) return;
-    try {
-      await navigator.clipboard.writeText(summaryText(summary));
-      setCopied(true);
-    } catch {
-      setCopied(false);
-    }
-  };
+  const { showSkeleton } = useSkeletonSwap({ ready: !loading });
 
   const sendFeedback = async () => {
     if (!summary?.lines.length || !feedback.trim()) return;
@@ -180,14 +177,17 @@ export function DoctorPanel({
         </header>
 
         <div className="flex flex-1 flex-col gap-5 overflow-y-auto p-4">
-          {loading && <p className="text-muted-foreground">Loading summary…</p>}
+          <p role="status" className="sr-only">
+            {loading ? 'Loading summary' : ''}
+          </p>
+          {showSkeleton && <SkeletonLines lines={6} />}
           {error && (
             <p className="text-destructive" role="alert">
               This summary could not be loaded or updated.
             </p>
           )}
 
-          {summary && session && (
+          {!showSkeleton && summary && session && (
             <>
               {summary.redFlags.length > 0 ? (
                 <section className="rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-destructive">
@@ -274,26 +274,15 @@ export function DoctorPanel({
               <section className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
                   <h3 className="font-semibold">Body map</h3>
-                  <div
-                    className="flex gap-1"
-                    role="group"
-                    aria-label="Body view"
-                  >
-                    {(['front', 'back'] as const).map((side) => (
-                      <button
-                        key={side}
-                        type="button"
-                        onClick={() => setView(side)}
-                        aria-pressed={view === side}
-                        className={buttonVariants({
-                          variant: view === side ? 'default' : 'outline',
-                          size: 'sm',
-                        })}
-                      >
-                        {side === 'front' ? 'Front' : 'Back'}
-                      </button>
-                    ))}
-                  </div>
+                  <SegmentedControl
+                    label="Body view"
+                    value={view}
+                    onValueChange={setView}
+                    options={[
+                      { value: 'front', label: 'Front' },
+                      { value: 'back', label: 'Back' },
+                    ]}
+                  />
                 </div>
                 <div className="flex h-44 items-center justify-center overflow-hidden rounded-lg border border-border bg-muted">
                   {snapshot ? (
@@ -409,19 +398,18 @@ export function DoctorPanel({
             </label>
           )}
           <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
+            <CopyButton
+              value={summary ? summaryText(summary) : ''}
               disabled={!summary}
-              onClick={() => void copy()}
-              className={buttonVariants({ variant: 'outline' })}
-            >
-              {copied ? 'Copied' : 'Copy to notes'}
-            </button>
+              label="Copy to notes"
+              copiedLabel="Copied"
+              errorLabel="Copy failed"
+            />
             <button
               type="button"
               disabled={!summary?.lines.length}
               onClick={() => setShowFeedback((shown) => !shown)}
-              className={buttonVariants({ variant: 'outline' })}
+              className={cn(buttonVariants({ variant: 'outline' }))}
             >
               {feedbackSent ? 'Feedback sent' : 'Flag inaccuracy'}
             </button>

@@ -22,6 +22,7 @@ import {
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import * as THREE from 'three';
 import { patientCopy } from '@/components/i18n/patient';
+import { SegmentedControl } from '@/components/interior/segmented-control';
 import { REGION_BY_ID, REGIONS } from '@/contracts/regions';
 import type { BodyMark, Lang } from '@/contracts/types';
 import { buttonVariants } from '@/components/ui/button';
@@ -341,34 +342,17 @@ export default function BodyViewer({
   return (
     <div className="flex flex-col gap-3">
       {!compact && (
-        <div
-          className="grid grid-cols-2 gap-2"
-          role="group"
-          aria-label={copy.marking}
-        >
-          {MARK_KINDS.map((k) => (
-            <button
-              key={k}
-              type="button"
-              onClick={() => setKind(k)}
-              aria-pressed={kind === k}
-              className={cn(
-                buttonVariants({
-                  variant: kind === k ? 'default' : 'outline',
-                  size: 'touch',
-                }),
-                'justify-start text-lg',
-              )}
-            >
-              <span
-                aria-hidden
-                className="size-3 shrink-0 rounded-full"
-                style={{ backgroundColor: COLORS[k] }}
-              />
-              {kindLabel[k]}
-            </button>
-          ))}
-        </div>
+        <SegmentedControl
+          label={copy.marking}
+          size="touch"
+          value={kind}
+          onValueChange={setKind}
+          options={MARK_KINDS.map((k) => ({
+            value: k,
+            label: kindLabel[k],
+            swatch: COLORS[k],
+          }))}
+        />
       )}
 
       <div className="relative overflow-hidden rounded-xl border border-border bg-muted">

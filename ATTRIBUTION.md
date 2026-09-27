@@ -29,9 +29,10 @@ This prototype is **not clinical guidance**.
 
 ## Copied UI components
 
-| Component                      | Licence                                      | Source and notes                                                                                                                                                                                                     |
-| ------------------------------ | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Hook Sidebar, Animated Counter | MIT + Commons Clause + Attribution (Rare UI) | [Rare UI](https://rareui.com) by Swami Malode ([swamimalode07/rare-ui](https://github.com/swamimalode07/rare-ui)). Copied into `src/components/ui/`, notice kept in each file. Visible credit link on the home page. |
+| Component                                                       | Licence                                      | Source and notes                                                                                                                                                                                                                                             |
+| --------------------------------------------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Hook Sidebar, Animated Counter                                  | MIT + Commons Clause + Attribution (Rare UI) | [Rare UI](https://rareui.com) by Swami Malode ([swamimalode07/rare-ui](https://github.com/swamimalode07/rare-ui)). Copied into `src/components/ui/`, notice kept in each file. Visible credit link on the home page.                                         |
+| Typing Indicator, Segmented Control, Copy Button, Skeleton Swap | MIT (interior.dev)                           | [interior.dev](https://www.interior.dev) by ozzy ([ddoemonn/interior](https://github.com/ddoemonn/interior)). Adapted into `src/components/interior/` with our theme tokens and 44px patient targets; MIT licence text in `src/components/interior/LICENSE`. |
 
 ## Tooling
 

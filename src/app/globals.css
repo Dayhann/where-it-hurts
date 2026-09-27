@@ -195,16 +195,6 @@
       opacity: 0;
     }
   }
-
-  .wait-pulse {
-    animation: wait-pulse 900ms linear infinite;
-  }
-}
-
-@keyframes wait-pulse {
-  50% {
-    opacity: 0.45;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -218,9 +208,5 @@
   .scrim-in {
     transition: opacity 200ms ease;
     transform: none;
-  }
-
-  .wait-pulse {
-    animation: none;
   }
 }
