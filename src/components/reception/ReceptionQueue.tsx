@@ -131,8 +131,8 @@ export function ReceptionQueue() {
       </header>
 
       <dl className="grid grid-cols-2 gap-5">
-        <div className="rounded-2xl border border-border bg-card p-6 shadow-[var(--elevation-1)]">
-          <dt className="text-sm text-muted-foreground">Checked in</dt>
+        <div className="border-t-2 border-foreground/80 pt-5">
+          <dt className="label-caps">Checked in</dt>
           <dd>
             <ValueFlash
               value={items.length}
@@ -141,8 +141,8 @@ export function ReceptionQueue() {
             />
           </dd>
         </div>
-        <div className="rounded-xl border border-border bg-card p-4">
-          <dt className="text-sm text-muted-foreground">Red flags</dt>
+        <div className="border-t-2 border-foreground/80 pt-5">
+          <dt className="label-caps">Red flags</dt>
           <dd>
             <ValueFlash
               value={redFlags}
@@ -173,7 +173,7 @@ export function ReceptionQueue() {
 
       {error && (
         <p
-          className="rounded-lg bg-destructive/10 p-3 text-destructive"
+          className="border-l-2 border-destructive bg-destructive/8 p-3 text-destructive"
           role="alert"
         >
           The queue could not be refreshed. The last update remains visible.
@@ -181,7 +181,7 @@ export function ReceptionQueue() {
       )}
 
       <section
-        className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--elevation-1)]"
+        className="relative overflow-hidden border-t-2 border-foreground/80"
         aria-label="Today's check-ins"
       >
         <NewItemsPill
@@ -220,7 +220,7 @@ export function ReceptionQueue() {
                   </div>
                   <span
                     className={cn(
-                      'rounded-full px-3.5 py-1.5 text-sm font-semibold',
+                      'label-caps px-2.5 py-1.5',
                       item.redFlag
                         ? 'bg-destructive text-white'
                         : item.status === 'confirmed'

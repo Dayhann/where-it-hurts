@@ -49,32 +49,46 @@
 }
 
 :root {
-  /* Calm clinical tokens: warm paper, deep ink, one restrained petrol accent.
-     Red is reserved exclusively for clinical alarm — never decoration. */
-  --background: oklch(0.982 0.006 80);
-  --foreground: oklch(0.26 0.012 250);
-  --card: oklch(0.996 0.003 80);
-  --card-foreground: oklch(0.26 0.012 250);
-  --popover: oklch(0.998 0.002 80);
-  --popover-foreground: oklch(0.26 0.012 250);
-  --primary: oklch(0.38 0.062 200);
-  --primary-foreground: oklch(0.99 0.004 80);
-  --secondary: oklch(0.958 0.008 80);
-  --secondary-foreground: oklch(0.26 0.012 250);
-  --muted: oklch(0.956 0.008 80);
-  --muted-foreground: oklch(0.52 0.014 250);
-  --accent: oklch(0.945 0.016 200);
-  --accent-foreground: oklch(0.32 0.05 200);
-  --destructive: oklch(0.55 0.19 25);
-  --border: oklch(0.918 0.007 80);
-  --input: oklch(0.905 0.008 80);
-  --ring: oklch(0.38 0.062 200);
+  /* Bone and ink, with bronze as a trace element.
+
+     Warm bone paper instead of white, and a near-black warm ink that does
+     the heavy lifting — a black mark on bone is the oldest luxury signal
+     there is, and it is nowhere near the teal/emerald default.
+
+     Bronze appears only in small doses (--gold) for rules and detail. It is
+     deliberately not the button colour: a mid-brown fill reads muddy at
+     scale, where near-black reads considered.
+
+     Red remains reserved exclusively for clinical alarm — never decoration. */
+  --background: oklch(0.963 0.009 84);
+  --foreground: oklch(0.185 0.009 55);
+  --card: oklch(0.982 0.007 84);
+  --card-foreground: oklch(0.185 0.009 55);
+  --popover: oklch(0.99 0.005 84);
+  --popover-foreground: oklch(0.185 0.009 55);
+  --primary: oklch(0.205 0.012 55);
+  --primary-foreground: oklch(0.968 0.009 84);
+  --secondary: oklch(0.925 0.01 84);
+  --secondary-foreground: oklch(0.185 0.009 55);
+  --muted: oklch(0.928 0.009 84);
+  --muted-foreground: oklch(0.455 0.014 60);
+  --accent: oklch(0.908 0.021 74);
+  --accent-foreground: oklch(0.3 0.05 62);
+  --destructive: oklch(0.485 0.198 27);
+  --border: oklch(0.868 0.011 80);
+  --input: oklch(0.85 0.012 80);
+  --ring: oklch(0.205 0.012 55);
+
+  /* Bronze. Used for hairline detail and small marks, never large fills. */
+  --gold: oklch(0.55 0.072 68);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --radius: 0.75rem;
+  /* Squared off. Structure comes from hairline rules, type and negative
+     space rather than from a pill outline around every element. */
+  --radius: 0.125rem;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
@@ -89,17 +103,17 @@
   --space-6: 3rem; /* 48px — between major sections      */
   --space-8: 4rem; /* 64px — page top/bottom breathing   */
 
-  /* Elevation — layered, low-opacity, tinted with the ink colour so shadows
-     read as depth rather than grey haze. */
-  --elevation-1:
-    0 1px 2px oklch(0.26 0.012 250 / 0.04),
-    0 1px 3px oklch(0.26 0.012 250 / 0.03);
-  --elevation-2:
-    0 2px 4px oklch(0.26 0.012 250 / 0.04),
-    0 6px 16px oklch(0.26 0.012 250 / 0.05);
-  --elevation-3:
-    0 4px 8px oklch(0.26 0.012 250 / 0.05),
-    0 16px 40px oklch(0.26 0.012 250 / 0.08);
+  /* Elevation is almost entirely retired. A shadow under every card is the
+     fastest way to make an interface look generated. Only genuinely floating
+     things — the drawer, a popover — get one, and even then it is a wide,
+     soft shade rather than a glow. */
+  --elevation-1: none;
+  --elevation-2: 0 1px 2px oklch(0.205 0.008 60 / 0.05);
+  --elevation-3: 0 24px 60px -12px oklch(0.205 0.008 60 / 0.18);
+
+  /* Hairline rule — the main structural device in place of card borders. */
+  --rule: 1px solid oklch(0.205 0.008 60 / 0.12);
+  --rule-strong: 1px solid oklch(0.205 0.008 60 / 0.22);
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -160,13 +174,20 @@
 }
 
 @layer components {
+  /* Display type carries the hierarchy. A high-contrast serif set large and
+     tight against a neutral UI sans does the work that a bordered card was
+     doing before. */
   .display-title {
-    letter-spacing: -0.022em;
-    line-height: 1.12;
-    font-weight: 600;
-    /* Optical balance: large type reads heavier, so pull the colour back a
-       touch rather than sitting at full ink. */
-    color: oklch(0.24 0.014 250);
+    font-family: var(--font-display), Georgia, serif;
+    font-weight: 400;
+    letter-spacing: -0.012em;
+    line-height: 1.04;
+    color: oklch(0.185 0.01 60);
+  }
+
+  /* Optional italic for a single emphasised word in a heading. */
+  .display-title em {
+    font-style: italic;
   }
 
   /* Vertical rhythm ------------------------------------------------------ */
@@ -188,16 +209,35 @@
 
   /* Surfaces ------------------------------------------------------------- */
 
+  /* A "surface" is no longer a floating rounded box. It is a block of
+     content separated by a hairline and space — the way a printed page
+     separates things. */
   .surface {
-    background-color: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-xl);
-    padding: var(--space-3);
-    box-shadow: var(--elevation-1);
+    border-block-start: var(--rule);
+    padding-block: var(--space-3);
   }
 
-  .surface-raised {
-    box-shadow: var(--elevation-2);
+  /* Use where a block genuinely needs to read as a distinct panel. Still
+     square, still flat, just tinted. */
+  .surface-panel {
+    background-color: var(--card);
+    border: var(--rule);
+    padding: var(--space-3);
+  }
+
+  /* Rules ---------------------------------------------------------------- */
+
+  .rule-top {
+    border-block-start: var(--rule);
+  }
+
+  .rule-bottom {
+    border-block-end: var(--rule);
+  }
+
+  /* A list where each row is divided by a hairline rather than boxed. */
+  .divide-rule > * + * {
+    border-block-start: var(--rule);
   }
 
   /* Readability ---------------------------------------------------------- */
@@ -213,13 +253,24 @@
     letter-spacing: 0.004em;
   }
 
-  /* Eyebrow / section label above a heading. */
+  /* Eyebrow / section label above a heading. Set in the UI sans, widely
+     tracked, in muted ink rather than the accent — the accent is spent on
+     one thing per screen. */
   .eyebrow {
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.09em;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--primary);
+    color: var(--gold);
+  }
+
+  /* Small caps label used on the clinic side for column headings. */
+  .label-caps {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
   }
 
   /* Interaction ---------------------------------------------------------- */

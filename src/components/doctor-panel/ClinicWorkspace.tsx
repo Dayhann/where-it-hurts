@@ -67,20 +67,20 @@ export function ClinicWorkspace() {
       </header>
 
       {error && (
-        <p className="rounded-lg bg-destructive/10 p-4 text-destructive">
+        <p className="border-l-2 border-destructive bg-destructive/8 p-4 text-destructive">
           Today&apos;s appointments could not be loaded.
         </p>
       )}
 
       <div className="grid flex-1 gap-6 md:grid-cols-[19rem_1fr]">
-        <aside className="h-fit rounded-2xl border border-border bg-card shadow-[var(--elevation-1)]">
-          <h2 className="border-b border-border px-5 py-4 text-sm font-semibold tracking-wide text-muted-foreground uppercase">
+        <aside className="h-fit border-t-2 border-foreground/80">
+          <h2 className="label-caps border-b border-border py-4">
             Today&apos;s patients
           </h2>
           {loading ? (
-            <p className="p-5 text-muted-foreground">Loading appointments…</p>
+            <p className="py-5 text-muted-foreground">Loading appointments…</p>
           ) : items.length === 0 ? (
-            <p className="p-5 text-muted-foreground">
+            <p className="py-5 text-muted-foreground">
               No appointments scheduled.
             </p>
           ) : (
@@ -90,7 +90,7 @@ export function ClinicWorkspace() {
                   This strip restores the at-a-glance alarm that the list
                   itself can no longer carry, and jumps straight to them. */}
               {items.some((item) => item.redFlag) && (
-                <div className="border-b border-border p-3">
+                <div className="border-b border-border py-3">
                   {items
                     .filter((item) => item.redFlag)
                     .map((item) => (
@@ -98,12 +98,12 @@ export function ClinicWorkspace() {
                         key={item.sessionId}
                         type="button"
                         onClick={() => setSelectedId(item.sessionId)}
-                        className="pressable flex w-full items-center justify-between gap-3 rounded-lg bg-destructive/10 px-3 py-3 text-left hover:bg-destructive/15"
+                        className="pressable flex w-full items-center justify-between gap-3 border-l-2 border-destructive bg-destructive/8 py-3 pr-3 pl-3 text-left hover:bg-destructive/14"
                       >
                         <span className="font-semibold text-destructive">
                           {item.patientDisplayName}
                         </span>
-                        <span className="rounded-full bg-destructive px-2.5 py-1 text-xs font-semibold tracking-wide text-background uppercase">
+                        <span className="label-caps bg-destructive px-2 py-1 text-background!">
                           Red flag
                         </span>
                       </button>
@@ -112,7 +112,7 @@ export function ClinicWorkspace() {
               )}
               <HookSidebar
                 aria-label="Today's patients"
-                className="p-4"
+                className="py-4"
                 color="var(--primary)"
                 value={items.findIndex((item) => item.sessionId === selectedId)}
                 onChange={(index) => setSelectedId(items[index].sessionId)}
@@ -130,7 +130,7 @@ export function ClinicWorkspace() {
           )}
         </aside>
 
-        <section className="flex flex-col gap-6 rounded-2xl border border-border bg-card p-7 shadow-[var(--elevation-1)]">
+        <section className="flex flex-col gap-7 border-t-2 border-foreground/80 pt-6">
           {selected ? (
             <>
               <div className="flex flex-wrap items-start justify-between gap-4">
@@ -138,10 +138,10 @@ export function ClinicWorkspace() {
                   <p className="text-sm text-muted-foreground">
                     {appointmentTime(selected.startsAt)} phone consultation
                   </p>
-                  <h2 className="flex items-center gap-2 text-xl font-semibold">
+                  <h2 className="display-title flex items-center gap-3 text-[1.625rem]">
                     {selected.patientDisplayName}
                     {selected.redFlag && (
-                      <span className="rounded-full bg-destructive/10 px-2 py-1 text-xs font-semibold text-destructive">
+                      <span className="label-caps bg-destructive px-2 py-1 text-background!">
                         Red flag
                       </span>
                     )}
@@ -159,9 +159,9 @@ export function ClinicWorkspace() {
                 </button>
               </div>
               <label className="flex flex-1 flex-col gap-2">
-                <span className="font-semibold">Consult notes</span>
+                <span className="label-caps">Consult notes</span>
                 <textarea
-                  className="min-h-80 flex-1 resize-none rounded-lg border border-input bg-background p-4 outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                  className="min-h-80 flex-1 resize-none border border-input bg-card p-4 outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                   placeholder="Record notes during the consultation…"
                 />
               </label>

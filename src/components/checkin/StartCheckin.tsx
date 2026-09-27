@@ -5,9 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { patientCopy } from '@/components/i18n/patient';
 import { LoadingButton } from '@/components/interior/loading-button';
-import { TextReveal } from '@/components/interior/text-reveal';
 import { buttonVariants } from '@/components/ui/button';
-import FluidOrb from '@/components/ui/fluid-orb';
 import { getApiClient } from '@/lib/api-client';
 import { cn } from '@/lib/utils';
 
@@ -38,26 +36,21 @@ export function StartCheckin() {
 
   return (
     <main className="flex flex-1 flex-col justify-center py-4 [&>*+*]:mt-10">
+      {/* No decorative gradient, no character-by-character reveal. The
+          heading is legible the instant the page paints — which matters
+          when the reader is in pain — and the serif/sans contrast carries
+          the tone instead. */}
       <header className="flex flex-col">
-        <FluidOrb size={140} color="#23636B" className="mb-8 self-center" />
         <p className="eyebrow">{copy.home.badge}</p>
-        <h1 className="display-title mt-4 text-[2rem] sm:text-4xl">
-          <TextReveal
-            text={copy.home.title}
-            by="character"
-            className="text-foreground!"
-          />
+        <h1 className="display-title mt-5 text-[2.75rem] sm:text-[3.5rem]">
+          {copy.home.title}
         </h1>
-        <p className="measure body-copy mt-4 text-muted-foreground">
-          <TextReveal
-            text={copy.home.description}
-            by="word"
-            className="text-muted-foreground!"
-          />
+        <p className="measure body-copy mt-5 text-muted-foreground">
+          {copy.home.description}
         </p>
       </header>
 
-      <label className="surface flex min-h-14 cursor-pointer items-center gap-4 transition-colors hover:bg-muted/40">
+      <label className="flex min-h-14 cursor-pointer items-center gap-4 border-y border-border py-4 transition-colors hover:bg-muted/40">
         <input
           type="checkbox"
           checked={carerMode}
@@ -82,7 +75,7 @@ export function StartCheckin() {
           pendingLabel={copy.home.starting}
           successLabel={copy.home.opening}
           errorLabel={copy.recap.retry}
-          className="h-14! w-full rounded-xl! border-primary! bg-primary! text-lg! shadow-[var(--elevation-2)] hover:bg-primary/90! [&>span>span]:text-primary-foreground!"
+          className="h-14! w-full rounded-none! border-primary! bg-primary! text-base! tracking-[0.02em]! hover:bg-primary/90! [&>span>span]:text-primary-foreground!"
         >
           {copy.home.start}
         </LoadingButton>

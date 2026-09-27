@@ -61,7 +61,7 @@ const COPY = {
       showFull: 'Show the full body map',
       undo: 'Undo last change',
       clear: 'Clear all marks',
-      holdClear: 'Hold to clear all marks',
+      holdClear: 'Hold to clear all',
       cleared: 'Marks cleared',
       sliderLabel: 'How bad is it',
       noPainShort: 'No pain',
