@@ -61,7 +61,7 @@ export function ReceptionQueue() {
         </div>
         <Link
           href="/"
-          className={buttonVariants({ variant: 'outline', size: 'sm' })}
+          className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}
         >
           Exit demo
         </Link>

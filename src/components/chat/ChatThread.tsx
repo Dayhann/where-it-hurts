@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { patientCopy } from '@/components/i18n/patient';
+import { TypingIndicator } from '@/components/interior/typing-indicator';
 import type { Lang, Message } from '@/contracts/types';
 import { cn } from '@/lib/utils';
 
@@ -45,12 +46,12 @@ export function ChatThread({
         );
       })}
       {typing && (
-        <p
-          className="wait-pulse me-auto rounded-2xl bg-secondary px-4 py-3 text-lg text-muted-foreground"
-          aria-label={copy.waiting}
-        >
-          …
-        </p>
+        <TypingIndicator
+          active
+          label={copy.waiting}
+          size={48}
+          className="me-auto"
+        />
       )}
       <div ref={endRef} />
     </div>

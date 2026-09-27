@@ -6,6 +6,7 @@ import type { GetClinicQueueResponse } from '@/contracts/api';
 import { buttonVariants } from '@/components/ui/button';
 import { HookSidebar } from '@/components/ui/hook-sidebar';
 import { getApiClient } from '@/lib/api-client';
+import { cn } from '@/lib/utils';
 import { DoctorPanel } from './DoctorPanel';
 
 type QueueItem = GetClinicQueueResponse['items'][number];
@@ -61,7 +62,7 @@ export function ClinicWorkspace() {
         </div>
         <Link
           href="/"
-          className={buttonVariants({ variant: 'outline', size: 'sm' })}
+          className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}
         >
           Exit demo
         </Link>
