@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { patientCopy } from '@/components/i18n/patient';
 import { LoadingButton } from '@/components/interior/loading-button';
-import { FigureMark } from '@/components/layout/FigureMark';
+import { StepCard } from '@/components/layout/StepCard';
 import { buttonVariants } from '@/components/ui/button';
 import { getApiClient } from '@/lib/api-client';
 import { cn } from '@/lib/utils';
@@ -37,39 +37,12 @@ export function StartCheckin() {
 
   return (
     <main className="flex flex-1 flex-col py-2 [&>*+*]:mt-7">
-      <header className="flex flex-col">
-        <p className="text-base text-muted-foreground">{copy.home.greeting}</p>
-        <h1 className="display-title mt-1 text-[2.125rem]">
-          {copy.home.title}
-        </h1>
-      </header>
-
-      {/* Step card: numbered badge, step name, serif heading, body copy and
-          a figure thumbnail that doubles as the affordance into the flow. */}
-      <section className="surface">
-        <div className="flex items-start gap-5">
-          <div className="flex min-w-0 flex-1 flex-col">
-            <div className="flex items-center gap-2.5">
-              <span
-                aria-hidden
-                className="flex size-6 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground"
-              >
-                1
-              </span>
-              <span className="text-sm font-medium">{copy.home.stepName}</span>
-            </div>
-            <h2 className="display-title mt-3 text-[1.625rem]">
-              {copy.home.stepTitle}
-            </h2>
-            <p className="mt-2.5 text-[0.9375rem] leading-relaxed text-muted-foreground">
-              {copy.home.description}
-            </p>
-          </div>
-          <div className="flex shrink-0 flex-col items-center gap-3 pt-1">
-            <FigureMark className="h-24 w-14 text-muted-foreground/70" />
-          </div>
-        </div>
-      </section>
+      <StepCard
+        step={1}
+        stepName={copy.home.stepName}
+        title={copy.home.stepTitle}
+        body={copy.home.description}
+      />
 
       <label className="card-row cursor-pointer py-3 transition-colors hover:bg-muted/40">
         <input
