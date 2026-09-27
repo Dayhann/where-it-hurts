@@ -13,6 +13,7 @@ export function HeroRidges({ className }: { className?: string }) {
       preserveAspectRatio="none"
       aria-hidden
       className={className}
+      overflow="hidden"
     >
       <defs>
         <linearGradient id="hero-sky" x1="0" y1="0" x2="0" y2="1">
@@ -29,24 +30,28 @@ export function HeroRidges({ className }: { className?: string }) {
 
       <rect width="390" height="190" fill="url(#hero-sky)" />
 
-      {/* Farthest ridge — palest, lowest contrast. */}
-      <path
-        d="M0 118 58 74l34 26 40-38 52 44 44-30 60 48 42-26 20 14v70H0Z"
-        fill="oklch(0.6 0.03 155)"
-        opacity="0.3"
-      />
-      {/* Middle ridge. */}
-      <path
-        d="M0 142 46 104l40 30 46-24 42 34 56-28 54 40 66-30v124H0Z"
-        fill="oklch(0.47 0.038 152)"
-        opacity="0.42"
-      />
-      {/* Nearest ridge — darkest, most defined. */}
-      <path
-        d="M0 176 70 132l38 26 54-18 48 30 62-22 58 32 60-18v58H0Z"
-        fill="oklch(0.345 0.035 148)"
-        opacity="0.55"
-      />
+      {/* Extra width so a few pixels of drift never flash the sky at an edge. */}
+      <g className="ridge-far">
+        <path
+          d="M-40 124 58 74l34 26 40-38 52 44 44-30 60 48 42-26 60 18v70H-40Z"
+          fill="oklch(0.6 0.03 155)"
+          opacity="0.3"
+        />
+      </g>
+      <g className="ridge-mid">
+        <path
+          d="M-40 150 46 104l40 30 46-24 42 34 56-28 54 40 106-38v124H-40Z"
+          fill="oklch(0.47 0.038 152)"
+          opacity="0.42"
+        />
+      </g>
+      <g className="ridge-near">
+        <path
+          d="M-40 184 70 132l38 26 54-18 48 30 62-22 58 32 100-22v58H-40Z"
+          fill="oklch(0.345 0.035 148)"
+          opacity="0.55"
+        />
+      </g>
 
       <rect width="390" height="190" fill="url(#hero-fade)" />
     </svg>

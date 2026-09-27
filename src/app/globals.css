@@ -311,6 +311,50 @@
       );
   }
 
+  /* Parallax drift: nearer ridges travel further and faster, so the band
+     reads as depth. Plain ease-in-out rather than --ease-in-out: the strong
+     curve parks each layer at its ends for most of a long cycle, which reads
+     as frozen. Distances are SVG user units; the paths overhang by 40 so no
+     edge is ever exposed. */
+  .ridge-far {
+    animation: ridge-far 18s ease-in-out infinite alternate;
+  }
+
+  .ridge-mid {
+    animation: ridge-mid 13s ease-in-out infinite alternate;
+  }
+
+  .ridge-near {
+    animation: ridge-near 9s ease-in-out infinite alternate;
+  }
+
+  @keyframes ridge-far {
+    from {
+      transform: translateX(-10px);
+    }
+    to {
+      transform: translateX(10px);
+    }
+  }
+
+  @keyframes ridge-mid {
+    from {
+      transform: translateX(18px);
+    }
+    to {
+      transform: translateX(-18px);
+    }
+  }
+
+  @keyframes ridge-near {
+    from {
+      transform: translateX(-28px);
+    }
+    to {
+      transform: translateX(28px);
+    }
+  }
+
   /* Rules ---------------------------------------------------------------- */
 
   .rule-top {
@@ -555,5 +599,11 @@
     opacity: 0;
     transform: none;
     transition: opacity 200ms ease;
+  }
+
+  .ridge-far,
+  .ridge-mid,
+  .ridge-near {
+    animation: none;
   }
 }

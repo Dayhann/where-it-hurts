@@ -1,10 +1,8 @@
 import { ArrowRight } from 'lucide-react';
-import { FigureMark } from './FigureMark';
 
 /**
- * The step card from the design reference: a numbered badge and step name on
- * one line, a heading, the instructions, and a right-hand column
- * holding the figure thumbnail and a forward arrow.
+ * The step card: a numbered badge and step name on one line, a heading,
+ * the instructions, and a forward arrow.
  */
 export function StepCard({
   step,
@@ -38,11 +36,9 @@ export function StepCard({
           </p>
         </div>
 
-        <FigureMark className="mt-1 h-24 w-12 shrink-0 text-strong/60" />
-
         <ArrowRight
           aria-hidden
-          className="mt-14 size-5 shrink-0 text-strong rtl:-scale-x-100"
+          className="mt-8 size-5 shrink-0 text-strong rtl:-scale-x-100"
         />
       </div>
     </section>

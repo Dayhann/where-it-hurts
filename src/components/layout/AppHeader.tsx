@@ -44,7 +44,7 @@ export function AppHeader({
   }).format(today);
 
   return (
-    <div className="relative -mx-5 -mt-8 px-5 pt-8 pb-12 sm:-mx-8 sm:-mt-12 sm:px-8 sm:pt-12">
+    <div className="relative -mx-5 -mt-8 overflow-hidden px-5 pt-8 pb-12 sm:-mx-8 sm:-mt-12 sm:px-8 sm:pt-12">
       <HeroRidges className="pointer-events-none absolute inset-0 -z-10 h-full w-full" />
       <div className="relative flex items-start justify-between gap-4">
         <div className="flex flex-col gap-1.5">
