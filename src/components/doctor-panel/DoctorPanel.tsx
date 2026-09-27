@@ -63,20 +63,18 @@ function SummaryQuoteLine({
         type="button"
         onClick={onToggle}
         aria-expanded={open}
-        className="pressable w-full rounded-xl border border-border bg-card p-4 text-left leading-snug font-semibold shadow-[var(--elevation-1)] hover:bg-muted"
+        className="pressable w-full border-b border-border bg-transparent py-4 pe-2 text-left leading-snug font-medium hover:bg-muted/50"
       >
         <span>{line.text}</span>
         {!line.verified && (
-          <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-900">
+          <span className="label-caps ms-2 bg-accent px-2 py-1 text-accent-foreground!">
             Unverified
           </span>
         )}
       </button>
       {open && (
-        <div className="enter-fade mt-2 origin-top rounded-xl border border-border bg-popover p-4 shadow-[var(--elevation-2)]">
-          <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-            Patient&apos;s words
-          </p>
+        <div className="enter-fade mt-2 origin-top rounded-xs border border-border bg-popover p-4">
+          <p className="label-caps">Patient&apos;s words</p>
           {line.quotes.map((quote, quoteIndex) => (
             <blockquote
               key={`${lineIndex}-${quoteIndex}`}
@@ -173,10 +171,11 @@ export function DoctorPanel({
       >
         <header className="flex items-center justify-between border-b border-border px-6 py-5">
           <div>
-            <p className="text-sm font-medium text-muted-foreground">
-              Pre-consult check-in
-            </p>
-            <h2 id="summary-panel-title" className="text-xl font-semibold">
+            <p className="eyebrow">Pre-consult check-in</p>
+            <h2
+              id="summary-panel-title"
+              className="display-title mt-1 text-[1.5rem]"
+            >
               Patient summary
             </h2>
           </div>
@@ -203,7 +202,7 @@ export function DoctorPanel({
           {summary &&
             session &&
             (summary.redFlags.length > 0 ? (
-              <section className="rounded-xl border border-destructive/40 bg-destructive/10 p-4 text-destructive">
+              <section className="border-l-2 border-destructive bg-destructive/8 p-4 text-destructive">
                 <h3 className="font-semibold">Red flag reported</h3>
                 <ul className="mt-1 list-disc pl-5">
                   {summary.redFlags.map((hit) => (
@@ -214,15 +213,13 @@ export function DoctorPanel({
                 </ul>
               </section>
             ) : (
-              <p className="rounded-xl bg-muted p-4 font-medium">
+              <p className="rounded-xs bg-muted p-4 font-medium">
                 No red flags reported
               </p>
             ))}
 
           <section>
-            <h3 className="text-sm font-semibold tracking-wide text-muted-foreground uppercase">
-              Headline
-            </h3>
+            <h3 className="label-caps">Headline</h3>
             <SkeletonSwap
               ready={!loading}
               lines={3}
@@ -310,7 +307,7 @@ export function DoctorPanel({
                     ]}
                   />
                 </div>
-                <div className="flex h-44 items-center justify-center overflow-hidden rounded-lg border border-border bg-muted">
+                <div className="flex h-44 items-center justify-center overflow-hidden rounded-xs border border-border bg-muted">
                   {snapshot ? (
                     snapshotAspect ? (
                       <GridReveal
@@ -338,7 +335,7 @@ export function DoctorPanel({
                       summary.notAsked.map((slot) => (
                         <span
                           key={slot}
-                          className="rounded-full bg-muted px-2 py-1 text-sm"
+                          className="border border-border bg-muted px-2 py-1 text-sm"
                         >
                           {slot.replaceAll('_', ' ')}
                         </span>
@@ -357,7 +354,7 @@ export function DoctorPanel({
                       summary.unsure.map((slot) => (
                         <span
                           key={slot}
-                          className="rounded-full bg-muted px-2 py-1 text-sm"
+                          className="border border-border bg-muted px-2 py-1 text-sm"
                         >
                           {slot.replaceAll('_', ' ')}
                         </span>
@@ -388,7 +385,7 @@ export function DoctorPanel({
 
               <Accordion
                 maxPanelHeight={260}
-                className="shrink-0 rounded-lg! border-border! bg-card! shadow-none! [&_button]:min-h-11 [&_button>span]:text-sm! [&_button>span:first-child]:text-base! [&_button>span:first-child]:font-semibold! [&_button>span:first-child]:text-foreground!"
+                className="shrink-0 rounded-xs! border-border! bg-card! shadow-none! [&_button]:min-h-11 [&_button>span]:text-sm! [&_button>span:first-child]:text-base! [&_button>span:first-child]:font-semibold! [&_button>span:first-child]:text-foreground!"
                 items={[
                   {
                     id: 'transcript',
@@ -424,7 +421,7 @@ export function DoctorPanel({
                 value={feedback}
                 onChange={(event) => setFeedback(event.target.value)}
                 rows={2}
-                className="rounded-lg border border-input bg-background p-2"
+                className="rounded-xs border border-input bg-background p-2"
               />
               <button
                 type="button"

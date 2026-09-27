@@ -55,13 +55,17 @@ const PRESETS = {
 
 type Preset = keyof typeof PRESETS;
 
+/* Warm stone figure on bone paper, to sit inside the new palette rather
+   than the old blue-grey. Pain stays a true clinical red and spread an
+   amber — those two must remain unambiguous, so they are the only
+   saturated colours in the scene. */
 const COLORS = {
-  skin: '#b9bec4',
-  hover: '#d3d7db',
-  eyes: '#7f868d',
-  outline: '#f7f5f0',
-  pain: '#e5566f',
-  spread: '#f29a3a',
+  skin: '#c2bbae',
+  hover: '#d6cfc2',
+  eyes: '#8a8377',
+  outline: '#f7f4ec',
+  pain: '#b3342f',
+  spread: '#c8862c',
 } as const;
 
 const MARK_KINDS: MarkKind[] = ['pain', 'spread'];
@@ -357,7 +361,7 @@ export default function BodyViewer({
         />
       )}
 
-      <div className="body-canvas-scroll-safe relative overflow-hidden rounded-2xl border border-border bg-muted shadow-[var(--elevation-1)]">
+      <div className="body-canvas-scroll-safe relative overflow-hidden rounded-xs border border-border bg-muted">
         <div
           role="img"
           aria-label={compact ? copy.thumbnail : copy.interactive}
@@ -379,8 +383,8 @@ export default function BodyViewer({
             gl={{ preserveDrawingBuffer: true, antialias: true }}
             dpr={[1, 1.5]}
           >
-            <color attach="background" args={['#f3efe6']} />
-            <hemisphereLight args={['#f7f3ea', '#b7c0c7', 1.15]} />
+            <color attach="background" args={['#efe9dc']} />
+            <hemisphereLight args={['#faf6ec', '#c0b8a8', 1.15]} />
             <directionalLight position={[2.2, 4, 2.5]} intensity={1.15} />
             <directionalLight position={[-2, 1.5, -1.5]} intensity={0.35} />
             <Suspense fallback={null}>
@@ -425,12 +429,12 @@ export default function BodyViewer({
           </Canvas>
         </div>
         {hoveredLabel && !compact && (
-          <p className="pointer-events-none absolute top-2 left-2 rounded-md bg-background/90 px-2 py-1 text-lg shadow-sm">
+          <p className="pointer-events-none absolute top-2 left-2 rounded-xs bg-background/90 px-2 py-1 text-lg">
             {hoveredLabel}
           </p>
         )}
         {calibrate && !compact && (
-          <p className="absolute right-2 bottom-2 rounded-md bg-background/90 px-2 py-1 text-lg shadow-sm">
+          <p className="absolute right-2 bottom-2 rounded-xs bg-background/90 px-2 py-1 text-lg">
             {copy.calibration}
           </p>
         )}
@@ -493,7 +497,7 @@ export default function BodyViewer({
                 setSelectedId(null);
                 commit([]);
               }}
-              className="h-11! w-full rounded-lg! border-border! bg-background! text-lg! text-foreground! [&>span.absolute]:bg-primary! [&>span.absolute]:text-primary-foreground!"
+              className="h-11! w-full rounded-xs! border-border! bg-background! text-lg! text-foreground! [&>span.absolute]:bg-primary! [&>span.absolute]:text-primary-foreground!"
             >
               {copy.holdClear}
             </HoldToConfirm>
@@ -554,7 +558,7 @@ export default function BodyViewer({
             )}
 
             {selected && (
-              <div className="flex flex-col gap-2 rounded-xl border border-border bg-background p-3">
+              <div className="flex flex-col gap-2 rounded-xs border border-border bg-background p-3">
                 <p>
                   {REGION_BY_ID[selected.regionId]?.label[lang]}:{' '}
                   {copy.severity}{' '}
@@ -593,7 +597,7 @@ export default function BodyViewer({
             )}
           </section>
 
-          <details className="rounded-xl border border-border bg-background p-3">
+          <details className="rounded-xs border border-border bg-background p-3">
             <summary className="min-h-11 cursor-pointer text-lg font-medium">
               {copy.chooseList}
             </summary>

@@ -104,14 +104,14 @@ export function PatientRecap({
       ) : (
         <div className="flex flex-col gap-4">
           {lines.length === 0 ? (
-            <p className="rounded-2xl border border-border bg-card p-5 shadow-[var(--elevation-1)]">
+            <p className="rounded-xs border border-border bg-card p-5">
               {copy.empty}
             </p>
           ) : (
             lines.map((line, index) => (
               <label
                 key={`${line.slot}-${index}`}
-                className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-5 shadow-[var(--elevation-1)]"
+                className="flex flex-col gap-3 rounded-xs border border-border bg-card p-5"
               >
                 <span className="font-medium">
                   {copy.answer} {index + 1}
@@ -128,7 +128,7 @@ export function PatientRecap({
                       ),
                     );
                   }}
-                  className="min-h-14 resize-y rounded-xl border border-input bg-background px-4 py-3 text-lg leading-relaxed outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                  className="min-h-14 resize-y rounded-xs border border-input bg-background px-4 py-3 text-lg leading-relaxed outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                 />
               </label>
             ))
@@ -148,7 +148,7 @@ export function PatientRecap({
         pendingLabel={copy.sending}
         successLabel={copy.sentShort}
         errorLabel={copy.retry}
-        className="h-14! w-full rounded-xl! border-primary! bg-primary! text-lg! shadow-[var(--elevation-2)] hover:bg-primary/90! [&>span>span]:text-primary-foreground!"
+        className="h-14! w-full rounded-xs! border-primary! bg-primary! text-lg! hover:bg-primary/90! [&>span>span]:text-primary-foreground!"
       >
         {copy.confirm}
       </LoadingButton>

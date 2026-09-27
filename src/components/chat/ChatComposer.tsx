@@ -123,7 +123,7 @@ export function ChatComposer({
               }
             }}
             className={cn(
-              'h-12! rounded-full! px-5! text-lg! leading-7!',
+              'h-12! rounded-none! px-5! text-lg! leading-7!',
               option.id.startsWith('scale_') && 'min-w-11 px-3!',
             )}
           >
@@ -150,13 +150,13 @@ export function ChatComposer({
               void sendText();
             }
           }}
-          className="min-h-14 w-full resize-y rounded-xl border border-input bg-card px-4 py-3 text-lg leading-relaxed outline-none transition-shadow focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+          className="min-h-14 w-full resize-y rounded-xs border border-input bg-card px-4 py-3 text-lg leading-relaxed outline-none transition-shadow focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
         />
       </label>
       {voiceSupported && (
         <MatrixOrb
           size={44}
-          color="#23636B"
+          color="#2E2823"
           state={listening ? 'listening' : disabled ? 'thinking' : 'idle'}
           labels={{
             idle: copy.voiceIdle,
@@ -189,7 +189,7 @@ export function ChatComposer({
           disabled={disabled || text.trim().length === 0}
           onPress={() => void sendText()}
           tintClassName="bg-white/30"
-          className="min-h-12 rounded-xl! border-primary! bg-primary! text-lg! text-primary-foreground!"
+          className="min-h-12 rounded-xs! border-primary! bg-primary! text-lg! text-primary-foreground!"
         >
           {copy.send}
         </Ripple>

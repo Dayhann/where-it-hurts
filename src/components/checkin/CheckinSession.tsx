@@ -211,7 +211,7 @@ export function CheckinSession({ sessionId }: { sessionId: string }) {
             </p>
           )}
           {session?.carerMode && (
-            <p className="mt-4 rounded-lg bg-accent px-4 py-3 text-base text-accent-foreground">
+            <p className="mt-4 rounded-xs bg-accent px-4 py-3 text-base text-accent-foreground">
               {copy.checkin.carerBanner}
             </p>
           )}
