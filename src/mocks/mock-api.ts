@@ -21,12 +21,12 @@ import type {
   ClinicianSummary,
   Message,
   Question,
-  RedFlagHit,
   Session,
   SlotFact,
   SocratesSlot,
 } from '@/contracts/types';
 import { questionBank } from '@/server/questions/bank';
+import { checkRedFlags } from '@/server/redflags/check';
 import { mockConfirmedSummary, mockSessions } from './fixtures';
 
 const questions = questionBank;
@@ -94,67 +94,6 @@ function lastQuestion(session: Session): Question | undefined {
     .reverse()
     .find((message) => message.role === 'assistant' && message.questionId);
   return last?.questionId ? questionById.get(last.questionId) : undefined;
-}
-
-function safetyHit(
-  answer: Message,
-  asked: Question | undefined,
-): RedFlagHit | undefined {
-  if (
-    asked?.mandatory &&
-    (answer.choiceId === 'yes' ||
-      answer.choiceId === 'not_sure' ||
-      (asked.id === 'RF_FEVER_TRAUMA' &&
-        answer.choiceId !== undefined &&
-        answer.choiceId !== 'none' &&
-        answer.choiceId !== 'something_else') ||
-      /^(yes|not sure|نعم|لست متأكداً)\.?$/i.test(answer.text.trim()))
-  ) {
-    return {
-      ruleId: `MOCK_${asked.id}`,
-      label: `Flagged answer to ${asked.id}`,
-      sourceMessageId: answer.id,
-    };
-  }
-  // Demo phrases only. B-04 supplies the complete deterministic rule set.
-  const phrases = [
-    {
-      ruleId: 'RF_CAUDA_SADDLE',
-      label: 'Possible saddle anaesthesia',
-      pattern:
-        /\b(?:numb|no feeling|can't feel|pins and needles)\b.{0,60}\b(?:groin|bottom|bum|buttock|inner thigh|saddle)\b/i,
-    },
-    {
-      ruleId: 'RF_CAUDA_BLADDER',
-      label: 'New bladder or bowel difficulty',
-      pattern:
-        /\b(?:can't pee|cannot urinate|wet myself|lost control of my bladder|trouble passing urine)\b/i,
-    },
-    {
-      ruleId: 'RF_BILATERAL',
-      label: 'Bilateral leg weakness',
-      pattern: /\bboth legs\b.{0,30}\b(?:weak|giving way|can't walk)\b/i,
-    },
-    {
-      ruleId: 'RF_CHEST',
-      label: 'Chest pain',
-      pattern: /\b(?:i have|having|new) chest pain\b/i,
-    },
-    {
-      ruleId: 'RF_BREATH',
-      label: 'Breathing difficulty',
-      pattern: /\b(?:can't breathe|short of breath|struggling to breathe)\b/i,
-    },
-  ];
-  const matched = phrases.find(({ pattern }) => pattern.test(answer.text));
-  if (matched) {
-    return {
-      ruleId: matched.ruleId,
-      label: matched.label,
-      sourceMessageId: answer.id,
-    };
-  }
-  return undefined;
 }
 
 function addFact(
@@ -298,7 +237,7 @@ export function createMockApi({
       if (!answer.text) throw new Error('A message or choice is required');
       session.messages.push(answer);
 
-      const hit = safetyHit(answer, asked);
+      const hit = checkRedFlags(answer, asked)[0];
       let turn: AssistantTurn;
       if (hit) {
         session.redFlags.push(hit);
