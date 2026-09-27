@@ -5,9 +5,6 @@ import { BottomNav } from './BottomNav';
 
 type PageShellProps = {
   children: ReactNode;
-  /** Greeting + headline rendered over the hero, as in the reference. */
-  greeting?: string;
-  title?: string;
   /** Patient check-in: 18px type, phone-width column. Clinic: full width. */
   variant?: 'patient' | 'clinic';
   /** Patient pages carry the masthead and tab bar; the clinic does not. */
@@ -16,8 +13,6 @@ type PageShellProps = {
 
 export function PageShell({
   children,
-  greeting,
-  title,
   variant = 'patient',
   chrome = true,
 }: PageShellProps) {
@@ -38,7 +33,7 @@ export function PageShell({
           patient ? 'max-w-md' : 'max-w-6xl',
         )}
       >
-        {withChrome && <AppHeader greeting={greeting} title={title} />}
+        {withChrome && <AppHeader />}
         <div className={cn('flex flex-1 flex-col', withChrome && 'pt-2 pb-6')}>
           {children}
         </div>

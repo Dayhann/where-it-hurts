@@ -1,14 +1,10 @@
 'use client';
 
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { patientCopy } from '@/components/i18n/patient';
 import { LoadingButton } from '@/components/interior/loading-button';
-import { StepCard } from '@/components/layout/StepCard';
-import { buttonVariants } from '@/components/ui/button';
 import { getApiClient } from '@/lib/api-client';
-import { cn } from '@/lib/utils';
 
 export function StartCheckin() {
   const router = useRouter();
@@ -37,12 +33,12 @@ export function StartCheckin() {
 
   return (
     <main className="stagger-in flex flex-1 flex-col py-2 [&>*+*]:mt-7">
-      <StepCard
-        step={1}
-        stepName={copy.home.stepName}
-        title={copy.home.stepTitle}
-        body={copy.home.description}
-      />
+      <section className="flex flex-col items-center text-center">
+        <h2 className="type-display text-strong">{copy.home.headline}</h2>
+        <p className="mt-3 max-w-[22rem] text-[18px] leading-[1.5] text-muted-foreground">
+          {copy.home.description}
+        </p>
+      </section>
 
       <label className="card-row cursor-pointer py-3 transition-colors hover:bg-muted/40">
         <input
@@ -60,42 +56,17 @@ export function StartCheckin() {
         </p>
       )}
 
-      {/* The patient action is the only filled button on the page. The two
-          demo entrances are visually demoted so the primary path is obvious
-          at a glance. */}
-      <nav className="flex flex-col gap-3" aria-label="Demo screens">
-        <LoadingButton
-          onAction={start}
-          pendingLabel={copy.home.starting}
-          successLabel={copy.home.opening}
-          errorLabel={copy.recap.retry}
-          className="button-raised! h-[46px]! w-full rounded-full! text-base! hover:brightness-110 [&>span>span]:text-primary-foreground!"
-        >
-          {copy.home.start}
-        </LoadingButton>
-        <div className="mt-2 grid grid-cols-2 gap-3">
-          <Link
-            href="/clinic"
-            className={cn(
-              buttonVariants({ variant: 'outline', size: 'touch' }),
-              'w-full',
-            )}
-          >
-            {copy.home.clinic}
-          </Link>
-          <Link
-            href="/reception"
-            className={cn(
-              buttonVariants({ variant: 'outline', size: 'touch' }),
-              'w-full',
-            )}
-          >
-            {copy.home.reception}
-          </Link>
-        </div>
-      </nav>
+      <LoadingButton
+        onAction={start}
+        pendingLabel={copy.home.starting}
+        successLabel={copy.home.opening}
+        errorLabel={copy.recap.retry}
+        className="button-raised! h-[46px]! w-full rounded-full! text-base! hover:brightness-110 [&>span>span]:text-primary-foreground!"
+      >
+        {copy.home.start}
+      </LoadingButton>
 
-      <footer className="type-body border-t border-track pt-6 text-muted-foreground [&>p+p]:mt-2">
+      <footer className="type-body border-t border-track pt-6 text-muted-foreground">
         <p>
           {copy.home.prototype}{' '}
           <a
@@ -104,18 +75,6 @@ export function StartCheckin() {
           >
             {copy.home.emergency}
           </a>
-        </p>
-        <p>
-          {copy.home.credit}{' '}
-          <a
-            className="underline underline-offset-4"
-            href="https://rareui.com"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Rare UI
-          </a>
-          .
         </p>
       </footer>
     </main>

@@ -1,10 +1,17 @@
 import type { Metadata } from 'next';
-import { Geist_Mono, Inter_Tight } from 'next/font/google';
+import { Geist_Mono, Inter_Tight, Petrona } from 'next/font/google';
 import './globals.css';
 
 const interTight = Inter_Tight({
   variable: '--font-inter-tight',
   subsets: ['latin'],
+});
+
+const petrona = Petrona({
+  variable: '--font-petrona',
+  subsets: ['latin'],
+  weight: ['400'],
+  style: ['normal', 'italic'],
 });
 
 const geistMono = Geist_Mono({
@@ -24,7 +31,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${interTight.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${interTight.variable} ${petrona.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

@@ -7,8 +7,7 @@ const COPY = {
       greeting: 'Good to see you,',
       title: "Let's get started.",
       wordmark: 'Where It Hurts',
-      stepName: 'Mark the body',
-      stepTitle: 'Tap where it hurts',
+      headline: 'Where it Hurts?',
       description:
         'Show where the pain is, answer a few questions, and send a short recap to the clinician before the call.',
       language: 'Language',
@@ -143,8 +142,7 @@ const COPY = {
       greeting: 'سعداء برؤيتك،',
       title: 'لنبدأ.',
       wordmark: 'أين يؤلمك؟',
-      stepName: 'حدّد مكان الألم',
-      stepTitle: 'اضغط على مكان الألم',
+      headline: 'أين يؤلمك؟',
       description:
         'حدّد مكان الألم، وأجب عن بعض الأسئلة، وأرسل ملخصاً قصيراً إلى الطبيب قبل المكالمة.',
       language: 'اللغة',

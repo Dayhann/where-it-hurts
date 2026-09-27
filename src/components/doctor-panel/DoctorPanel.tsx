@@ -219,9 +219,14 @@ export function DoctorPanel({
           {summary &&
             session &&
             (summary.redFlags.length > 0 ? (
-              <section className="pinned surface-inset bg-card py-4 ps-5 pe-4 text-destructive [--pin:var(--destructive)]">
-                <h3 className="type-section">Red flag reported</h3>
-                <ul className="mt-1 list-disc pl-5">
+              <section
+                role="alert"
+                className="button-raised-alert rounded-[var(--radius-inset)] px-5 py-4"
+              >
+                <h3 className="type-section text-destructive">
+                  Red flag reported
+                </h3>
+                <ul className="mt-2 flex flex-col gap-1.5 text-[18px] leading-[1.4] text-destructive">
                   {summary.redFlags.map((hit) => (
                     <li key={`${hit.ruleId}-${hit.sourceMessageId}`}>
                       {hit.label}

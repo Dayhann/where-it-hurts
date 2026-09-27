@@ -10,6 +10,7 @@
   --font-sans: var(--font-inter-tight);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
+  --font-display: var(--font-petrona);
   --color-text: var(--text);
   --color-strong: var(--strong);
   --color-track: var(--track);
@@ -284,77 +285,6 @@
       var(--elevation-1);
   }
 
-  /* Misted landscape band behind the app header. Stands in for the
-     photograph in the reference — swap in a real image when there is one. */
-  .hero-mist {
-    background:
-      radial-gradient(
-        120% 90% at 18% 118%,
-        oklch(0.345 0.035 148 / 0.5) 0%,
-        transparent 58%
-      ),
-      radial-gradient(
-        95% 80% at 74% 122%,
-        oklch(0.4 0.03 155 / 0.42) 0%,
-        transparent 55%
-      ),
-      radial-gradient(
-        130% 110% at 45% 135%,
-        oklch(0.28 0.03 145 / 0.55) 0%,
-        transparent 62%
-      ),
-      linear-gradient(
-        to bottom,
-        oklch(0.86 0.014 140) 0%,
-        oklch(0.9 0.012 120) 45%,
-        var(--background) 100%
-      );
-  }
-
-  /* Parallax drift: nearer ridges travel further and faster, so the band
-     reads as depth. Plain ease-in-out rather than --ease-in-out: the strong
-     curve parks each layer at its ends for most of a long cycle, which reads
-     as frozen. Distances are SVG user units; the paths overhang by 40 so no
-     edge is ever exposed. */
-  .ridge-far {
-    animation: ridge-far 18s ease-in-out infinite alternate;
-  }
-
-  .ridge-mid {
-    animation: ridge-mid 13s ease-in-out infinite alternate;
-  }
-
-  .ridge-near {
-    animation: ridge-near 9s ease-in-out infinite alternate;
-  }
-
-  @keyframes ridge-far {
-    from {
-      transform: translateX(-10px);
-    }
-    to {
-      transform: translateX(10px);
-    }
-  }
-
-  @keyframes ridge-mid {
-    from {
-      transform: translateX(18px);
-    }
-    to {
-      transform: translateX(-18px);
-    }
-  }
-
-  @keyframes ridge-near {
-    from {
-      transform: translateX(-28px);
-    }
-    to {
-      transform: translateX(28px);
-    }
-  }
-
   /* Rules ---------------------------------------------------------------- */
 
   .rule-top {
@@ -510,6 +440,17 @@
 
 /* Type scale ------------------------------------------------------------- */
 
+/* Marketing display, Heidi-style: Petrona italic, optical size of a first
+   landing line. Not for UI chrome. */
+@utility type-display {
+  font-family: var(--font-display);
+  font-size: 40px;
+  line-height: 1.08;
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: -0.4px;
+}
+
 @utility type-title {
   font-family: var(--font-sans);
   font-size: 22px;
@@ -599,11 +540,5 @@
     opacity: 0;
     transform: none;
     transition: opacity 200ms ease;
-  }
-
-  .ridge-far,
-  .ridge-mid,
-  .ridge-near {
-    animation: none;
   }
 }
