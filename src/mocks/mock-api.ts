@@ -27,6 +27,7 @@ import type {
 } from '@/contracts/types';
 import { questionBank } from '@/server/questions/bank';
 import { checkRedFlags } from '@/server/redflags/check';
+import { verifyLine } from '@/server/summary/validate';
 import { mockConfirmedSummary, mockSessions } from './fixtures';
 
 const questions = questionBank;
@@ -121,23 +122,32 @@ function addFact(
 }
 
 function summaryFor(session: Session): ClinicianSummary {
-  if (session.id === mockConfirmedSummary.sessionId)
-    return mockConfirmedSummary;
+  if (session.id === mockConfirmedSummary.sessionId) {
+    const lines = mockConfirmedSummary.lines.map((line) =>
+      verifyLine(line, session.messages),
+    );
+    return {
+      ...mockConfirmedSummary,
+      lines,
+      headline: lines
+        .filter((line) => line.verified)
+        .slice(0, 3)
+        .map((line) => line.text),
+    };
+  }
 
-  const lines = session.facts.map((fact) => ({
-    text: `Patient reported: ${fact.value}`,
-    slot: fact.slot,
-    sourceMessageIds: fact.sourceMessageIds,
-    quotes: [fact.quote],
-    verified: fact.sourceMessageIds.some((id) =>
-      session.messages.some(
-        (message) =>
-          message.id === id &&
-          message.role === 'patient' &&
-          message.text.includes(fact.quote),
-      ),
+  const lines = session.facts.map((fact) =>
+    verifyLine(
+      {
+        text: `Patient reported: ${fact.value}`,
+        slot: fact.slot,
+        sourceMessageIds: fact.sourceMessageIds,
+        quotes: [fact.quote],
+        verified: false,
+      },
+      session.messages,
     ),
-  }));
+  );
   return {
     sessionId: session.id,
     redFlags: session.redFlags,
