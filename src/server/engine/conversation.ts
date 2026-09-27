@@ -63,11 +63,14 @@ function regionGroups(session: Session): Set<string> {
   );
 }
 
-function applies(question: Question, groups: Set<string>): boolean {
-  // Unknown location receives every mandatory safety question.
+function applies(
+  question: Question,
+  groups: Set<string>,
+  unknownMatches: boolean,
+): boolean {
   return (
     !question.appliesTo ||
-    groups.size === 0 ||
+    (unknownMatches && groups.size === 0) ||
     question.appliesTo.some((group) => groups.has(group))
   );
 }
@@ -77,7 +80,7 @@ function mandatoryRemaining(session: Session): Question[] {
   return questionBank.filter(
     (question) =>
       question.mandatory &&
-      applies(question, groups) &&
+      applies(question, groups, true) &&
       !session.askedQuestionIds.includes(question.id),
   );
 }
@@ -222,14 +225,14 @@ export async function handlePatientMessage(
   }
 
   const remaining = mandatoryRemaining(next);
-  const filled = new Set(
+  const covered = new Set(
     next.facts
-      .filter((fact) => fact.status === 'answered')
+      .filter((fact) => fact.status !== 'unsure')
       .map((fact) => fact.slot),
   );
   if (
     !remaining.length &&
-    (REQUIRED.every((slot) => filled.has(slot)) ||
+    (REQUIRED.every((slot) => covered.has(slot)) ||
       next.askedQuestionIds.length >= MAX_QUESTIONS)
   ) {
     next.status = 'awaiting_confirm';
@@ -249,9 +252,9 @@ export async function handlePatientMessage(
   const candidates = questionBank.filter(
     (candidate) =>
       !candidate.mandatory &&
-      applies(candidate, groups) &&
+      applies(candidate, groups, false) &&
       !next.askedQuestionIds.includes(candidate.id) &&
-      !filled.has(candidate.slot as SocratesSlot),
+      !covered.has(candidate.slot as SocratesSlot),
   );
   let selected: Question | undefined;
   if (candidates.length && deps.select) {
